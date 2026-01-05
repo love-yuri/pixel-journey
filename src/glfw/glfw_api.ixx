@@ -8,7 +8,9 @@ import yuri_log;
 
 export namespace glfw {
 
-using GLFWwindow = GLFWwindow;
+using ::GLFWwindow;
+using ::glfwCreateWindowSurface;
+using ::glfwGetFramebufferSize;
 
 class application final {
 public:
@@ -16,6 +18,8 @@ public:
     if (glfwInit() == GLFW_FALSE) {
       throw std::runtime_error("glfw: 初始化失败!");
     }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   }
 
   ~application() {
