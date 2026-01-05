@@ -18,6 +18,7 @@
 import yuri_log;
 import std;
 import vulkan;
+import glfw;
 import glfw_api;
 
 constexpr auto VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
@@ -33,8 +34,6 @@ VkQueue graphicsQueue = nullptr;
 VkApplicationInfo application_info;
 std::vector<const char *> instance_extensions;
 VkSwapchainKHR swapchain = nullptr;
-const char *layers[] = { VK_LAYER_KHRONOS_validation };
-
 
 void check_res(const VkResult res, const std::string_view msg) {
   if (res != VK_SUCCESS) {
@@ -44,38 +43,6 @@ void check_res(const VkResult res, const std::string_view msg) {
   }
 
   yuri::info("{} 成功!", msg);
-}
-
-void check_vk_format() {
-  bool has_find = false;
-  uint32_t formatCount = 0;
-  vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &formatCount, nullptr);
-
-  std::vector<VkSurfaceFormatKHR> formats(formatCount);
-  vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &formatCount,formats.data());
-
-  for (auto &[format, colorSpace] : formats) {
-    if (format == targe_format && colorSpace == target_color_space) {
-      has_find = true;
-      yuri::info("Format: {} ColorSpace: {}",
-         magic_enum::enum_name(format),
-         magic_enum::enum_name(colorSpace)
-      );
-    }
-  }
-
-  if (!has_find) {
-    throw std::runtime_error("没有找到目标format 和 colorSpace");
-  }
-
-  uint32_t presentModeCount = 0;
-  vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &presentModeCount, nullptr);
-  std::vector<VkPresentModeKHR> presentModes(presentModeCount);
-  vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &presentModeCount, presentModes.data());
-
-  for (const auto mode : presentModes) {
-    yuri::info("Present mode: {}", magic_enum::enum_name(mode));
-  }
 }
 
 void create_vk_swapchain() {
@@ -122,22 +89,20 @@ void create_vk_swapchain() {
 }
 
 void create_vk_instance() {
-  vulkan_instance vulkan_instance;
+
+  glfw::glfw_window gw = {
+    200, 200, "yuri"
+  };
 
   // 创建window和suffice
-  window = glfwCreateWindow(200, 200, "yuri", nullptr, nullptr);
-  auto res = glfwCreateWindowSurface(vulkan_instance, window,nullptr, &surface);
-  check_res(res, "CreateWindowSurface");
+  window = gw.m_window;
+  surface = gw.m_surface;
 
-  physical_device = vulkan_instance.physical_device;
-  vk_device = vulkan_instance.logic_device;
+  physical_device = global_vulkan_instance->physical_device;
+  vk_device = global_vulkan_instance->logic_device;
 
   // 创建graphic_queue
-  vkGetDeviceQueue(vk_device, 0, 0, &graphicsQueue);
-  yuri::info("Graphics queue 获取成功!");
-
-  // 检查目标surface支持格式
-  check_vk_format();
+  graphicsQueue = global_vulkan_instance->queue;
 
   // 创建swapchain
   create_vk_swapchain();
@@ -301,7 +266,7 @@ void create_vk_instance() {
 }
 
 int main() {
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
 
   create_vk_instance();
 }
