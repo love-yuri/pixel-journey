@@ -12,13 +12,23 @@ message(STATUS "GLFW version: ${glfw3_VERSION}")
 # ----------------------------------------------------------------------------
 # skia
 # ----------------------------------------------------------------------------
-set(SKIA_ROOT /home/yuri/github/skia)
-set(SKIA_OUT  ${SKIA_ROOT}/out/Shared)
-add_library(skia STATIC IMPORTED GLOBAL)
-set_target_properties(skia PROPERTIES
-    IMPORTED_LOCATION             ${SKIA_OUT}/libskia.a
-    INTERFACE_INCLUDE_DIRECTORIES ${SKIA_ROOT}
-)
+set(SKIA_OUT "${SKIA_ROOT}/out/Shared")
+if(WIN32)
+    set(SKIA_ROOT "D:/skia")
+    add_library(skia SHARED IMPORTED GLOBAL)
+    set_target_properties(skia PROPERTIES
+        IMPORTED_LOCATION             "${SKIA_OUT}/skia.dll"       # Windows 动态库
+        IMPORTED_IMPLIB               "${SKIA_OUT}/skia.dll.lib"   # Windows 导入库
+        INTERFACE_INCLUDE_DIRECTORIES "${SKIA_ROOT}"               # 头文件路径
+    )
+elseif(UNIX)
+    set(SKIA_ROOT "/home/user/skia")
+    add_library(skia STATIC IMPORTED GLOBAL)
+    set_target_properties(skia PROPERTIES
+        IMPORTED_LOCATION             "${SKIA_OUT}/libskia.a"      # Linux 静态库
+        INTERFACE_INCLUDE_DIRECTORIES "${SKIA_ROOT}"               # 头文件路径
+    )
+endif()
 list(APPEND THIRD_PARTY_LIBS skia)
 
 # ----------------------------------------------------------------------------
