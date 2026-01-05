@@ -86,7 +86,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 template <bool ThrowOnError = true>
 bool check_vk_result(const Result result, std::string_view msg = {}) {
   if (result != Result::eSuccess) {
-    const auto error_msg = std::format("{} 失败! 错误码: {}", msg, static_cast<int>(result));
+    const auto error_msg = std::format("{} 失败! 错误码: {}", msg, to_string(result));
     if constexpr (ThrowOnError) {
       throw std::runtime_error(error_msg);
     } else {

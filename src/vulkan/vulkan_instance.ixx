@@ -61,7 +61,7 @@ public:
   vulkan_instance() {
     if (const auto res = createInstance(&info, nullptr, this); res != Result::eSuccess) {
       throw std::runtime_error(std::format(
-        "创建vulkan_instance 失败: {}", enum_utils::name(res))
+        "创建vulkan_instance 失败, 错误码: {}", to_string(res))
       );
     }
 
