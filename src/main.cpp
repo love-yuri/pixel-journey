@@ -304,6 +304,4 @@ int main() {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
   create_vk_instance();
-
-  yuri::info("Wayland session: {}", std::getenv("WAYLAND_DISPLAY"));
 }
