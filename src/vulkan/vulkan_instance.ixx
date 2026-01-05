@@ -111,6 +111,8 @@ public:
   const instance_create_info info; // 创建instance 信息
   PhysicalDevice physical_device;  // 物理设备
   Device logic_device;             // 逻辑设备
+  Queue queue;                     // 队列
+  SurfaceKHR surface_khr;          // surface
 
 // todo: 未完全替换c api前暂时public
 public:
@@ -124,6 +126,7 @@ public:
     auto [physical_device, index] = pick_physical_device_and_graphics_queue(*this);
     this->physical_device = physical_device;
     this->logic_device = create_logical_device(physical_device, index);
+    this->queue = logic_device.getQueue(index, index);
 
     const DebugUtilsMessengerCreateInfoEXT createInfo {
       {},
@@ -137,3 +140,7 @@ public:
     check_vk_result(res.result, "Debug 附加消息");
   }
 };
+
+// 导出全局
+auto global_vulkan_instance_ = std::make_shared<vulkan_instance>();
+export auto global_vulkan_instance = global_vulkan_instance_.get();

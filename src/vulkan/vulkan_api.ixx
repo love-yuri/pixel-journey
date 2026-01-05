@@ -18,13 +18,14 @@ using vk::makeVersion;
 
 /* 通用基础 */
 using vk::to_string;
+using vk::Extent2D;
 
 /* types */
 using vk::Instance;
-using ::VkInstance_T;
 using vk::InstanceCreateInfo;
 using vk::ApplicationInfo;
 using vk::StructureType;
+using vk::SharingMode;
 
 /* debug messenger */
 using vk::DebugUtilsMessengerCreateInfoEXT;
@@ -46,6 +47,22 @@ using vk::PhysicalDevice;
 using vk::Device;
 using vk::PhysicalDeviceProperties;
 using vk::PhysicalDeviceFeatures;
+using vk::Queue;
+
+/* Surface */
+using vk::SurfaceKHR;
+using ::VkSurfaceKHR;
+using vk::Format;
+using vk::ScopeKHR;
+using vk::ColorSpaceKHR;
+
+/* swap chain */
+using vk::SwapchainCreateInfoKHR;
+using vk::SwapchainKHR;
+using vk::ImageUsageFlagBits;
+using vk::PresentModeKHR;
+using vk::CompositeAlphaFlagBitsKHR;
+using vk::SurfaceTransformFlagBitsKHR;
 
 /* constexpr */
 constexpr auto vulkan_api_version = VK_API_VERSION_1_4;  // 使用的vulkan版本
@@ -159,5 +176,17 @@ Device create_logical_device(const PhysicalDevice& physical_device, const std::u
   return res.value;
 }
 
+/**
+ * 检查是否支持所需format
+ * @param format_khrs format合集
+ * @param format 目标 format
+ * @param space_khr 目标 space khr
+ * @return 是否支持
+ */
+bool check_surface_format_support(const std::vector<SurfaceFormatKHR>& format_khrs, Format format, ColorSpaceKHR space_khr) {
+  return std::ranges::any_of(format_khrs, [format, space_khr](const SurfaceFormatKHR& format_khr) {
+    return format_khr.format == format && format_khr.colorSpace == space_khr;
+  });
+}
 
 }
