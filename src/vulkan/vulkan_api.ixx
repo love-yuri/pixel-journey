@@ -26,6 +26,7 @@ using vk::makeVersion;
 /* 通用基础 */
 using vk::to_string;
 using vk::Extent2D;
+using detail::resultCheck;
 
 /* types */
 using vk::Instance;
@@ -63,6 +64,7 @@ using ::VkSurfaceKHR;
 using vk::Format;
 using vk::ScopeKHR;
 using vk::ColorSpaceKHR;
+using vk::SurfaceCapabilitiesKHR;
 
 /* swap chain */
 using vk::SwapchainCreateInfoKHR;
@@ -121,6 +123,16 @@ bool check_vk_result(const Result result, std::string_view msg = {}) {
   }
 
   return true;
+}
+
+template <typename T>
+T check_vk_result(ResultValue<T> res, const std::string_view msg) {
+  if (res.result != Result::eSuccess) {
+    const auto error_msg = std::format("{} 失败! 错误码: {}", msg, to_string(res.result));
+    throw std::runtime_error(error_msg);
+  }
+
+  return res.value;
 }
 
 /**
