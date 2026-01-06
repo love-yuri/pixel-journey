@@ -8,6 +8,13 @@ import yuri_log;
 import glfw_api;
 import common_config;
 
+/**
+ * detail
+ */
+export namespace vk::detail {
+  using detail::getDispatchLoaderStatic;
+}
+
 export namespace vk {
 
 /* 通用 版本控制 */
