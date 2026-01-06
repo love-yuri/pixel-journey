@@ -1,9 +1,9 @@
-export module vulkan.swapchain;
+export module vulkan.detail:swapchain_create_info;
 
 import vulkan.api;
 import std;
 
-using namespace vk;
+export namespace vk::detail {
 
 /**
  * @brief Swapchain 创建信息封装
@@ -22,7 +22,7 @@ using namespace vk;
  * - 不同 usage / alpha / clipping 行为
  * 可在此结构基础上继续扩展
  */
-struct vulkan_swapchain_create_info : SwapchainCreateInfoKHR {
+struct swapchain_create_info : SwapchainCreateInfoKHR {
 
   /**
    * @brief 构造 SwapchainCreateInfoKHR
@@ -57,7 +57,7 @@ struct vulkan_swapchain_create_info : SwapchainCreateInfoKHR {
    * - 通常直接使用 surface capabilities 的 currentTransform
    * - 用于处理旋转、翻转等窗口变换
    */
-  explicit vulkan_swapchain_create_info(
+  explicit swapchain_create_info(
     const SurfaceKHR surface_khr,
     const std::uint32_t image_count,
     const Format format,
@@ -108,3 +108,5 @@ struct vulkan_swapchain_create_info : SwapchainCreateInfoKHR {
     clipped = true;
   }
 };
+
+}

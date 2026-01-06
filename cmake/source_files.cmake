@@ -4,6 +4,7 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/glfw/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/detail/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
 )
 

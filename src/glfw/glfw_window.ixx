@@ -2,7 +2,6 @@ export module glfw.window;
 
 import glfw.api;
 import vulkan.api;
-import vulkan.instance;
 import vulkan.context;
 import yuri_log;
 import common_config;
@@ -74,7 +73,7 @@ glfw_window::~glfw_window() {
 
 vk::VkSurfaceKHR glfw_window::create_surface() const {
   vk::VkSurfaceKHR surface{};
-  glfwCreateWindowSurface(*global_vulkan_instance, m_window, nullptr, &surface);
+  glfwCreateWindowSurface(vulkan_context->instance, m_window, nullptr, &surface);
   return surface;
 }
 
@@ -93,14 +92,14 @@ std::tuple<std::uint32_t, std::uint32_t> glfw_window::get_buffer_size() const {
 }
 
 void glfw_window::show_debug_info() const {
-  const auto physical_device = global_vulkan_instance->physical_device;
+  const auto physical_device = vulkan_context->physical_device;
   auto caps = physical_device.getSurfaceCapabilitiesKHR(m_surface).value;
   yuri::info("Surface capabilities:");
   yuri::info("  minImageCount: {}", caps.minImageCount);
   yuri::info("  maxImageCount: {}", caps.maxImageCount);
   yuri::info("  currentExtent: {} x {}", caps.currentExtent.width, caps.currentExtent.height);
 
-  const auto formats = global_vulkan_instance->physical_device.getSurfaceFormatsKHR(m_surface);
+  const auto formats = vulkan_context->physical_device.getSurfaceFormatsKHR(m_surface);
   auto res = vk::check_surface_format_support(formats.value, default_surface_format, default_surface_color_space);
   yuri::info("format: {}, space_khr: {} 支持情况 -> {}", vk::to_string(default_surface_format), vk::to_string(default_surface_color_space), res);
 }

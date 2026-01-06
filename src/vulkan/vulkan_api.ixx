@@ -41,6 +41,7 @@ using vk::DebugUtilsMessageSeverityFlagBitsEXT;
 using vk::DebugUtilsMessageTypeFlagBitsEXT;
 using vk::DebugUtilsMessageSeverityFlagsEXT;
 using vk::PFN_DebugUtilsMessengerCallbackEXT;
+using vk::DebugUtilsMessengerEXT;
 
 using ::vkGetInstanceProcAddr;
 using detail::DispatchLoaderDynamic;

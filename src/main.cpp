@@ -98,11 +98,11 @@ void create_vk_instance() {
   window = gw.m_window;
   surface = gw.m_surface;
 
-  physical_device = global_vulkan_instance->physical_device;
-  vk_device = global_vulkan_instance->logic_device;
+  physical_device = vulkan_context->physical_device;
+  vk_device = vulkan_context->logic_device;
 
   // 创建graphic_queue
-  graphicsQueue = global_vulkan_instance->queue;
+  graphicsQueue = vulkan_context->queue;
 
   // 创建swapchain
   create_vk_swapchain();
