@@ -35,59 +35,6 @@ VkApplicationInfo application_info;
 std::vector<const char *> instance_extensions;
 VkSwapchainKHR swapchain = nullptr;
 
-void check_res(const VkResult res, const std::string_view msg) {
-  if (res != VK_SUCCESS) {
-    throw std::runtime_error(std::format(
-      "{} failed: {}", msg, magic_enum::enum_name(res))
-    );
-  }
-
-  yuri::info("{} 成功!", msg);
-}
-
-void create_vk_swapchain() {
-  // 创建khr
-  VkSurfaceCapabilitiesKHR caps{};
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &caps);
-
-  yuri::info("Surface capabilities:");
-  yuri::info("  minImageCount: {}", caps.minImageCount);
-  yuri::info("  maxImageCount: {}", caps.maxImageCount);
-  yuri::info("  currentExtent: {} x {}", caps.currentExtent.width, caps.currentExtent.height);
-
-  uint32_t imageCount = caps.minImageCount + 1;
-  if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount) {
-    imageCount = caps.maxImageCount;
-  }
-
-  int width, height;
-  glfwGetFramebufferSize(window, &width, &height);
-
-  const VkSwapchainCreateInfoKHR swapchainInfo {
-    .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-    .surface = surface,
-    .minImageCount = imageCount,
-    .imageFormat = targe_format,
-    .imageColorSpace = target_color_space,
-    .imageExtent = {
-      .width = static_cast<uint32_t>(width),
-      .height = static_cast<uint32_t>(height),
-    },
-    .imageArrayLayers = 1,
-    .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-    .imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
-    .preTransform = caps.currentTransform,
-    .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-    .presentMode = VK_PRESENT_MODE_FIFO_KHR,
-    .clipped = VK_TRUE,
-  };
-
-  vkCreateSwapchainKHR(vk_device, &swapchainInfo, nullptr, &swapchain);
-  if (swapchain == nullptr) {
-    throw std::runtime_error("swapchain 创建失败!");
-  }
-}
-
 void create_vk_instance() {
 
   glfw::glfw_window gw = {
@@ -96,7 +43,7 @@ void create_vk_instance() {
 
   // 创建window和suffice
   window = gw.m_window;
-  surface = gw.m_surface;
+  surface = gw.context.surface;
 
   physical_device = vulkan_context->physical_device;
   vk_device = vulkan_context->logic_device;
@@ -105,7 +52,7 @@ void create_vk_instance() {
   graphicsQueue = vulkan_context->queue;
 
   // 创建swapchain
-  create_vk_swapchain();
+  swapchain = gw.context.swapchain;
 
   // 获取交换链图像数量
   uint32_t swapchainImageCount = 0;
@@ -266,7 +213,5 @@ void create_vk_instance() {
 }
 
 int main() {
-
-
   create_vk_instance();
 }
