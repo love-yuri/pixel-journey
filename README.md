@@ -3,7 +3,7 @@
 一个从零开始的图形之旅。  
 记录我对 Vulkan、渲染管线以及底层图形系统的探索。
 
-> 因使用qwidget绘制复杂界面性能不好，qml又太狗屎所以打算自己重绘
+> 因使用qwidget绘制复杂界面性能不好，qml又不太喜欢所以打算自己重绘
 > 所以这个既是我学习vulkan和skia的仓库，也是我qq-music重构版本的开始
 > 使用vulkan + skia + c++23全新打造，别的不说反正很新
 
@@ -49,7 +49,7 @@ modern-cpp/
 ```bash
 
 # 克隆项目
-git clone https://github.com/love-yuri/modern-cpp.git
+git clone https://github.com/love-yuri/pixel-journey.git
 cd modern-cpp
 mkdir build
 cd build
