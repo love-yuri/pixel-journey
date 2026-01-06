@@ -34,7 +34,7 @@ struct instance_create_info : InstanceCreateInfo {
    * 用于向 Vulkan 驱动描述当前应用及引擎的基本信息，
    * 主要用于驱动内部统计和调试，对功能无直接影响。
    */
-  ApplicationInfo application_info{
+  ApplicationInfo application_info {
     default_application_name,     // 应用程序名称
     default_application_version,  // 应用程序版本
     default_engin_name,           // 引擎名称
@@ -69,7 +69,6 @@ struct instance_create_info : InstanceCreateInfo {
    * - Instance 创建所需的扩展与层信息
    */
   instance_create_info() {
-
     if constexpr (is_debug_mode) {
       /// 启用 validation layer 数量
       enabledLayerCount = 1;
@@ -94,8 +93,7 @@ struct instance_create_info : InstanceCreateInfo {
     ppEnabledLayerNames = layers;
 
     /// 启用的 Instance 扩展数量
-    enabledExtensionCount =
-      static_cast<std::uint32_t>(extensions.size());
+    enabledExtensionCount = static_cast<std::uint32_t>(extensions.size());
 
     /// 启用的 Instance 扩展名称列表
     ppEnabledExtensionNames = extensions.data();
@@ -141,6 +139,9 @@ public:
   }
 };
 
-// 导出全局
+// 初始化application
+auto application = std::make_unique<glfw::application>();
+
+// 初始化vulkan_instance
 auto global_vulkan_instance_ = std::make_shared<vulkan_instance>();
 export auto global_vulkan_instance = global_vulkan_instance_.get();

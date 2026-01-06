@@ -57,5 +57,3 @@ void destroy_window(GLFWwindow* window) {
 }
 
 }
-
-auto application = std::make_unique<glfw::application>();
