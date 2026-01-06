@@ -2,6 +2,7 @@ export module vulkan.instance;
 
 import yuri_log;
 import vulkan.api;
+import vulkan.context;
 import glfw.api;
 import common_config;
 import vulkan_config;
@@ -110,7 +111,6 @@ public:
   PhysicalDevice physical_device;  // 物理设备
   Device logic_device;             // 逻辑设备
   Queue queue;                     // 队列
-  SurfaceKHR surface_khr;          // surface
 
 // todo: 未完全替换c api前暂时public
 public:
@@ -131,7 +131,8 @@ public:
       DebugUtilsMessageSeverityFlagBitsEXT::eVerbose | DebugUtilsMessageSeverityFlagBitsEXT::eWarning | DebugUtilsMessageSeverityFlagBitsEXT::eError,
       DebugUtilsMessageTypeFlagBitsEXT::eGeneral | DebugUtilsMessageTypeFlagBitsEXT::eValidation | DebugUtilsMessageTypeFlagBitsEXT::ePerformance,
       reinterpret_cast<PFN_DebugUtilsMessengerCallbackEXT>(debugCallback),
-      nullptr};
+      nullptr,
+    };
 
     const auto dispatcher = DispatchLoaderDynamic(*this, vkGetInstanceProcAddr);
     const auto res = createDebugUtilsMessengerEXT(createInfo, nullptr, dispatcher);
@@ -145,3 +146,8 @@ auto application = std::make_unique<glfw::application>();
 // 初始化vulkan_instance
 auto global_vulkan_instance_ = std::make_shared<vulkan_instance>();
 export auto global_vulkan_instance = global_vulkan_instance_.get();
+
+auto t = [] {
+  vulkan_context.instance = global_vulkan_instance;
+  return 1;
+}();
