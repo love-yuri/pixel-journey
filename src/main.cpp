@@ -19,7 +19,7 @@ import yuri_log;
 import std;
 import vulkan;
 import glfw;
-import glfw_api;
+import glfw.api;
 
 constexpr auto VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
 constexpr auto targe_format = VK_FORMAT_B8G8R8A8_UNORM;

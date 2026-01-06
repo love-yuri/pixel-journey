@@ -2,10 +2,10 @@ module;
 #define VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_NO_SMART_HANDLE
 #include <vulkan/vulkan.hpp>
-export module vulkan_api;
+export module vulkan.api;
 
 import yuri_log;
-import glfw_api;
+import glfw.api;
 import common_config;
 
 /**

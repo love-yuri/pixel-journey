@@ -1,8 +1,8 @@
-export module vulkan:instance;
+export module vulkan.instance;
 
 import yuri_log;
-import vulkan_api;
-import glfw_api;
+import vulkan.api;
+import glfw.api;
 import common_config;
 import vulkan_config;
 import std;

@@ -1,7 +1,7 @@
 module;
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-export module glfw_api;
+export module glfw.api;
 
 import std;
 import yuri_log;

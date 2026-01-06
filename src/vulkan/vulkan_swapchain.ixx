@@ -1,6 +1,6 @@
-export module vulkan_swapchain;
+export module vulkan.swapchain;
 
-import vulkan_api;
+import vulkan.api;
 import std;
 
 using namespace vk;

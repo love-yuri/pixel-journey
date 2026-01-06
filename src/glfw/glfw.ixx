@@ -4,4 +4,5 @@
 
 export module glfw;
 
-export import :window;
+export import glfw.window;
+export import glfw.api;

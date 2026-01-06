@@ -1,5 +1,9 @@
+/**
+ * vulkan上下文模块
+ */
+export module vulkan.context;
 
-export module vulkan_context;
+import vulkan.api;
 
 // struct vulkan_context {
 //   vk::Instance instance;

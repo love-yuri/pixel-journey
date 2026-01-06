@@ -1,8 +1,9 @@
-export module glfw:window;
+export module glfw.window;
 
-import glfw_api;
-import vulkan;
-import vulkan_api;
+import glfw.api;
+import vulkan.api;
+import vulkan.instance;
+import vulkan.context;
 import yuri_log;
 import common_config;
 import std;
