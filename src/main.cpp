@@ -88,7 +88,7 @@ void create_vk_instance() {
   VkFence fence;
   vkCreateFence(vk_device, &fenceInfo, nullptr, &fence);
 
-  VkSemaphoreCreateInfo semInfo{
+  VkSemaphoreCreateInfo semInfo {
     .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
   };
 
@@ -181,7 +181,7 @@ void create_vk_instance() {
   VkPipelineStageFlags waitStage =
     VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-  VkSubmitInfo submitInfo{
+  VkSubmitInfo submitInfo {
     .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
     .waitSemaphoreCount = 1,
     .pWaitSemaphores = &imageAvailable,
@@ -207,6 +207,7 @@ void create_vk_instance() {
   vkQueuePresentKHR(graphicsQueue, &presentInfo);
   vkWaitForFences(vk_device, 1, &fence, VK_TRUE, UINT64_MAX);
 
+  glfwShowWindow(window);
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
   }
