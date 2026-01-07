@@ -11,6 +11,7 @@ export namespace glfw {
 using ::GLFWwindow;
 using ::glfwCreateWindowSurface;
 using ::glfwGetFramebufferSize;
+using ::glfwHideWindow;
 
 class application final {
 public:
@@ -19,6 +20,7 @@ public:
       throw std::runtime_error("glfw: 初始化失败!");
     }
 
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   }
 
