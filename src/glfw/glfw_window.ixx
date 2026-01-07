@@ -60,7 +60,7 @@ private:
   /**
    * 创建交换链
    */
-  vk::SwapchainKHR create_swapchain() const;
+  [[nodiscard]] vk::SwapchainKHR create_swapchain() const;
 
   /**
    * 初始化context
