@@ -74,6 +74,10 @@ using vk::PresentModeKHR;
 using vk::CompositeAlphaFlagBitsKHR;
 using vk::SurfaceTransformFlagBitsKHR;
 
+/* image view */
+using vk::Image;
+using vk::ImageView;
+
 /* constexpr */
 constexpr auto vulkan_api_version = VK_API_VERSION_1_4;  // 使用的vulkan版本
 constexpr auto vulkan_debug_extension_name = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
