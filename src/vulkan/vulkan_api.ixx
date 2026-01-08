@@ -17,25 +17,17 @@ export namespace vk::detail {
 
 export namespace vk {
 
-/* 通用 版本控制 */
 using vk::versionMajor;
 using vk::versionMinor;
 using vk::versionPatch;
 using vk::makeVersion;
-
-/* 通用基础 */
 using vk::to_string;
 using vk::Extent2D;
-using detail::resultCheck;
-
-/* types */
 using vk::Instance;
 using vk::InstanceCreateInfo;
 using vk::ApplicationInfo;
 using vk::StructureType;
 using vk::SharingMode;
-
-/* debug messenger */
 using vk::DebugUtilsMessengerCreateInfoEXT;
 using vk::DebugUtilsMessengerCreateFlagsEXT;
 using vk::DebugUtilsMessageSeverityFlagBitsEXT;
@@ -43,40 +35,56 @@ using vk::DebugUtilsMessageTypeFlagBitsEXT;
 using vk::DebugUtilsMessageSeverityFlagsEXT;
 using vk::PFN_DebugUtilsMessengerCallbackEXT;
 using vk::DebugUtilsMessengerEXT;
-
 using ::vkGetInstanceProcAddr;
 using detail::DispatchLoaderDynamic;
 using vk::operator|;
 using ::VkInstance;
 using vk::createInstance;
 using vk::Result;
-
-/* 设备API */
 using vk::PhysicalDevice;
 using vk::Device;
 using vk::PhysicalDeviceProperties;
 using vk::PhysicalDeviceFeatures;
 using vk::Queue;
-
-/* Surface */
 using vk::SurfaceKHR;
 using ::VkSurfaceKHR;
 using vk::Format;
 using vk::ScopeKHR;
 using vk::ColorSpaceKHR;
 using vk::SurfaceCapabilitiesKHR;
-
-/* swap chain */
 using vk::SwapchainCreateInfoKHR;
 using vk::SwapchainKHR;
 using vk::ImageUsageFlagBits;
 using vk::PresentModeKHR;
 using vk::CompositeAlphaFlagBitsKHR;
 using vk::SurfaceTransformFlagBitsKHR;
-
-/* image view */
 using vk::Image;
 using vk::ImageView;
+using vk::CommandBuffer;
+using vk::CommandPool;
+using vk::CommandPoolCreateInfo;
+using vk::CommandPoolCreateFlags;
+using vk::CommandPoolCreateFlagBits;
+using vk::CommandBufferAllocateInfo;
+using vk::CommandBufferLevel;
+using vk::FenceCreateInfo;
+using vk::Fence;
+using vk::FenceCreateFlagBits;
+using vk::Semaphore;
+using vk::SemaphoreCreateInfo;
+using vk::CommandBufferBeginInfo;
+using vk::ImageMemoryBarrier;
+using vk::AccessFlagBits;
+using vk::AccessFlags;
+using vk::ImageLayout;
+using vk::ImageSubresourceRange;
+using vk::ImageAspectFlagBits;
+using vk::PipelineStageFlagBits;
+using vk::DependencyFlags;
+using vk::ClearColorValue;
+using vk::PipelineStageFlags;
+using vk::SubmitInfo;
+using vk::PresentInfoKHR;
 
 /* constexpr */
 constexpr auto vulkan_api_version = VK_API_VERSION_1_4;  // 使用的vulkan版本
@@ -129,8 +137,13 @@ bool check_vk_result(const Result result, std::string_view msg = {}) {
   return true;
 }
 
+/**
+ * 检查vulkan操作信息是否正确，并可以设置是否抛出异常
+ * @param res 操作结果
+ * @param msg 操作信息
+ */
 template <typename T>
-T check_vk_result(ResultValue<T> res, const std::string_view msg) {
+T check_vk_result(const ResultValue<T>& res, const std::string_view msg) {
   if (res.result != Result::eSuccess) {
     const auto error_msg = std::format("{} 失败! 错误码: {}", msg, to_string(res.result));
     throw std::runtime_error(error_msg);
