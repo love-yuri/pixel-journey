@@ -5,6 +5,7 @@ export module vulkan.context;
 
 import vulkan.api;
 import vulkan.detail;
+import yuri_log;
 import configuration;
 import glfw.api;
 import std;
@@ -27,6 +28,7 @@ public:
   CommandPool command_pool;                // command pool
 
   vulkan_context();
+  ~vulkan_context();
 
   /**
    * 分配command_buffer
@@ -91,6 +93,13 @@ vulkan_context::vulkan_context() :instance(nullptr) {
     }),
     "创建 Command Pool"
   );
+}
+
+vulkan_context::~vulkan_context() {
+  logic_device.destroyCommandPool(command_pool);
+  logic_device.destroy();
+  instance.destroyDebugUtilsMessengerEXT(debug_messenger_, nullptr);
+  instance.destroy();
 }
 
 std::vector<CommandBuffer> vulkan_context::allocate_command_buffer() const {

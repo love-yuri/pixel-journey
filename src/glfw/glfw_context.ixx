@@ -45,11 +45,34 @@ public:
   std::vector<std::vector<vk::CommandBuffer>> command_buffers; // buffers
 
   /**
+   * 析构函数，释放资源
+   */
+  ~glfw_context();
+
+  /**
    * 获取下一个渲染帧数据
    * @return 下一帧数据
    */
   render_frame acquire_next_frame();
 };
+
+glfw_context::~glfw_context() {
+  auto _ = vulkan_context->logic_device.waitIdle();
+  for (const auto &k : image_available_semaphores) {
+    vulkan_context->logic_device.destroySemaphore(k);
+  }
+
+  for (const auto &k : render_finished_semaphores) {
+    vulkan_context->logic_device.destroySemaphore(k);
+  }
+
+  for (const auto &k : fences) {
+    vulkan_context->logic_device.destroyFence(k);
+  }
+
+  vulkan_context->logic_device.destroySwapchainKHR(swapchain);
+  vulkan_context->instance.destroySurfaceKHR(surface);
+}
 
 render_frame glfw_context::acquire_next_frame() {
   // 获取下一帧
