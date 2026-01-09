@@ -20,12 +20,13 @@ class vulkan_context final {
   DebugUtilsMessengerEXT debug_messenger_; // debug_messenger
 
 public:
-  Instance instance;                       // vulkan实例
-  PhysicalDevice physical_device;          // 物理 gpu设备
-  Device logic_device;                     // 逻辑 gpu设备
-  Queue queue;                             // gpu渲染队列
-  std::uint32_t queue_family_index = 0;    // 选择的index
-  CommandPool command_pool;                // command pool
+  Instance instance;                               // vulkan实例
+  PhysicalDevice physical_device;                  // 物理 gpu设备
+  Device logic_device;                             // 逻辑 gpu设备
+  Queue queue;                                     // gpu渲染队列
+  std::uint32_t queue_family_index = 0;            // 选择的index
+  CommandPool command_pool;                        // command pool
+  DispatchLoaderDynamic instance_dynamic_dispatch; // instance 动态加载器
 
   vulkan_context();
   ~vulkan_context();
@@ -80,7 +81,6 @@ vulkan_context::vulkan_context() :instance(nullptr) {
 
   // 创建逻辑设备
   this->logic_device = create_logical_device(physical_device, index);
-  vulkan_dynamic_loader.init(this->logic_device);
 
   // 创建queue
   this->queue = this->logic_device.getQueue(index, index);
@@ -98,7 +98,9 @@ vulkan_context::vulkan_context() :instance(nullptr) {
 vulkan_context::~vulkan_context() {
   logic_device.destroyCommandPool(command_pool);
   logic_device.destroy();
-  instance.destroyDebugUtilsMessengerEXT(debug_messenger_, nullptr);
+  if constexpr (is_debug_mode) {
+    instance.destroyDebugUtilsMessengerEXT(debug_messenger_, nullptr, instance_dynamic_dispatch);
+  }
   instance.destroy();
 }
 
@@ -150,18 +152,14 @@ std::vector<Image> vulkan_context::get_images(const SwapchainKHR & swapchain) co
 }
 
 void vulkan_context::init_instance() {
-  // 动态加载 get instance函数
-  vulkan_dynamic_loader.init(vkGetInstanceProcAddr);
-
   const detail::instance_create_info info;
   if (const auto res = createInstance(&info, nullptr, &instance); res != Result::eSuccess) {
     throw std::runtime_error(std::format("创建vulkan_instance 失败, 错误码: {}", to_string(res)));
   }
 
-  // 初始化别的动态函数
-  vulkan_dynamic_loader.init(instance);
-
+  // 初始化加载器
   if constexpr (is_debug_mode) {
+    instance_dynamic_dispatch = DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
     const DebugUtilsMessengerCreateInfoEXT createInfo{
       {},
       DebugUtilsMessageSeverityFlagBitsEXT::eVerbose | DebugUtilsMessageSeverityFlagBitsEXT::eWarning | DebugUtilsMessageSeverityFlagBitsEXT::eError,
@@ -170,9 +168,10 @@ void vulkan_context::init_instance() {
       nullptr,
     };
 
-    const auto res = instance.createDebugUtilsMessengerEXT(createInfo, nullptr);
-    check_vk_result(res.result, "Debug 附加消息");
-    debug_messenger_ = res.value;
+    debug_messenger_ = check_vk_result(
+      instance.createDebugUtilsMessengerEXT(createInfo, nullptr, instance_dynamic_dispatch),
+      "Debug 附加消息"
+    );
   }
 }
 
