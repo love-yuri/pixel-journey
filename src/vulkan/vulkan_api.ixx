@@ -123,7 +123,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
  * @param msg 操作信息
  */
 template <bool ThrowOnError = true>
-bool check_vk_result(const Result result, std::string_view msg = {}) {
+bool check_vk_result(const Result result, std::string_view msg = "vulkan操作") {
   if (result != Result::eSuccess) {
     const auto error_msg = std::format("{} 失败! 错误码: {}", msg, to_string(result));
     if constexpr (ThrowOnError) {
@@ -143,7 +143,7 @@ bool check_vk_result(const Result result, std::string_view msg = {}) {
  * @param msg 操作信息
  */
 template <typename T>
-T check_vk_result(const ResultValue<T>& res, const std::string_view msg) {
+T check_vk_result(const ResultValue<T>& res, const std::string_view msg = "vulkan操作") {
   if (res.result != Result::eSuccess) {
     const auto error_msg = std::format("{} 失败! 错误码: {}", msg, to_string(res.result));
     throw std::runtime_error(error_msg);
