@@ -6,7 +6,7 @@ export module vulkan.api;
 
 import yuri_log;
 import glfw.api;
-import common_config;
+import configuration;
 
 /**
  * detail

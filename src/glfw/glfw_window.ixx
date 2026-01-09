@@ -5,9 +5,8 @@ import glfw.context;
 import vulkan.detail;
 import vulkan.api;
 import vulkan.context;
-import vulkan_config;
+import configuration;
 import yuri_log;
-import common_config;
 import std;
 
 export namespace glfw {

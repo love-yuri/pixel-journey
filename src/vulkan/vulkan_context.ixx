@@ -5,8 +5,7 @@ export module vulkan.context;
 
 import vulkan.api;
 import vulkan.detail;
-import common_config;
-import vulkan_config;
+import configuration;
 import glfw.api;
 import std;
 

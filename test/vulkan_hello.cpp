@@ -22,7 +22,7 @@ import yuri_log;
 import std;
 import vulkan;
 import glfw;
-import vulkan_config;
+import configuration;
 
 using namespace std::chrono_literals;
 

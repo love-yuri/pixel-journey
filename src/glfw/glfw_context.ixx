@@ -7,7 +7,7 @@ export module glfw.context;
 import std;
 import vulkan.api;
 import vulkan.context;
-import vulkan_config;
+import configuration;
 import yuri_log;
 import glfw.api;
 
