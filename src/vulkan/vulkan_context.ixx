@@ -78,6 +78,7 @@ vulkan_context::vulkan_context() :instance(nullptr) {
 
   // 创建逻辑设备
   this->logic_device = create_logical_device(physical_device, index);
+  vulkan_dynamic_loader.init(this->logic_device);
 
   // 创建queue
   this->queue = this->logic_device.getQueue(index, index);
