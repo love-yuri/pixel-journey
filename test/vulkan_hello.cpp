@@ -54,38 +54,19 @@ void create_vk_instance() {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution dis(0.0f, 1.0f);
-
   while (!glfwWindowShouldClose(window)) {
-    constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 4;
-    auto &frame = gw.context.frames[current_frame];
+    auto frame = gw.context.acquire_next_frame();
 
-    // 1. 等待上一轮这个 Frame 完成
-    frame.wait_and_reset();
-
+    // // 1. 等待上一轮这个 Frame 完成
+    // frame.wait_and_reset();
 
 
-    yuri::info("error: {}", current_frame);
+    // if (result == vk::Result::eErrorOutOfDateKHR) {
+    //   // TODO: recreate swapchain
+    //   continue;
+    // }
 
-    // 2. acquire image（用 Frame 自己的 semaphore）
-    uint32_t image_index;
-    auto result = device.acquireNextImageKHR (
-      swapchain,
-      UINT64_MAX,
-      frame.image_available,
-      nullptr,
-      &image_index);
-
-    gw.context.frames[image_index].wait_and_reset();
-
-    yuri::info("select image: {}, frame: {}", image_index, current_frame);
-
-    if (result == vk::Result::eErrorOutOfDateKHR) {
-      // TODO: recreate swapchain
-      continue;
-    }
-
-    vk::Image image = gw.context.images[image_index];
-    vk::CommandBuffer cmd = frame.command_buffers[0];
+    vk::CommandBuffer cmd = frame.command_buffers->at(0);
 
     // 3. 录制命令
     cmd.reset();
@@ -105,15 +86,16 @@ void create_vk_instance() {
         vk::ImageLayout::eTransferDstOptimal,
         VK_QUEUE_FAMILY_IGNORED,
         VK_QUEUE_FAMILY_IGNORED,
-        image,
+        *frame.image,
         {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}});
 
-    vk::ImageSubresourceRange range{
+    vk::ImageSubresourceRange range {
       vk::ImageAspectFlagBits::eColor,
       0,
       1,
       0,
-      1};
+      1,
+    };
 
     // 生成随机颜色
     vk::ClearColorValue clearColor{
@@ -126,7 +108,7 @@ void create_vk_instance() {
     };
 
     cmd.clearColorImage(
-        image,
+        *frame.image,
         vk::ImageLayout::eTransferDstOptimal,
         clearColor,
         range);
@@ -145,7 +127,7 @@ void create_vk_instance() {
         vk::ImageLayout::ePresentSrcKHR,
         VK_QUEUE_FAMILY_IGNORED,
         VK_QUEUE_FAMILY_IGNORED,
-        image,
+        *frame.image,
         {
           vk::ImageAspectFlagBits::eColor,
           0, 1, 0, 1}});
@@ -158,26 +140,20 @@ void create_vk_instance() {
     graphicsQueue.submit(
       vk::SubmitInfo{
         1,
-        &frame.image_available,
+        frame.image_available,
         &waitStage, 1,
         &cmd, 1,
-        &frame.render_finished
+        frame.render_finished
       },
-      frame.fence);
+      *frame.fence);
 
     graphicsQueue.presentKHR(
       vk::PresentInfoKHR{
         1,
-        &frame.render_finished,
+        frame.render_finished,
         1, &swapchain,
-        &image_index
+        &frame.image_index
     });
-
-    // 6. Frame 轮转
-    current_frame = (current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-
-    // std::this_thread::sleep_for(100ms);
-    yuri::info("render...");
 
     glfwPollEvents();
   }

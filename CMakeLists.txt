@@ -13,9 +13,6 @@ add_library(yuri_lib STATIC ${PROJECT_SOURCES})
 target_include_directories(yuri_lib PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(yuri_lib ${THIRD_PARTY_LIBS})
 
-add_executable(yuri src/main.cpp)
-target_link_libraries(yuri yuri_lib)
-
 # 构建测试
 option(BUILD_TESTING "Build the testing tree." ON)
 if (BUILD_TESTING)
