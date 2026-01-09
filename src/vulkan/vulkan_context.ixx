@@ -13,16 +13,6 @@ import std;
 using namespace vk;
 
 /**
- * 每帧渲染数据
- */
-struct render_frame {
-  Semaphore image_available;                 // 图像获取完成的信号
-  Semaphore render_finished;                 // 渲染完成的信号
-  Fence fence;                               // 帧渲染完成的栅栏
-  std::vector<CommandBuffer> command_buffers; // 专属命令缓冲区
-};
-
-/**
  * 全局vulkan上下文
  */
 class vulkan_context final {
@@ -36,10 +26,38 @@ public:
   Queue queue;                             // gpu渲染队列
   std::uint32_t queue_family_index = 0;    // 选择的index
   CommandPool command_pool;                // command pool
-  std::vector<render_frame> render_frames; // cmd buffers
 
   vulkan_context();
-  ~vulkan_context() = default;
+
+  /**
+   * 分配command_buffer
+   * @return 分配好的command_buffer
+   */
+  [[nodiscard]] std::vector<CommandBuffer> allocate_command_buffer() const;
+
+  /**
+   * 创建fence
+   * @return Fence
+   */
+  [[nodiscard]] Fence create_fence() const;
+
+  /**
+   * 创建Semaphore
+   * @return Semaphore
+   */
+  [[nodiscard]] Semaphore create_semaphore() const;
+
+  /**
+   * 获取 SurfaceCapabilitiesKHR
+   * @return SurfaceCapabilitiesKHR
+   */
+  [[nodiscard]] SurfaceCapabilitiesKHR get_surface_capabilities(const SurfaceKHR &) const;
+
+  /**
+   * 获取 交换链里的image
+   * @return std::vector<Image>
+   */
+  [[nodiscard]] std::vector<Image> get_images(const SwapchainKHR &) const;
 
 private:
   /**
@@ -72,6 +90,53 @@ vulkan_context::vulkan_context() :instance(nullptr) {
       index
     }),
     "创建 Command Pool"
+  );
+}
+
+std::vector<CommandBuffer> vulkan_context::allocate_command_buffer() const {
+  auto command_buffers = std::vector<CommandBuffer>(command_buffer_size);
+  const CommandBufferAllocateInfo allocInfo {
+    command_pool,
+    CommandBufferLevel::ePrimary,
+    command_buffer_size
+  };
+  check_vk_result(logic_device.allocateCommandBuffers(&allocInfo, command_buffers.data()),"分配 Command Buffers");
+  return command_buffers;
+}
+
+Fence vulkan_context::create_fence() const {
+  Fence fence;
+  constexpr FenceCreateInfo fence_create_info = {
+    FenceCreateFlagBits::eSignaled
+  };
+  check_vk_result(
+    logic_device.createFence(&fence_create_info, nullptr, &fence),
+    "创建 Fence"
+  );
+  return fence;
+}
+
+Semaphore vulkan_context::create_semaphore() const {
+  Semaphore semaphore;
+  constexpr SemaphoreCreateInfo semaphore_create_info;
+  check_vk_result(
+    logic_device.createSemaphore(&semaphore_create_info, nullptr, &semaphore),
+    "创建 semaphore"
+  );
+  return semaphore;
+}
+
+SurfaceCapabilitiesKHR vulkan_context::get_surface_capabilities(const SurfaceKHR &surface) const {
+  return check_vk_result (
+    physical_device.getSurfaceCapabilitiesKHR(surface),
+    "获取 Surface Capabilities"
+  );
+}
+
+std::vector<Image> vulkan_context::get_images(const SwapchainKHR & swapchain) const {
+  return check_vk_result (
+    logic_device.getSwapchainImagesKHR(swapchain),
+    "获取 Swap Images"
   );
 }
 
