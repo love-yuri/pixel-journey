@@ -12,6 +12,12 @@ using ::GLFWwindow;
 using ::glfwCreateWindowSurface;
 using ::glfwGetFramebufferSize;
 using ::glfwHideWindow;
+using ::glfwShowWindow;
+using ::glfwWindowShouldClose;
+using ::glfwPollEvents;
+using ::glfwSetFramebufferSizeCallback;
+using ::glfwSetWindowUserPointer;
+using ::glfwGetWindowUserPointer;
 
 class application final {
 public:
@@ -56,6 +62,19 @@ GLFWwindow* create_window(const int width, const int height, const std::string_v
  */
 void destroy_window(GLFWwindow* window) {
   glfwDestroyWindow(window);
+}
+
+/**
+ * 获取窗口的帧buffer大小
+ * @return <width, height>
+ */
+std::tuple<std::uint32_t, std::uint32_t> get_buffer_size(GLFWwindow* window) {
+  int height, width;
+  glfwGetFramebufferSize(window, &width, &height);
+  return {
+    static_cast<std::uint32_t>(width),
+    static_cast<std::uint32_t>(height)
+  };
 }
 
 }

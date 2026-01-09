@@ -95,6 +95,13 @@ constexpr auto vulkan_debug_extension_name = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 constexpr auto vulkan_layer_khronos_validation = "VK_LAYER_KHRONOS_validation";
 
 /**
+  * 默认使用以下两个，大部分设备都支持
+  * 默认不会进行检查
+  */
+constexpr auto default_surface_format = vk::Format::eB8G8R8A8Unorm;             // 默认format
+constexpr auto default_surface_color_space = vk::ColorSpaceKHR::eSrgbNonlinear; // 默认color_space
+
+/**
  * 获取版本字符串
  * @return 返回xx.xx.xx格式
  */
@@ -227,6 +234,19 @@ bool check_surface_format_support(const std::vector<SurfaceFormatKHR>& format_kh
   return std::ranges::any_of(format_khrs, [format, space_khr](const SurfaceFormatKHR& format_khr) {
     return format_khr.format == format && format_khr.colorSpace == space_khr;
   });
+}
+
+/**
+ * 获取窗口的帧buffer大小
+ * @return <width, height>
+ */
+Extent2D get_buffer_size(glfw::GLFWwindow* window) {
+  int height, width;
+  glfw::glfwGetFramebufferSize(window, &width, &height);
+  return {
+    static_cast<std::uint32_t>(width),
+    static_cast<std::uint32_t>(height)
+  };
 }
 
 }
