@@ -46,13 +46,6 @@ public:
    * @return 0: 宽度 ：1、高度
    */
   [[nodiscard]] vk::Extent2D get_buffer_size() const;
-
-  /**
-   * 获取一个可用的frame
-   * @return fram
-   */
-  [[nodiscard]] std::uint32_t acquire_frame(std::uint32_t index) const;
-
   /**
    * 展示debug信息
    */
@@ -121,48 +114,20 @@ vk::SwapchainKHR glfw_window::create_swapchain() {
 void glfw_window::init_context() {
   context.surface = create_surface();
   context.window = m_window;
-  context.capabilities = vk::check_vk_result(
-    vulkan_context->physical_device.getSurfaceCapabilitiesKHR(context.surface),
-    "获取 Surface Capabilities"
-  );
+  context.capabilities = vulkan_context->get_surface_capabilities(context.surface);
   context.swapchain = create_swapchain();
-  context.images = vk::check_vk_result(
-     vulkan_context->logic_device.getSwapchainImagesKHR(context.swapchain),
-     "获取 Swap Images"
-   );
+  context.images = vulkan_context->get_images(context.swapchain);
 
   // 创建渲染帧
-  context.frames = std::vector<render_frame>(context.image_count);
+  context.fences.resize(context.image_count);
+  context.render_finished_semaphores.resize(context.image_count);
+  context.image_available_semaphores.resize(context.image_count);
+  context.command_buffers.resize(context.image_count);
   for (auto i = 0; i < context.image_count; ++i) {
-    auto &[render_finished, image_available, fence, command_buffers] = context.frames[i];
-    const auto &logic_device = vulkan_context->logic_device;
-
-    // 创建command buffers
-    command_buffers = std::vector<vk::CommandBuffer>(vk::command_buffer_size);
-    const vk::CommandBufferAllocateInfo allocInfo {
-      vulkan_context->command_pool,
-      vk::CommandBufferLevel::ePrimary,
-      vk::command_buffer_size
-    };
-    vk::check_vk_result(logic_device.allocateCommandBuffers(&allocInfo, command_buffers.data()),"分配 Command Buffers");
-
-    // 创建fence
-    constexpr vk::FenceCreateInfo fence_create_info = { vk::FenceCreateFlagBits::eSignaled };
-    vk::check_vk_result(
-      logic_device.createFence(&fence_create_info, nullptr, &fence),
-      "创建 Fence"
-    );
-
-    // 信号量
-    constexpr vk::SemaphoreCreateInfo semaphore_create_info;
-    vk::check_vk_result(
-      logic_device.createSemaphore(&semaphore_create_info, nullptr, &image_available),
-      "创建 semaphore"
-    );
-    vk::check_vk_result(
-      logic_device.createSemaphore(&semaphore_create_info, nullptr, &render_finished),
-      "创建 semaphore"
-    );
+    context.render_finished_semaphores[i] = vulkan_context->create_semaphore();
+    context.image_available_semaphores[i] = vulkan_context->create_semaphore();
+    context.fences[i] = vulkan_context->create_fence();
+    context.command_buffers[i] = vulkan_context->allocate_command_buffer();
   }
 }
 
@@ -181,16 +146,6 @@ vk::Extent2D glfw_window::get_buffer_size() const {
     static_cast<std::uint32_t>(width),
     static_cast<std::uint32_t>(height)
   };
-}
-
-std::uint32_t glfw_window::acquire_frame(const std::uint32_t index) const {
-  std::uint32_t imageIndex;
-  vk::check_vk_result(vulkan_context->logic_device.acquireNextImageKHR(
-    context.swapchain, std::numeric_limits<std::uint64_t>::max(),
-    context.frames[index].image_available, nullptr, &imageIndex
-  ), "acquire image index");
-
-  return imageIndex;
 }
 
 void glfw_window::show_debug_info() const {
