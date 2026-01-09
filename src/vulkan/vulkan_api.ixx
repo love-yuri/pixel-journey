@@ -1,6 +1,6 @@
 module;
 #define VULKAN_HPP_NO_EXCEPTIONS
-#define VULKAN_HPP_NO_SMART_HANDLE
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include <vulkan/vulkan.hpp>
 export module vulkan.api;
 
@@ -8,15 +8,23 @@ import yuri_log;
 import glfw.api;
 import configuration;
 
+// 导出直接使用，防止clangd报错
+export auto &vulkan_dynamic_loader = vk::detail::defaultDispatchLoaderDynamic;
+
 /**
  * detail
  */
 export namespace vk::detail {
-  using detail::getDispatchLoaderStatic;
+  using detail::defaultDispatchLoaderDynamic;
+  using detail::DispatchLoaderDynamic;
+
+  // 导出全局定义动态加载器
+  DispatchLoaderDynamic defaultDispatchLoaderDynamic;
 }
 
 export namespace vk {
 
+using ::vkDestroyDebugUtilsMessengerEXT;
 using vk::versionMajor;
 using vk::versionMinor;
 using vk::versionPatch;

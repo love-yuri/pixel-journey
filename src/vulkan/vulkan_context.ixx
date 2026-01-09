@@ -140,10 +140,16 @@ std::vector<Image> vulkan_context::get_images(const SwapchainKHR & swapchain) co
 }
 
 void vulkan_context::init_instance() {
+  // 动态加载 get instance函数
+  vulkan_dynamic_loader.init(vkGetInstanceProcAddr);
+
   const detail::instance_create_info info;
   if (const auto res = createInstance(&info, nullptr, &instance); res != Result::eSuccess) {
     throw std::runtime_error(std::format("创建vulkan_instance 失败, 错误码: {}", to_string(res)));
   }
+
+  // 初始化别的动态函数
+  vulkan_dynamic_loader.init(instance);
 
   if constexpr (is_debug_mode) {
     const DebugUtilsMessengerCreateInfoEXT createInfo{
@@ -154,8 +160,7 @@ void vulkan_context::init_instance() {
       nullptr,
     };
 
-    const auto dispatcher = DispatchLoaderDynamic(instance, vkGetInstanceProcAddr);
-    const auto res = instance.createDebugUtilsMessengerEXT(createInfo, nullptr, dispatcher);
+    const auto res = instance.createDebugUtilsMessengerEXT(createInfo, nullptr);
     check_vk_result(res.result, "Debug 附加消息");
     debug_messenger_ = res.value;
   }
