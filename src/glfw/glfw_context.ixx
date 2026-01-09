@@ -5,8 +5,7 @@
 export module glfw.context;
 
 import std;
-import vulkan.api;
-import vulkan.context;
+import vulkan;
 import configuration;
 import yuri_log;
 import glfw.api;
@@ -28,7 +27,7 @@ public:
  * GLFW窗口与Vulkan渲染上下文整合结构体
  * 管理窗口、Surface、交换链及帧渲染资源
  */
-export class glfw_context {
+export class window_context {
 public:
   glfw::GLFWwindow *window;                // GLFW窗口句柄
   vk::SurfaceKHR surface;                  // Vulkan Surface对象
@@ -44,10 +43,22 @@ public:
   std::vector<vk::Semaphore> image_available_semaphores;       // 图像可用同步量
   std::vector<std::vector<vk::CommandBuffer>> command_buffers; // buffers
 
+  explicit window_context(glfw::GLFWwindow *window);
+
   /**
    * 析构函数，释放资源
    */
-  ~glfw_context();
+  ~window_context();
+
+  /**
+  * 创建交换链
+  */
+  void create_swapchain();
+
+  /**
+   * 销毁交换链
+   */
+  void destroy_swapchain() const;
 
   /**
    * 获取下一个渲染帧数据
@@ -56,7 +67,57 @@ public:
   render_frame acquire_next_frame();
 };
 
-glfw_context::~glfw_context() {
+window_context::window_context(glfw::GLFWwindow *window): window(window) {
+  // 创建surface
+  vk::VkSurfaceKHR surface{};
+  glfw::glfwCreateWindowSurface(vulkan_context->instance, window, nullptr, &surface);
+  this->surface = surface;
+
+  // 获取caps
+  capabilities = vulkan_context->get_surface_capabilities(surface);
+
+  // 创建交换链
+  create_swapchain();
+}
+
+window_context::~window_context() {
+  destroy_swapchain();
+  vulkan_context->instance.destroySurfaceKHR(surface);
+}
+
+void window_context::create_swapchain() {
+  const vk::Extent2D extent = vk::get_buffer_size(window);
+  image_count = capabilities.minImageCount + 1;
+  const vk::detail::swapchain_create_info info {
+    surface,
+    image_count,
+    vk::default_surface_format,
+    vk::default_surface_color_space,
+    extent,
+    capabilities.currentTransform
+  };
+
+  swapchain = vk::check_vk_result (
+    vulkan_context->logic_device.createSwapchainKHR(info),
+    "创建swapchain"
+  );
+
+  images = vulkan_context->get_images(swapchain);
+
+  // 创建渲染帧
+  fences.resize(image_count);
+  render_finished_semaphores.resize(image_count);
+  image_available_semaphores.resize(image_count);
+  command_buffers.resize(image_count);
+  for (auto i = 0; i < image_count; ++i) {
+    render_finished_semaphores[i] = vulkan_context->create_semaphore();
+    image_available_semaphores[i] = vulkan_context->create_semaphore();
+    fences[i] = vulkan_context->create_fence();
+    command_buffers[i] = vulkan_context->allocate_command_buffer();
+  }
+}
+
+void window_context::destroy_swapchain() const {
   auto _ = vulkan_context->logic_device.waitIdle();
   for (const auto &k : image_available_semaphores) {
     vulkan_context->logic_device.destroySemaphore(k);
@@ -71,10 +132,10 @@ glfw_context::~glfw_context() {
   }
 
   vulkan_context->logic_device.destroySwapchainKHR(swapchain);
-  vulkan_context->instance.destroySurfaceKHR(surface);
 }
 
-render_frame glfw_context::acquire_next_frame() {
+
+render_frame window_context::acquire_next_frame() {
   // 获取下一帧
   current_frame = (current_frame + 1) % image_count;
 
