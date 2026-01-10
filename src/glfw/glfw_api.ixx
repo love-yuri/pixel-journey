@@ -18,6 +18,7 @@ using ::glfwPollEvents;
 using ::glfwSetFramebufferSizeCallback;
 using ::glfwSetWindowUserPointer;
 using ::glfwGetWindowUserPointer;
+using ::glfwPollEvents;
 
 class application final {
 public:
