@@ -155,8 +155,8 @@ void window_context::create_swapchain() {
   const vk::detail::swapchain_create_info info {
     surface,
     image_count,
-    vk::default_surface_format,
-    vk::default_surface_color_space,
+    vk::defaults::default_surface_format,
+    vk::defaults::default_surface_color_space,
     extent,
     capabilities.currentTransform
   };

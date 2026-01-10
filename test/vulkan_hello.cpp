@@ -15,14 +15,6 @@ int main() {
     const auto frame = gw.acquire_next_frame();
     const auto cmd = frame->begin_frame();
 
-    vk::ImageSubresourceRange range{
-      vk::ImageAspectFlagBits::eColor, // 操作image，这里只能是eColor
-      0, // 操作第 0 层mip
-      1, // 仅操作 1 层mip
-      0, // 从第0个layers开始操作
-      1, // 仅操作1个layer
-    };
-
     // UNDEFINED -> TRANSFER_DST
     cmd->pipelineBarrier(
       vk::PipelineStageFlagBits::eTopOfPipe, // 从管线从开始
@@ -38,7 +30,7 @@ int main() {
         vk::QueueFamilyIgnored, // 不涉及队列操作
         vk::QueueFamilyIgnored,
         *frame->image,
-        range,
+        vk::defaults::default_color_2d_range,
       });
 
     // 生成随机颜色
@@ -51,7 +43,12 @@ int main() {
       },
     };
 
-    cmd->clearColorImage(*frame->image, vk::ImageLayout::eTransferDstOptimal, clearColor, range);
+    cmd->clearColorImage(
+      *frame->image,
+      vk::ImageLayout::eTransferDstOptimal,
+      clearColor,
+      vk::defaults::default_color_2d_range
+    );
 
     // TRANSFER_DST -> PRESENT
     cmd->pipelineBarrier(
@@ -68,7 +65,7 @@ int main() {
         vk::QueueFamilyIgnored,
         vk::QueueFamilyIgnored,
         *frame->image,
-        range
+        vk::defaults::default_color_2d_range
       });
 
     frame->submit();

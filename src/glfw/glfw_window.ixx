@@ -136,8 +136,8 @@ void glfw_window::show_debug_info() const {
   yuri::info("  currentExtent: {} x {}", caps.currentExtent.width, caps.currentExtent.height);
 
   const auto formats = vulkan_context->physical_device.getSurfaceFormatsKHR(context.surface);
-  auto res = vk::check_surface_format_support(formats.value, vk::default_surface_format, vk::default_surface_color_space);
-  yuri::info("format: {}, space_khr: {} 支持情况 -> {}", vk::to_string(vk::default_surface_format), vk::to_string(vk::default_surface_color_space), res);
+  auto res = vk::check_surface_format_support(formats.value, vk::defaults::default_surface_format, vk::defaults::default_surface_color_space);
+  yuri::info("format: {}, space_khr: {} 支持情况 -> {}", vk::to_string(vk::defaults::default_surface_format), vk::to_string(vk::defaults::default_surface_color_space), res);
 }
 
 } // namespace glfw

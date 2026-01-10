@@ -36,7 +36,7 @@ struct instance_create_info : InstanceCreateInfo {
     default_application_version, // 应用程序版本
     default_engin_name,          // 引擎名称
     default_application_version, // 引擎版本
-    vulkan_api_version           // 使用的 Vulkan API 版本
+    defaults::vulkan_api_version // 使用的 Vulkan API 版本
   };
 
   /**
@@ -53,7 +53,7 @@ struct instance_create_info : InstanceCreateInfo {
    * - 当前仅启用 Khronos 官方 validation layer
    * - 仅在 Debug 模式下实际生效
    */
-  static constexpr const char *layers[] = {vulkan_layer_khronos_validation};
+  static constexpr const char *layers[] = { defaults::vulkan_layer_khronos_validation };
 
   /**
    * @brief 构造 InstanceCreateInfo
@@ -69,7 +69,7 @@ struct instance_create_info : InstanceCreateInfo {
       enabledLayerCount = 1;
 
       /// 添加调试扩展（如 VK_EXT_debug_utils）
-      extensions.push_back(vulkan_debug_extension_name);
+      extensions.push_back(defaults::vulkan_debug_extension_name);
 
       /// 输出当前环境所需的 Instance extensions（调试用）
       yuri::info("GLFW 当前环境所需 extensions: {}", extensions.size());

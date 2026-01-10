@@ -6,18 +6,33 @@ export module vulkan.api:config;
 
 import :core;
 
-export namespace vk {
+export namespace vk::defaults {
 
-/* constexpr */
-constexpr auto vulkan_api_version = makeVersion(1, 4, 0);  // 使用的vulkan版本
+ // 使用的vulkan版本/
+constexpr auto vulkan_api_version = makeVersion(1, 4, 0);
+
+// debug 扩展名称
 constexpr auto vulkan_debug_extension_name = EXTDebugUtilsExtensionName;
+
+// 验证层layer名称
 constexpr auto vulkan_layer_khronos_validation = "VK_LAYER_KHRONOS_validation";
 
 /**
-  * 默认使用以下两个，大部分设备都支持
-  * 默认不会进行检查
-  */
+* 默认使用以下两个，大部分设备都支持
+* 默认不会进行检查
+*/
 constexpr auto default_surface_format = Format::eB8G8R8A8Unorm;             // 默认format
 constexpr auto default_surface_color_space = ColorSpaceKHR::eSrgbNonlinear; // 默认color_space
+
+/**
+ * 操作2d image 默认range
+ */
+constexpr ImageSubresourceRange default_color_2d_range {
+  ImageAspectFlagBits::eColor, // 操作image，这里只能是eColor
+  0, // 操作第 0 层mip
+  1, // 仅操作 1 层mip
+  0, // 从第0个layers开始操作
+  1, // 仅操作1个layer
+};
 
 }
