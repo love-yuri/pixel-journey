@@ -31,49 +31,20 @@ constexpr auto targe_format = VK_FORMAT_B8G8R8A8_UNORM;
 constexpr auto target_color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 
 void create_vk_instance() {
-  glfw::glfw_window gw = {
-    200, 200, "yuri"};
+  glfw::glfw_window gw = { 200, 200, "yuri"};
 
-  // 创建window和suffice
-  auto window = gw.m_window;
-  auto surface = gw.context.surface;
-
-  auto physical_device = vulkan_context->physical_device;
-  auto vk_device = vulkan_context->logic_device;
-
-  // 创建graphic_queue
-  auto graphicsQueue = vulkan_context->queue;
-
-  // 创建swapchain
-  auto swapchain = gw.context.swapchain;
-
-  glfwShowWindow(window);
-  std::uint32_t current_frame = 0;
-  auto device = vulkan_context->logic_device;
+  gw.show();
 
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution dis(0.0f, 1.0f);
-  while (!glfwWindowShouldClose(window)) {
-    auto frame = gw.context.acquire_next_frame();
 
-    // // 1. 等待上一轮这个 Frame 完成
-    // frame.wait_and_reset();
-
-
-    // if (result == vk::Result::eErrorOutOfDateKHR) {
-    //   // TODO: recreate swapchain
-    //   continue;
-    // }
-
-    vk::CommandBuffer cmd = frame.command_buffers->at(0);
-
-    // 3. 录制命令
-    cmd.reset();
-    cmd.begin(vk::CommandBufferBeginInfo{});
+  while (!gw.should_close()) {
+    const auto frame = gw.acquire_next_frame();
+    const auto cmd = frame->begin_frame();
 
     // UNDEFINED -> TRANSFER_DST
-    cmd.pipelineBarrier(
+    cmd->pipelineBarrier(
       vk::PipelineStageFlagBits::eTopOfPipe,
       vk::PipelineStageFlagBits::eTransfer,
       {},
@@ -86,7 +57,7 @@ void create_vk_instance() {
         vk::ImageLayout::eTransferDstOptimal,
         VK_QUEUE_FAMILY_IGNORED,
         VK_QUEUE_FAMILY_IGNORED,
-        *frame.image,
+        *frame->image,
         {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}});
 
     vk::ImageSubresourceRange range {
@@ -107,14 +78,14 @@ void create_vk_instance() {
       }
     };
 
-    cmd.clearColorImage(
-        *frame.image,
+    cmd->clearColorImage(
+        *frame->image,
         vk::ImageLayout::eTransferDstOptimal,
         clearColor,
         range);
 
     // TRANSFER_DST -> PRESENT
-    cmd.pipelineBarrier(
+    cmd->pipelineBarrier(
       vk::PipelineStageFlagBits::eTransfer,
       vk::PipelineStageFlagBits::eBottomOfPipe,
       {},
@@ -127,33 +98,13 @@ void create_vk_instance() {
         vk::ImageLayout::ePresentSrcKHR,
         VK_QUEUE_FAMILY_IGNORED,
         VK_QUEUE_FAMILY_IGNORED,
-        *frame.image,
+        *frame->image,
         {
           vk::ImageAspectFlagBits::eColor,
           0, 1, 0, 1}});
 
-    cmd.end();
-
-    // 4. submit
-    vk::PipelineStageFlags waitStage = vk::PipelineStageFlagBits::eTransfer;
-
-    graphicsQueue.submit(
-      vk::SubmitInfo{
-        1,
-        frame.image_available,
-        &waitStage, 1,
-        &cmd, 1,
-        frame.render_finished
-      },
-      *frame.fence);
-
-    graphicsQueue.presentKHR(
-      vk::PresentInfoKHR{
-        1,
-        frame.render_finished,
-        1, &swapchain,
-        &frame.image_index
-    });
+    frame->submit();
+    frame->present();
 
     glfwPollEvents();
   }
