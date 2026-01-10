@@ -12,12 +12,11 @@ import std;
 export namespace glfw {
 
 class glfw_window {
-public:
   int m_width;                // 窗口宽度
   int m_height;               // 窗口高度
   GLFWwindow *m_window{};     // 窗口指针
   std::string m_title{};      // 窗口标题
-  window_context context;   // context
+  window_context context;     // context
 
 public:
   glfw_window(int width, int height, std::string_view title = "yuri");
@@ -32,6 +31,24 @@ public:
    * 获取窗口高度
    */
   [[nodiscard]] int height() const;
+
+  /**
+   * 检查窗口状态
+   * @return 是否应该关闭窗口
+   */
+  bool should_close() const;
+
+  /**
+   * 展示窗口
+   */
+  void show() const;
+
+  /**
+   * 获取下一个渲染帧数据
+   * 仅保证该帧在当前周期内有效，
+   * 请不要保存该指针
+   */
+  render_frame* acquire_next_frame();
 
   /**
    * 展示debug信息
@@ -79,7 +96,8 @@ void glfw_window::on_resize(int width, int height) {
 }
 
 void glfw_window::on_resize_static(GLFWwindow *window, const int width, const int height) {
-  if (width > 0 && height > 0) {  // 忽略最小化
+  // 忽略最小化
+  if (width > 0 && height > 0) {
     const auto self = static_cast<glfw_window*>(glfwGetWindowUserPointer(window));
     if (width == self->m_width && height == self->m_height) {
       return;
@@ -96,6 +114,18 @@ int glfw_window::width() const {
 
 int glfw_window::height() const {
   return m_height;
+}
+
+bool glfw_window::should_close() const {
+  return glfwWindowShouldClose(m_window);
+}
+
+void glfw_window::show() const {
+  glfwShowWindow(m_window);
+}
+
+render_frame* glfw_window::acquire_next_frame() {
+  return context.acquire_next_frame();
 }
 
 void glfw_window::show_debug_info() const {

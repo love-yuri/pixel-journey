@@ -10,10 +10,19 @@ import configuration;
 import yuri_log;
 import glfw.api;
 
+// 等待信息
+constexpr vk::PipelineStageFlags wait_stage = vk::PipelineStageFlagBits::eTransfer;
+
+// 开始绘制信息
+constexpr vk::CommandBufferBeginInfo command_buffer_begin_info{};
+
 /**
  * 每帧渲染数据
  */
 export class render_frame {
+  vk::SwapchainKHR* swapchain = nullptr;        // 不持有交换链，仅作api使用
+  vk::CommandBuffer* command_buffer = nullptr;  // 正在使用的command buffer
+
 public:
   std::uint32_t image_index{};                       // image index
   vk::Image* image{};                                // 当前帧image
@@ -21,6 +30,24 @@ public:
   vk::Semaphore* image_available{};                  // 图像获取完成的信号
   vk::Fence* fence{};                                // 帧渲染完成的栅栏
   std::vector<vk::CommandBuffer>* command_buffers{}; // 专属命令缓冲区
+
+  explicit render_frame(vk::SwapchainKHR &swapchain);
+
+  /**
+   * 开始绘制
+   * @return 需要录制的commandBuffer
+   */
+  vk::CommandBuffer* begin_frame();
+
+  /**
+   * 提交渲染指令
+   */
+  void submit() const;
+
+  /**
+   * 展示渲染内容
+   */
+  void present();
 };
 
 /**
@@ -28,7 +55,10 @@ public:
  * 管理窗口、Surface、交换链及帧渲染资源
  */
 export class window_context {
+  int current_frame_index = -1;            // 当前使用的frame index
 public:
+  // 当前帧正在使用的frame
+  std::unique_ptr<render_frame> current_frame;
   glfw::GLFWwindow *window;                // GLFW窗口句柄
   vk::SurfaceKHR surface;                  // Vulkan Surface对象
   vk::Format format;                       // 交换链图像格式
@@ -36,7 +66,6 @@ public:
   vk::SurfaceCapabilitiesKHR capabilities; // Surface能力参数
   vk::SwapchainKHR swapchain;              // 交换链对象
   std::uint32_t image_count;               // 图像数量: 默认min + 1
-  int current_frame = -1;                  // 当前使用的frame
   std::vector<vk::Image> images;           // 所有图像
   std::vector<vk::Fence> fences;           // fence 同步量
   std::vector<vk::Semaphore> render_finished_semaphores;       // render 同步量
@@ -62,10 +91,45 @@ public:
 
   /**
    * 获取下一个渲染帧数据
-   * @return 下一帧数据
+   * 仅保证该帧在当前周期内有效，
+   * 请不要保存该指针
    */
-  render_frame acquire_next_frame();
+  render_frame* acquire_next_frame();
 };
+
+render_frame::render_frame(vk::SwapchainKHR &swapchain):swapchain(&swapchain) {
+
+}
+
+vk::CommandBuffer* render_frame::begin_frame() {
+  command_buffer = &command_buffers->at(0);
+  vk::check_vk_result(command_buffer->reset(), "重置cmd");
+  vk::check_vk_result(command_buffer->begin(command_buffer_begin_info), "开始绘制");
+  return command_buffer;
+}
+
+void render_frame::submit() const {
+  vk::check_vk_result(command_buffer->end(), "结束录制");
+  const vk::SubmitInfo submit_info {
+    1, image_available,
+    &wait_stage, 1,
+    command_buffer, 1,
+    render_finished
+  };
+
+  vk::check_vk_result(vulkan_context->queue.submit(submit_info, *fence), "提交绘制信息");
+}
+
+void render_frame::present() {
+  const vk::PresentInfoKHR present_info {
+    1,
+    render_finished,
+    1, swapchain,
+    &image_index
+  };
+
+  vk::check_vk_result<false>(vulkan_context->queue.presentKHR(present_info), "呈现");
+}
 
 window_context::window_context(glfw::GLFWwindow *window): window(window) {
   // 创建surface
@@ -102,6 +166,7 @@ void window_context::create_swapchain() {
     "创建swapchain"
   );
 
+  current_frame = std::make_unique<render_frame>(swapchain);
   images = vulkan_context->get_images(swapchain);
 
   // 创建渲染帧
@@ -135,32 +200,32 @@ void window_context::destroy_swapchain() const {
 }
 
 
-render_frame window_context::acquire_next_frame() {
+render_frame* window_context::acquire_next_frame() {
   // 获取下一帧
-  current_frame = (current_frame + 1) % image_count;
+  current_frame_index = (current_frame_index + 1) % image_count;
 
   // 等待并重置fence
   const auto &device = vulkan_context->logic_device;
   vk::check_vk_result(
-    device.waitForFences(fences[current_frame], true, vk::wait_fence_timeout),
+    device.waitForFences(fences[current_frame_index], true, vk::wait_fence_timeout),
     "等待 Fence"
   );
-  vk::check_vk_result(device.resetFences(fences[current_frame]),"重置 Fence");
+  vk::check_vk_result(device.resetFences(fences[current_frame_index]),"重置 Fence");
 
   // 拿到所需image_index
   std::uint32_t image_index;
   vk::check_vk_result(device.acquireNextImageKHR(
     swapchain, std::numeric_limits<std::uint64_t>::max(),
-    image_available_semaphores[current_frame], nullptr, &image_index
+    image_available_semaphores[current_frame_index], nullptr, &image_index
   ), "acquire image index");
 
-  // 返回frame 帧
-  return {
-    image_index,
-    &images[image_index],
-    &render_finished_semaphores[image_index],
-    &image_available_semaphores[current_frame],
-    &fences[current_frame],
-    &command_buffers[current_frame],
-  };
+  // 更新当前帧数据
+  current_frame->image_index = image_index;
+  current_frame->image = &images[image_index];
+  current_frame->render_finished = &render_finished_semaphores[image_index];
+  current_frame->image_available = &image_available_semaphores[current_frame_index];
+  current_frame->fence = &fences[current_frame_index];
+  current_frame->command_buffers = &command_buffers[current_frame_index];
+
+  return current_frame.get();
 }
