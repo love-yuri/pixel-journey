@@ -1,38 +1,10 @@
-#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
-#include "include/core/SkCanvas.h"
-#include "include/core/SkSurface.h"
-#include "include/core/SkPaint.h"
-#include "include/gpu/ganesh/GrDirectContext.h"
-#include "include/gpu/ganesh/GrBackendSurface.h"
-#include "include/gpu/ganesh/vk/GrVkTypes.h"
-#include "include/core/SkFont.h"
-#include "include/gpu/ganesh/vk/GrVkBackendSemaphore.h"
-#include "include/gpu/vk/VulkanBackendContext.h"
-#include "include/gpu/vk/VulkanExtensions.h"
-#include "include/gpu/ganesh/SkSurfaceGanesh.h"
-#include "include/gpu/ganesh/vk/GrVkDirectContext.h"
-#include "include/core/SkColorSpace.h"
-
 #include <random>
-#include <thread>
-#include <magic_enum/magic_enum.hpp>
-
-import yuri_log;
 import std;
 import vulkan;
 import glfw;
-import configuration;
 
-using namespace std::chrono_literals;
-
-constexpr auto VK_LAYER_KHRONOS_validation = "VK_LAYER_KHRONOS_validation";
-constexpr auto targe_format = VK_FORMAT_B8G8R8A8_UNORM;
-constexpr auto target_color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-
-void create_vk_instance() {
-  glfw::glfw_window gw = { 200, 200, "yuri"};
-
+int main() {
+  glfw::glfw_window gw = {200, 200, "yuri"};
   gw.show();
 
   std::random_device rd;
@@ -43,73 +15,65 @@ void create_vk_instance() {
     const auto frame = gw.acquire_next_frame();
     const auto cmd = frame->begin_frame();
 
+    vk::ImageSubresourceRange range{
+      vk::ImageAspectFlagBits::eColor, // 操作image，这里只能是eColor
+      0, // 操作第 0 层mip
+      1, // 仅操作 1 层mip
+      0, // 从第0个layers开始操作
+      1, // 仅操作1个layer
+    };
+
     // UNDEFINED -> TRANSFER_DST
     cmd->pipelineBarrier(
-      vk::PipelineStageFlagBits::eTopOfPipe,
-      vk::PipelineStageFlagBits::eTransfer,
+      vk::PipelineStageFlagBits::eTopOfPipe, // 从管线从开始
+      vk::PipelineStageFlagBits::eTransfer, // 到传输阶段
       {},
       nullptr,
       nullptr,
       vk::ImageMemoryBarrier{
-        {},
-        vk::AccessFlagBits::eTransferWrite,
-        vk::ImageLayout::eUndefined,
+        {}, // 源访问时 未做任何访问
+        vk::AccessFlagBits::eTransferWrite, // 后续需要传输阶段可写
+        vk::ImageLayout::eUndefined, // eUndefined -> eTransferDstOptimal
         vk::ImageLayout::eTransferDstOptimal,
-        VK_QUEUE_FAMILY_IGNORED,
-        VK_QUEUE_FAMILY_IGNORED,
+        vk::QueueFamilyIgnored, // 不涉及队列操作
+        vk::QueueFamilyIgnored,
         *frame->image,
-        {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}});
-
-    vk::ImageSubresourceRange range {
-      vk::ImageAspectFlagBits::eColor,
-      0,
-      1,
-      0,
-      1,
-    };
+        range,
+      });
 
     // 生成随机颜色
     vk::ClearColorValue clearColor{
-      std::array{
-        dis(gen),  // 红色分量
-        dis(gen),  // 绿色分量
-        dis(gen),  // 蓝色分量
-        1.0f
-      }
+      std::array {
+        dis(gen), // 红色分量
+        dis(gen), // 绿色分量
+        dis(gen), // 蓝色分量
+        1.0f,
+      },
     };
 
-    cmd->clearColorImage(
-        *frame->image,
-        vk::ImageLayout::eTransferDstOptimal,
-        clearColor,
-        range);
+    cmd->clearColorImage(*frame->image, vk::ImageLayout::eTransferDstOptimal, clearColor, range);
 
     // TRANSFER_DST -> PRESENT
     cmd->pipelineBarrier(
-      vk::PipelineStageFlagBits::eTransfer,
-      vk::PipelineStageFlagBits::eBottomOfPipe,
+      vk::PipelineStageFlagBits::eTransfer,    // 传输
+      vk::PipelineStageFlagBits::eBottomOfPipe, // 渲染尾部
       {},
       nullptr,
       nullptr,
       vk::ImageMemoryBarrier{
         vk::AccessFlagBits::eTransferWrite,
         {},
-        vk::ImageLayout::eTransferDstOptimal,
-        vk::ImageLayout::ePresentSrcKHR,
-        VK_QUEUE_FAMILY_IGNORED,
-        VK_QUEUE_FAMILY_IGNORED,
+        vk::ImageLayout::eTransferDstOptimal, // 传输阶段
+        vk::ImageLayout::ePresentSrcKHR, // 提交阶段
+        vk::QueueFamilyIgnored,
+        vk::QueueFamilyIgnored,
         *frame->image,
-        {
-          vk::ImageAspectFlagBits::eColor,
-          0, 1, 0, 1}});
+        range
+      });
 
     frame->submit();
     frame->present();
 
-    glfwPollEvents();
+    glfw::glfwPollEvents();
   }
-}
-
-int main() {
-  create_vk_instance();
 }
