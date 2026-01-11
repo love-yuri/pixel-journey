@@ -17,6 +17,7 @@ using detail::DispatchLoaderDynamic;
 
 export namespace vk {
 
+using ::vkGetDeviceProcAddr;
 using ::VkBool32;
 using vk::ResultValue;
 using ::VkDebugUtilsMessengerCallbackDataEXT;
