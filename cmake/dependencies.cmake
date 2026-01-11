@@ -39,6 +39,16 @@ find_package(Freetype REQUIRED)
 list(APPEND THIRD_PARTY_LIBS Freetype::Freetype)
 message(STATUS "FreeType version: ${Freetype_VERSION}")
 
+
+# ----------------------------------------------------------------------------
+# font config: linux专属
+# ----------------------------------------------------------------------------
+if(UNIX)
+    find_package(Fontconfig REQUIRED)
+    list(APPEND THIRD_PARTY_LIBS Fontconfig::Fontconfig)
+    message(STATUS "Fontconfig version: ${Fontconfig_VERSION}")
+endif ()
+
 # ----------------------------------------------------------------------------
 # vulkan
 # ----------------------------------------------------------------------------
