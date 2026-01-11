@@ -19,10 +19,11 @@ NINJA_EXE = "ninja.exe" if os.name == "nt" else "ninja"
 # 公共参数
 args = [
     "is_official_build=true",  # Release
-    "is_component_build=true", # 编译动态库
     "is_debug=false",          # 非debug
     "skia_use_vulkan=true",    # 使用vulkan
     "skia_use_gl=false",       # 不使用opengl
+    "skia_enable_tools=true",  # 启用 tools"
+    "skia_use_freetype=true",  # 使用ttf
     r'cc="clang"',             # 使用clang
     r'cxx="clang++"',          # 使用clang++
 ]
@@ -32,7 +33,7 @@ if os.name == "nt":
     # Windows 特定
     args += [
         "skia_pdf_subset_harfbuzz=true",
-
+        "is_component_build=true", # 编译动态库
         # 使用 skia 自带库
         "skia_use_system_expat=false",
         "skia_use_system_harfbuzz=false",
@@ -47,17 +48,16 @@ else:
     # Linux 特定
     args += [
         "skia_use_fontconfig=true",
-        "skia_use_freetype=true",
     ]
 
 # -----------------------------
 # 调用 GN 生成 Ninja 构建文件
 # -----------------------------
-subprocess.check_call([GN_EXE, "gen", OUT_DIR, "--args=" + " ".join(args)], shell=True)
+subprocess.check_call([GN_EXE, "gen", OUT_DIR, "--args=" + " ".join(args)], shell=False)
 
 # -----------------------------
 # 调用 Ninja 编译
 # -----------------------------
-subprocess.check_call([NINJA_EXE, "-C", OUT_DIR], shell=True)
+subprocess.check_call([NINJA_EXE, "-C", OUT_DIR], shell=False)
 
 print("Skia 编译完成！输出目录:", OUT_DIR)
