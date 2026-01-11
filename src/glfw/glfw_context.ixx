@@ -58,14 +58,14 @@ export class window_context {
   int current_frame_index = -1;            // 当前使用的frame index
 public:
   // 当前帧正在使用的frame
-  std::unique_ptr<render_frame> current_frame;
+  std::unique_ptr<render_frame> current_frame{};
   glfw::GLFWwindow *window;                // GLFW窗口句柄
   vk::SurfaceKHR surface;                  // Vulkan Surface对象
   vk::Format format;                       // 交换链图像格式
-  vk::ColorSpaceKHR colorSpace;            // 颜色空间标准
+  vk::ColorSpaceKHR color_space;           // 颜色空间标准
   vk::SurfaceCapabilitiesKHR capabilities; // Surface能力参数
   vk::SwapchainKHR swapchain;              // 交换链对象
-  std::uint32_t image_count;               // 图像数量: 默认min + 1
+  std::uint32_t image_count{};             // 图像数量: 默认min + 1
   std::vector<vk::Image> images;           // 所有图像
   std::vector<vk::Fence> fences;           // fence 同步量
   std::vector<vk::Semaphore> render_finished_semaphores;       // render 同步量
@@ -124,14 +124,19 @@ void render_frame::present() {
   const vk::PresentInfoKHR present_info {
     1,
     render_finished,
-    1, swapchain,
+    1,
+    swapchain,
     &image_index
   };
 
   vk::check_vk_result<false>(vulkan_context->queue.presentKHR(present_info), "呈现");
 }
 
-window_context::window_context(glfw::GLFWwindow *window): window(window) {
+window_context::window_context(glfw::GLFWwindow *window) :
+  window(window),
+  format(vk::defaults::default_surface_format),
+  color_space(vk::defaults::default_surface_color_space) {
+
   // 创建surface
   vk::VkSurfaceKHR surface{};
   glfw::glfwCreateWindowSurface(vulkan_context->instance, window, nullptr, &surface);
@@ -198,7 +203,6 @@ void window_context::destroy_swapchain() const {
 
   vulkan_context->logic_device.destroySwapchainKHR(swapchain);
 }
-
 
 render_frame* window_context::acquire_next_frame() {
   // 获取下一帧
