@@ -157,7 +157,7 @@ void window_context::create_swapchain() {
 
   // 获取窗口size
   vk::Extent2D extent;
-  constexpr auto uint_64_max = std::numeric_limits<std::uint64_t>::max();
+  constexpr auto uint_64_max = std::numeric_limits<std::uint32_t>::max();
   if (capabilities.currentExtent.width != uint_64_max && capabilities.currentExtent.height != uint_64_max) {
     extent = capabilities.currentExtent;
   } else {
