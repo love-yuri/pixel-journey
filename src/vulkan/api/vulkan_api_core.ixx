@@ -99,5 +99,11 @@ using vk::PipelineStageFlags;
 using vk::SubmitInfo;
 using vk::PresentInfoKHR;
 using vk::QueueFamilyIgnored;
+using ::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+using ::VK_FORMAT_B8G8R8A8_UNORM;
+using ::VK_IMAGE_TILING_OPTIMAL;
+using ::PFN_vkVoidFunction;
+using ::VK_IMAGE_LAYOUT_UNDEFINED;
+using ::VkDevice;
 
 } // namespace vk

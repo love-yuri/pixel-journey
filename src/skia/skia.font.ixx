@@ -7,6 +7,8 @@ module;
 #include "include/ports/SkTypeface_win.h"
 #else
 #include "include/ports/SkFontScanner_FreeType.h"
+#include "include/ports/SkFontMgr_fontconfig.h"
+#include <include/core/SkTypeface.h>
 #endif
 
 export module skia.font;
@@ -20,6 +22,12 @@ sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_
 #endif
 
 export namespace skia::font {
+
+#if defined(_WIN32)
+constexpr auto default_font_path = R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-Medium.ttf)";
+#else
+constexpr auto default_font_path = "/usr/share/fonts/TTF/FiraCode-Medium.ttf";
+#endif
 
 /**
  * 从文件中加载字体

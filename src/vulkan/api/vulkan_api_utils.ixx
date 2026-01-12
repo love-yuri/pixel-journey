@@ -160,4 +160,24 @@ Extent2D get_buffer_size(glfw::GLFWwindow* window) {
   };
 }
 
+/**
+ * 获取vulkan函数
+ * @param name 函数名
+ * @param instance 实例
+ * @param device device
+ * @return 函数指针
+ */
+PFN_vkVoidFunction vulkan_get_proc(
+  const char *name,
+  // ReSharper disable once CppParameterMayBeConst
+  VkInstance instance,
+  // ReSharper disable once CppParameterMayBeConst
+  VkDevice device
+) {
+  if (device != nullptr) {
+    return vkGetDeviceProcAddr(device, name);
+  }
+  return vkGetInstanceProcAddr(instance, name);
+}
+
 }

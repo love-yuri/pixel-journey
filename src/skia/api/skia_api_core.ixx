@@ -1,0 +1,102 @@
+//
+// Created by yuri on 2026/1/12.
+//
+module;
+#include <include/core/SkFontMgr.h>
+#if defined(_WIN32)
+#include "include/ports/SkTypeface_win.h"
+#else
+#include "include/ports/SkFontScanner_FreeType.h"
+#include "include/ports/SkFontMgr_fontconfig.h"
+#include <include/core/SkTypeface.h>
+#endif
+#include <include/core/SkCanvas.h>
+#include <include/gpu/vk/VulkanBackendContext.h>
+#include <include/gpu/ganesh/vk/GrVkDirectContext.h>
+#include <include/gpu/ganesh/vk/GrVkBackendSurface.h>
+#include <include/gpu/ganesh/GrBackendSurface.h>
+#include <include/gpu/ganesh/vk/GrVkTypes.h>
+#include <include/gpu/vk/VulkanMutableTextureState.h>
+#include <include/gpu/ganesh/SkSurfaceGanesh.h>
+#include <include/gpu/ganesh/GrRecordingContext.h>
+#include <include/core/SkColorSpace.h>
+#include <include/gpu/MutableTextureState.h>
+#include <include/gpu/ganesh/GrDirectContext.h>
+#include <include/core/SkFont.h>
+#include <include/core/SkSurface.h>
+#include <include/core/SkColor.h>
+#include <include/private/chromium/GrVkSecondaryCBDrawContext.h>
+export module skia_api:core;
+
+import std;
+
+/**
+ * 默认空间
+ */
+export {
+  using ::SkPoint;
+  using ::SkRect;
+  using ::SkMatrix;
+  using ::SkPath;
+  using ::SkStream;
+  using ::SkSurface;
+  using ::SkCanvas;
+  using ::GrContextOptions;
+  using ::SkTypeface;
+  using GrDirectContexts::MakeVulkan;
+  using ::SkSurfaceProps;
+  using ::sk_sp;
+  using ::SkFont;
+  using ::SkPaint;
+  using ::kUnknown_SkPixelGeometry;
+  using ::GrVkImageInfo;
+  using ::GrBackendRenderTarget;
+  using ::kTopLeft_GrSurfaceOrigin;
+  using ::kBGRA_8888_SkColorType;
+  using ::GrSyncCpu;
+
+  /* inline constexpr */
+  constexpr auto SKColorRed = SK_ColorRED;
+  constexpr auto SKColorYellow = SK_ColorYELLOW;
+  constexpr auto SKColorGreen = SK_ColorGREEN;
+  constexpr auto SKColorWhite = SK_ColorWHITE;
+
+
+} // namespace skia
+
+/**
+ * skgpu
+ */
+export namespace skgpu {
+
+using skgpu::VulkanBackendContext;
+using skgpu::VulkanBackendContext;
+
+} // namespace skgpu
+
+/**
+ * MutableTextureStates
+ */
+export namespace skgpu::MutableTextureStates {
+
+using MutableTextureStates::MakeVulkan;
+
+}
+
+/**
+ * GrBackendRenderTargets
+ */
+export namespace GrBackendRenderTargets {
+
+using GrBackendRenderTargets::MakeVk;
+
+}
+
+/**
+ * SkSurfaces
+ */
+export namespace SkSurfaces {
+
+using SkSurfaces::WrapBackendRenderTarget;
+
+}

@@ -1,32 +1,11 @@
 #include <random>
-#include <include/core/SkCanvas.h>
-#include <include/gpu/vk/VulkanBackendContext.h>
-#include <include/gpu/ganesh/vk/GrVkDirectContext.h>
-#include <include/gpu/ganesh/vk/GrVkBackendSurface.h>
-#include <include/gpu/ganesh/GrBackendSurface.h>
-#include <include/gpu/ganesh/vk/GrVkTypes.h>
-#include <include/gpu/vk/VulkanMutableTextureState.h>
-#include <include/gpu/ganesh/SkSurfaceGanesh.h>
-#include <include/gpu/ganesh/GrRecordingContext.h>
-#include <include/core/SkColorSpace.h>
-#include <include/gpu/MutableTextureState.h>
-#include <include/gpu/ganesh/GrDirectContext.h>
-#include <include/core/SkFont.h>
-#include <include/core/SkSurface.h>
-#include "include/private/chromium/GrVkSecondaryCBDrawContext.h"
 
 import std;
 import vulkan;
 import glfw;
 import yuri_log;
 import skia.font;
-
-PFN_vkVoidFunction GetProc(const char *name, VkInstance instance, VkDevice device) {
-  if (device != VK_NULL_HANDLE) {
-    return vkGetDeviceProcAddr(device, name);
-  }
-  return vkGetInstanceProcAddr(instance, name);
-}
+import skia_api;
 
 class FPSCounter {
   int frameCount = 0;
@@ -62,31 +41,30 @@ int main() {
   vkContext.fDevice = vulkan_context->logic_device;
   vkContext.fGraphicsQueueIndex = vulkan_context->queue_family_index;
   vkContext.fQueue = vulkan_context->queue;
-  vkContext.fGetProc = GetProc;
+  vkContext.fGetProc = vk::vulkan_get_proc;
 
   GrContextOptions options;
   options.fSuppressPrints = true;
 
-  auto grContext = GrDirectContexts::MakeVulkan(vkContext, options);
+  auto grContext = MakeVulkan(vkContext, options);
 
   glfw::glfw_window gw = {200, 200, "yuri"};
   gw.show();
 
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_real_distribution dis(0.0f, 800.0f);
 
-  sk_sp<SkTypeface> typeface = skia::font::load_from_file(R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-Medium.ttf)");
+  sk_sp<SkTypeface> typeface = skia::font::load_from_file(skia::font::default_font_path);
   SkFont font(typeface, 24);
 
   // 使用 Vulkan 专用函数
   auto presentState = skgpu::MutableTextureStates::MakeVulkan(
-      VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+      vk::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
       vulkan_context->queue_family_index
   );
 
   SkPaint paint;
-  paint.setColor(SK_ColorRED);
+  paint.setColor(SKColorRed);
   paint.setAntiAlias(true);
 
   FPSCounter fpsCounter;
@@ -99,9 +77,9 @@ int main() {
 
     GrVkImageInfo imageInfo{};
     imageInfo.fImage = *frame->image;
-    imageInfo.fImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.fFormat = VK_FORMAT_B8G8R8A8_UNORM;
-    imageInfo.fImageTiling = VK_IMAGE_TILING_OPTIMAL;
+    imageInfo.fImageLayout = vk::VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.fFormat = vk::VK_FORMAT_B8G8R8A8_UNORM;
+    imageInfo.fImageTiling = vk::VK_IMAGE_TILING_OPTIMAL;
     imageInfo.fLevelCount = 1;
     imageInfo.fCurrentQueueFamily = vulkan_context->queue_family_index;
 
@@ -120,15 +98,20 @@ int main() {
       &props
     );
 
-    if (surface == nullptr) {
+    if (!surface) {
       yuri::error("surface is null!");
       return 0;
     }
 
     SkCanvas* canvas = surface->getCanvas();
-    canvas->clear(SK_ColorWHITE);
+    canvas->clear(SKColorWhite);
 
-    canvas->drawRect(SkRect::MakeXYWH(dis(gen), dis(gen), 100, 100), paint);
+    SkPoint center = {
+      static_cast<float>(gw.width() / 2),
+      static_cast<float>(gw.height() / 2)
+    };
+
+    canvas->drawCircle(center, 220, paint);
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
 
     // Flush 并转换到呈现布局
