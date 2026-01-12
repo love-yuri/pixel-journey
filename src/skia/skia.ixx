@@ -5,3 +5,4 @@
 export module skia;
 
 export import skia.font;
+export import skia.api;

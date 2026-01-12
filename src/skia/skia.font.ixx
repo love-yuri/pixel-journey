@@ -1,19 +1,14 @@
 //
 // Created by love-yuri on 2026/1/12.
 //
-module;
-#include <include/core/SkFontMgr.h>
-#if defined(_WIN32)
-#include "include/ports/SkTypeface_win.h"
-#else
-#include "include/ports/SkFontScanner_FreeType.h"
-#include "include/ports/SkFontMgr_fontconfig.h"
-#include <include/core/SkTypeface.h>
-#endif
 
 export module skia.font;
 
 import yuri_log;
+import skia.api;
+import std;
+
+using namespace skia;
 
 #if defined(_WIN32)
 sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_DirectWrite();
@@ -43,7 +38,4 @@ sk_sp<SkTypeface> load_from_file(const std::string_view path) {
   return typeface;
 }
 
-}
-
-
-
+} // namespace skia::font

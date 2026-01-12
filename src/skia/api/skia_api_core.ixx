@@ -26,69 +26,80 @@ module;
 #include <include/core/SkSurface.h>
 #include <include/core/SkColor.h>
 #include <include/private/chromium/GrVkSecondaryCBDrawContext.h>
-export module skia_api:core;
+export module skia.api:core;
 
 import std;
 
 /**
  * 默认空间
  */
-export {
-  using ::SkPoint;
-  using ::SkRect;
-  using ::SkMatrix;
-  using ::SkPath;
-  using ::SkStream;
-  using ::SkSurface;
-  using ::SkCanvas;
-  using ::GrContextOptions;
-  using ::SkTypeface;
-  using GrDirectContexts::MakeVulkan;
-  using ::SkSurfaceProps;
-  using ::sk_sp;
-  using ::SkFont;
-  using ::SkPaint;
-  using ::kUnknown_SkPixelGeometry;
-  using ::GrVkImageInfo;
-  using ::GrBackendRenderTarget;
-  using ::kTopLeft_GrSurfaceOrigin;
-  using ::kBGRA_8888_SkColorType;
-  using ::GrSyncCpu;
+export namespace skia {
 
-  /* inline constexpr */
-  constexpr auto SKColorRed = SK_ColorRED;
-  constexpr auto SKColorYellow = SK_ColorYELLOW;
-  constexpr auto SKColorGreen = SK_ColorGREEN;
-  constexpr auto SKColorWhite = SK_ColorWHITE;
+using ::SkPoint;
+using ::SkRect;
+using ::SkMatrix;
+using ::SkPath;
+using ::SkStream;
+using ::SkSurface;
+using ::SkCanvas;
+using ::GrContextOptions;
+using ::SkTypeface;
+using GrDirectContexts::MakeVulkan;
+using ::SkSurfaceProps;
+using ::sk_sp;
+using ::SkFont;
+using ::SkPaint;
+using ::kUnknown_SkPixelGeometry;
+using ::GrVkImageInfo;
+using ::GrBackendRenderTarget;
+using ::kTopLeft_GrSurfaceOrigin;
+using ::kBGRA_8888_SkColorType;
+using ::GrSyncCpu;
+using ::GrDirectContext;
+using ::SkFontMgr;
 
+/* 字体相关 */
+#if defined(_WIN32)
+using ::SkFontMgr_New_DirectWrite;
+#else
+using ::SkFontMgr_New_FontConfig;
+using ::SkFontScanner_Make_FreeType;
+#endif
+
+
+/* inline constexpr */
+constexpr auto SKColorRed = SK_ColorRED;
+constexpr auto SKColorYellow = SK_ColorYELLOW;
+constexpr auto SKColorGreen = SK_ColorGREEN;
+constexpr auto SKColorWhite = SK_ColorWHITE;
 
 } // namespace skia
 
 /**
  * skgpu
  */
-export namespace skgpu {
+export namespace skia::skgpu {
 
-using skgpu::VulkanBackendContext;
-using skgpu::VulkanBackendContext;
+using ::skgpu::VulkanBackendContext;
+using ::skgpu::VulkanBackendContext;
 
-} // namespace skgpu
+} // namespace skia::skgpu
 
 /**
  * MutableTextureStates
  */
-export namespace skgpu::MutableTextureStates {
+export namespace skia::skgpu::MutableTextureStates {
 
-using MutableTextureStates::MakeVulkan;
+using ::skgpu::MutableTextureStates::MakeVulkan;
 
 }
 
 /**
  * GrBackendRenderTargets
  */
-export namespace GrBackendRenderTargets {
+export namespace skia::GrBackendRenderTargets {
 
-using GrBackendRenderTargets::MakeVk;
+using ::GrBackendRenderTargets::MakeVk;
 
 }
 
