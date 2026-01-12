@@ -8,20 +8,18 @@
 #include <include/gpu/vk/VulkanMutableTextureState.h>
 #include <include/gpu/ganesh/SkSurfaceGanesh.h>
 #include <include/gpu/ganesh/GrRecordingContext.h>
-#include <include/core/SkFontMgr.h>
 #include <include/core/SkColorSpace.h>
 #include <include/gpu/MutableTextureState.h>
 #include <include/gpu/ganesh/GrDirectContext.h>
 #include <include/core/SkFont.h>
-#include <include/ports/SkFontMgr_fontconfig.h>
 #include <include/core/SkSurface.h>
-#include "include/ports/SkFontScanner_FreeType.h"
 #include "include/private/chromium/GrVkSecondaryCBDrawContext.h"
 
 import std;
 import vulkan;
 import glfw;
 import yuri_log;
+import skia.font;
 
 PFN_vkVoidFunction GetProc(const char *name, VkInstance instance, VkDevice device) {
   if (device != VK_NULL_HANDLE) {
@@ -78,12 +76,7 @@ int main() {
   std::mt19937 gen(rd());
   std::uniform_real_distribution dis(0.0f, 800.0f);
 
-  sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
-  sk_sp<SkTypeface> typeface = fontMgr->makeFromFile("/usr/share/fonts/TTF/FiraCode-Medium.ttf", 0);
-  if (!typeface) {
-    yuri::error("typeface is null!");
-    return 0;
-  }
+  sk_sp<SkTypeface> typeface = skia::font::load_from_file(R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-Medium.ttf)");
   SkFont font(typeface, 24);
 
   // 使用 Vulkan 专用函数
