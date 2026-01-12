@@ -1,0 +1,41 @@
+//
+// Created by love-yuri on 2026/1/12.
+//
+module;
+#include <include/core/SkFontMgr.h>
+#if defined(_WIN32)
+#include "include/ports/SkTypeface_win.h"
+#else
+#include "include/ports/SkFontScanner_FreeType.h"
+#endif
+
+export module skia.font;
+
+import yuri_log;
+
+#if defined(_WIN32)
+sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_DirectWrite();
+#else
+sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
+#endif
+
+export namespace skia::font {
+
+/**
+ * 从文件中加载字体
+ * @param path 字体文件路径
+ * @return sk_sp<SkTypeface>
+ */
+sk_sp<SkTypeface> load_from_file(const std::string_view path) {
+  auto typeface = fontMgr->makeFromFile(path.data(), 0);
+  if (!typeface) {
+    yuri::error("typeface is null! 字体： {} 加载失败!", path);
+    return nullptr;
+  }
+  return typeface;
+}
+
+}
+
+
+
