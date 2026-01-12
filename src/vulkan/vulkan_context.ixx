@@ -6,11 +6,13 @@ export module vulkan.context;
 import vulkan.api;
 import vulkan.detail;
 import yuri_log;
+import skia.api;
 import configuration;
 import glfw.api;
 import std;
 
 using namespace vk;
+using namespace skia;
 
 /**
  * 全局vulkan上下文
@@ -27,6 +29,8 @@ public:
   std::uint32_t queue_family_index = 0;            // 选择的index
   CommandPool command_pool;                        // command pool
   DispatchLoaderDynamic instance_dynamic_dispatch; // instance 动态加载器
+  skgpu::VulkanBackendContext skia_vk_context;     // vk_context
+  sk_sp<GrDirectContext> skia_direct_context;      // GrDirectContext
 
   vulkan_context();
   ~vulkan_context();
@@ -68,7 +72,7 @@ private:
   void init_instance();
 };
 
-vulkan_context::vulkan_context() :instance(nullptr) {
+vulkan_context::vulkan_context() : instance(nullptr) {
   // 创建instance
   init_instance();
 
@@ -93,6 +97,15 @@ vulkan_context::vulkan_context() :instance(nullptr) {
     }),
     "创建 Command Pool"
   );
+
+  // 创建skia context
+  skia_vk_context.fInstance = instance;
+  skia_vk_context.fPhysicalDevice = physical_device;
+  skia_vk_context.fDevice = logic_device;
+  skia_vk_context.fGraphicsQueueIndex = queue_family_index;
+  skia_vk_context.fQueue = queue;
+  skia_vk_context.fGetProc = vulkan_get_proc;
+  skia_direct_context = MakeVulkan(skia_vk_context);
 }
 
 vulkan_context::~vulkan_context() {

@@ -9,12 +9,16 @@ import vulkan;
 import configuration;
 import yuri_log;
 import glfw.api;
+import skia.api;
 
 // 等待信息
 constexpr vk::PipelineStageFlags wait_stage = vk::PipelineStageFlagBits::eTransfer;
 
 // 开始绘制信息
 constexpr vk::CommandBufferBeginInfo command_buffer_begin_info{};
+
+// 最大值
+constexpr auto uint_32_max = std::numeric_limits<std::uint32_t>::max();
 
 /**
  * 每帧渲染数据
@@ -29,6 +33,7 @@ public:
   vk::Semaphore* render_finished{};                  // 渲染完成的信号
   vk::Semaphore* image_available{};                  // 图像获取完成的信号
   vk::Fence* fence{};                                // 帧渲染完成的栅栏
+  skia::SkSurface* sk_surface{};                     // surface
   std::vector<vk::CommandBuffer>* command_buffers{}; // 专属命令缓冲区
 
   explicit render_frame(vk::SwapchainKHR &swapchain);
@@ -71,6 +76,7 @@ public:
   std::vector<vk::Semaphore> render_finished_semaphores;       // render 同步量
   std::vector<vk::Semaphore> image_available_semaphores;       // 图像可用同步量
   std::vector<std::vector<vk::CommandBuffer>> command_buffers; // buffers
+  std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;       // surface
 
   explicit window_context(glfw::GLFWwindow *window);
 
@@ -157,8 +163,7 @@ void window_context::create_swapchain() {
 
   // 获取窗口size
   vk::Extent2D extent;
-  constexpr auto uint_64_max = std::numeric_limits<std::uint32_t>::max();
-  if (capabilities.currentExtent.width != uint_64_max && capabilities.currentExtent.height != uint_64_max) {
+  if (capabilities.currentExtent.width != uint_32_max && capabilities.currentExtent.height != uint_32_max) {
     extent = capabilities.currentExtent;
   } else {
     extent = vk::get_buffer_size(window);
@@ -188,11 +193,14 @@ void window_context::create_swapchain() {
   render_finished_semaphores.resize(image_count);
   image_available_semaphores.resize(image_count);
   command_buffers.resize(image_count);
+  sk_surfaces.resize(image_count);
   for (auto i = 0; i < image_count; ++i) {
     render_finished_semaphores[i] = vulkan_context->create_semaphore();
     image_available_semaphores[i] = vulkan_context->create_semaphore();
     fences[i] = vulkan_context->create_fence();
     command_buffers[i] = vulkan_context->allocate_command_buffer();
+    sk_surfaces[i] = skia::create_surface(&images[i], extent, vulkan_context->queue_family_index,
+      vulkan_context->skia_direct_context.get());
   }
 }
 
@@ -239,6 +247,7 @@ render_frame* window_context::acquire_next_frame() {
   current_frame->image_available = &image_available_semaphores[current_frame_index];
   current_frame->fence = &fences[current_frame_index];
   current_frame->command_buffers = &command_buffers[current_frame_index];
+  current_frame->sk_surface = sk_surfaces[current_frame_index].get();
 
   return current_frame.get();
 }

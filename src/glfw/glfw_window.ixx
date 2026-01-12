@@ -6,6 +6,7 @@ import vulkan.detail;
 import vulkan.api;
 import vulkan.context;
 import configuration;
+import skia.api;
 import yuri_log;
 import std;
 
@@ -49,6 +50,16 @@ public:
    * 请不要保存该指针
    */
   render_frame* acquire_next_frame();
+
+  /**
+   * 开始执行绘制
+   */
+  void run();
+
+  /**
+   * 绘制
+   */
+  // virtual void render() = 0;
 
   /**
    * 展示debug信息
@@ -126,6 +137,63 @@ void glfw_window::show() const {
 
 render_frame* glfw_window::acquire_next_frame() {
   return context.acquire_next_frame();
+}
+
+void glfw_window::run() {
+  while (!should_close()) {
+    const auto frame = acquire_next_frame();
+    frame->begin_frame();
+
+    skia::GrVkImageInfo imageInfo{};
+    imageInfo.fImage = *frame->image;
+    imageInfo.fImageLayout = vk::VK_IMAGE_LAYOUT_UNDEFINED;
+    imageInfo.fFormat = vk::VK_FORMAT_B8G8R8A8_UNORM;
+    imageInfo.fImageTiling = vk::VK_IMAGE_TILING_OPTIMAL;
+    imageInfo.fLevelCount = 1;
+    imageInfo.fCurrentQueueFamily = vulkan_context->queue_family_index;
+
+    // skia::GrBackendRenderTarget backendRT = GrBackendRenderTargets::MakeVk(
+    //   width(),
+    //   height(),
+    //   imageInfo
+    // );
+
+    // auto surface = SkSurfaces::WrapBackendRenderTarget(
+    //   grContext.get(),
+    //   backendRT,
+    //   kTopLeft_GrSurfaceOrigin,
+    //   kBGRA_8888_SkColorType,
+    //   nullptr,
+    //   &props
+    // );
+    //
+    // if (surface == nullptr) {
+    //   yuri::error("surface is null!");
+    //   return 0;
+    // }
+    //
+    // SkCanvas* canvas = surface->getCanvas();
+    // canvas->clear(SK_ColorWHITE);
+    // std::uniform_int_distribution dis_w(0, gw.width());
+    // std::uniform_int_distribution dis_h(0, gw.height());
+    //
+    // SkPoint center = {
+    //   static_cast<float>(gw.width() / 2),
+    //   static_cast<float>(gw.height() / 2)
+    // };
+    //
+    // canvas->drawCircle(center, 220, paint);
+    // canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
+    //
+    // // Flush 并转换到呈现布局
+    // grContext->flush(surface.get(), {}, &presentState);
+    // grContext->submit(GrSyncCpu::kNo);
+
+    frame->submit();
+    frame->present();
+
+    glfwPollEvents();
+  }
 }
 
 void glfw_window::show_debug_info() const {
