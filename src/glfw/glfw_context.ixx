@@ -142,9 +142,6 @@ window_context::window_context(glfw::GLFWwindow *window) :
   glfw::glfwCreateWindowSurface(vulkan_context->instance, window, nullptr, &surface);
   this->surface = surface;
 
-  // 获取caps
-  capabilities = vulkan_context->get_surface_capabilities(surface);
-
   // 创建交换链
   create_swapchain();
 }
@@ -155,7 +152,19 @@ window_context::~window_context() {
 }
 
 void window_context::create_swapchain() {
-  const vk::Extent2D extent = vk::get_buffer_size(window);
+  // 获取caps
+  capabilities = vulkan_context->get_surface_capabilities(surface);
+
+  // 获取窗口size
+  vk::Extent2D extent;
+  constexpr auto uint_64_max = std::numeric_limits<std::uint64_t>::max();
+  if (capabilities.currentExtent.width != uint_64_max && capabilities.currentExtent.height != uint_64_max) {
+    extent = capabilities.currentExtent;
+  } else {
+    extent = vk::get_buffer_size(window);
+  }
+
+  // 创建
   image_count = capabilities.minImageCount + 1;
   const vk::detail::swapchain_create_info info {
     surface,
