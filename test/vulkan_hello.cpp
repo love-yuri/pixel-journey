@@ -5,7 +5,9 @@ import vulkan;
 import glfw;
 import yuri_log;
 import skia.font;
-import skia_api;
+import skia;
+
+using namespace skia;
 
 class FPSCounter {
   int frameCount = 0;
@@ -35,19 +37,6 @@ double getCurrentTime() {
 }
 
 int main() {
-  skgpu::VulkanBackendContext vkContext;
-  vkContext.fInstance = vulkan_context->instance;
-  vkContext.fPhysicalDevice = vulkan_context->physical_device;
-  vkContext.fDevice = vulkan_context->logic_device;
-  vkContext.fGraphicsQueueIndex = vulkan_context->queue_family_index;
-  vkContext.fQueue = vulkan_context->queue;
-  vkContext.fGetProc = vk::vulkan_get_proc;
-
-  GrContextOptions options;
-  options.fSuppressPrints = true;
-
-  auto grContext = MakeVulkan(vkContext, options);
-
   glfw::glfw_window gw = {200, 200, "yuri"};
   gw.show();
 
@@ -75,33 +64,7 @@ int main() {
 
     fpsCounter.update(getCurrentTime());
 
-    GrVkImageInfo imageInfo{};
-    imageInfo.fImage = *frame->image;
-    imageInfo.fImageLayout = vk::VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.fFormat = vk::VK_FORMAT_B8G8R8A8_UNORM;
-    imageInfo.fImageTiling = vk::VK_IMAGE_TILING_OPTIMAL;
-    imageInfo.fLevelCount = 1;
-    imageInfo.fCurrentQueueFamily = vulkan_context->queue_family_index;
-
-    GrBackendRenderTarget backendRT = GrBackendRenderTargets::MakeVk(
-      gw.width(),
-      gw.height(),
-      imageInfo
-    );
-
-    auto surface = SkSurfaces::WrapBackendRenderTarget(
-      grContext.get(),
-      backendRT,
-      kTopLeft_GrSurfaceOrigin,
-      kBGRA_8888_SkColorType,
-      nullptr,
-      &props
-    );
-
-    if (!surface) {
-      yuri::error("surface is null!");
-      return 0;
-    }
+    auto surface = frame->sk_surface;
 
     SkCanvas* canvas = surface->getCanvas();
     canvas->clear(SKColorWhite);
@@ -115,8 +78,8 @@ int main() {
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
 
     // Flush 并转换到呈现布局
-    grContext->flush(surface.get(), {}, &presentState);
-    grContext->submit(GrSyncCpu::kNo);
+    vulkan_context->skia_direct_context->flush(surface, {}, &presentState);
+    vulkan_context->skia_direct_context->submit(GrSyncCpu::kNo);
 
     frame->submit();
     frame->present();
