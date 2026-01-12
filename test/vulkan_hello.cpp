@@ -93,7 +93,7 @@ int main() {
   SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
   while (!gw.should_close()) {
     const auto frame = gw.acquire_next_frame();
-    const auto cmd = frame->begin_frame();
+    frame->begin_frame();
 
     fpsCounter.update(getCurrentTime());
 
@@ -134,8 +134,6 @@ int main() {
     // Flush 并转换到呈现布局
     grContext->flush(surface.get(), {}, &presentState);
     grContext->submit(GrSyncCpu::kNo);
-
-    surface.reset();
 
     frame->submit();
     frame->present();
