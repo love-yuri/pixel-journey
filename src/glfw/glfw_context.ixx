@@ -76,7 +76,7 @@ public:
   std::vector<vk::Semaphore> render_finished_semaphores;       // render 同步量
   std::vector<vk::Semaphore> image_available_semaphores;       // 图像可用同步量
   std::vector<std::vector<vk::CommandBuffer>> command_buffers; // buffers
-  std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;       // surface
+  std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;       // skia surface
 
   explicit window_context(glfw::GLFWwindow *window);
 
@@ -194,18 +194,36 @@ void window_context::create_swapchain() {
   image_available_semaphores.resize(image_count);
   command_buffers.resize(image_count);
   sk_surfaces.resize(image_count);
+
+  const auto presentState = skia::skgpu::MutableTextureStates::MakeVulkan(
+      vk::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+      vulkan_context->queue_family_index
+  );
   for (auto i = 0; i < image_count; ++i) {
     render_finished_semaphores[i] = vulkan_context->create_semaphore();
     image_available_semaphores[i] = vulkan_context->create_semaphore();
     fences[i] = vulkan_context->create_fence();
     command_buffers[i] = vulkan_context->allocate_command_buffer();
-    sk_surfaces[i] = skia::create_surface(&images[i], extent, vulkan_context->queue_family_index,
-      vulkan_context->skia_direct_context.get());
+    sk_surfaces[i] = skia::create_surface(
+      &images[i],
+      extent,
+      vulkan_context->queue_family_index,
+      vulkan_context->skia_direct_context.get()
+    );
+
+    // 再次提交更新layout
+    vulkan_context->skia_direct_context->flush(sk_surfaces[i].get(), {}, &presentState);
+    vulkan_context->skia_direct_context->submit();
   }
 }
 
 void window_context::destroy_swapchain() const {
   auto _ = vulkan_context->logic_device.waitIdle();
+
+  for (auto &k : command_buffers) {
+    vulkan_context->logic_device.freeCommandBuffers(vulkan_context->command_pool, k);
+  }
+
   for (const auto &k : image_available_semaphores) {
     vulkan_context->logic_device.destroySemaphore(k);
   }
@@ -219,6 +237,9 @@ void window_context::destroy_swapchain() const {
   }
 
   vulkan_context->logic_device.destroySwapchainKHR(swapchain);
+
+  // 释放显存
+  vulkan_context->logic_device.freeMemory();
 }
 
 render_frame* window_context::acquire_next_frame() {

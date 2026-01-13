@@ -109,6 +109,7 @@ vulkan_context::vulkan_context() : instance(nullptr) {
 }
 
 vulkan_context::~vulkan_context() {
+  skia_direct_context.reset();
   logic_device.destroyCommandPool(command_pool);
   logic_device.destroy();
   if constexpr (is_debug_mode) {
