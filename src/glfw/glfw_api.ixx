@@ -20,9 +20,9 @@ using ::glfwSetWindowUserPointer;
 using ::glfwGetWindowUserPointer;
 using ::glfwPollEvents;
 
-class application final {
+class Application final {
 public:
-  explicit application() {
+  explicit Application() {
     if (glfwInit() == GLFW_FALSE) {
       throw std::runtime_error("glfw: 初始化失败!");
     }
@@ -31,7 +31,7 @@ public:
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   }
 
-  ~application() {
+  ~Application() {
     glfwTerminate();
   }
 };

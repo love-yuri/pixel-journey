@@ -18,7 +18,7 @@ using namespace skia;
  * 全局vulkan上下文
  */
 class VulkanContext final {
-  glfw::application app;                   // glfw app
+  glfw::Application app;                   // glfw app
   DebugUtilsMessengerEXT debug_messenger_; // debug_messenger
 
 public:
