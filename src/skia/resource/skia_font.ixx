@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/1/12.
 //
 
-export module skia.font;
+export module skia.resource:font;
 
 import yuri_log;
 import skia.api;
