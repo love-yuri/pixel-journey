@@ -46,12 +46,6 @@ int main() {
   sk_sp<SkTypeface> typeface = skia::font::load_from_file(skia::font::default_font_path);
   SkFont font(typeface, 24);
 
-  // 使用 Vulkan 专用函数
-  auto presentState = skgpu::MutableTextureStates::MakeVulkan(
-      vk::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-      vulkan_context->queue_family_index
-  );
-
   SkPaint paint;
   paint.setColor(SKColorRed);
   paint.setAntiAlias(true);
@@ -78,7 +72,7 @@ int main() {
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
 
     // Flush 并转换到呈现布局
-    vulkan_context->skia_direct_context->flush(surface, {}, &presentState);
+    vulkan_context->skia_direct_context->flush(surface, {}, &vulkan_context->present_state);
     vulkan_context->skia_direct_context->submit(GrSyncCpu::kNo);
 
     frame->submit();

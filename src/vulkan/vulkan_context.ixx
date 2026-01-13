@@ -29,8 +29,9 @@ public:
   std::uint32_t queue_family_index = 0;            // 选择的index
   CommandPool command_pool;                        // command pool
   DispatchLoaderDynamic instance_dynamic_dispatch; // instance 动态加载器
-  skgpu::VulkanBackendContext skia_vk_context;     // vk_context
+  gpu::VulkanBackendContext skia_vk_context;     // vk_context
   sk_sp<GrDirectContext> skia_direct_context;      // GrDirectContext
+  gpu::MutableTextureState present_state;  // skia present s
 
   vulkan_context();
   ~vulkan_context();
@@ -84,16 +85,16 @@ vulkan_context::vulkan_context() : instance(nullptr) {
   this->physical_device = physical_device;
 
   // 创建逻辑设备
-  this->logic_device = create_logical_device(physical_device, index);
+  this->logic_device = create_logical_device(physical_device, queue_family_index);
 
   // 创建queue
-  this->queue = this->logic_device.getQueue(index, index);
+  this->queue = this->logic_device.getQueue(queue_family_index, queue_family_index);
 
   // 创建command pool
   this->command_pool = check_vk_result(
     logic_device.createCommandPool( {
       CommandPoolCreateFlagBits::eResetCommandBuffer,
-      index
+      queue_family_index
     }),
     "创建 Command Pool"
   );
@@ -106,6 +107,7 @@ vulkan_context::vulkan_context() : instance(nullptr) {
   skia_vk_context.fQueue = queue;
   skia_vk_context.fGetProc = vulkan_get_proc;
   skia_direct_context = MakeVulkan(skia_vk_context);
+  present_state = gpu::MutableTextureStates::MakeVulkan(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, queue_family_index);
 }
 
 vulkan_context::~vulkan_context() {

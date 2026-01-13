@@ -195,10 +195,6 @@ void window_context::create_swapchain() {
   command_buffers.resize(image_count);
   sk_surfaces.resize(image_count);
 
-  const auto presentState = skia::skgpu::MutableTextureStates::MakeVulkan(
-      vk::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-      vulkan_context->queue_family_index
-  );
   for (auto i = 0; i < image_count; ++i) {
     render_finished_semaphores[i] = vulkan_context->create_semaphore();
     image_available_semaphores[i] = vulkan_context->create_semaphore();
@@ -212,7 +208,7 @@ void window_context::create_swapchain() {
     );
 
     // 再次提交更新layout
-    vulkan_context->skia_direct_context->flush(sk_surfaces[i].get(), {}, &presentState);
+    vulkan_context->skia_direct_context->flush(sk_surfaces[i].get(), {}, &vulkan_context->present_state);
     vulkan_context->skia_direct_context->submit();
   }
 }
