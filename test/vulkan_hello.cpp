@@ -43,24 +43,73 @@ class Window: public glfw::Window {
 
   SkPaint paint = [] {
     SkPaint paint;
-    paint.setColor(skia_colors::red);
+    paint.setColor(skia_colors::gray);
     paint.setAntiAlias(true);
     return paint;
   }();
 
 public:
+  SkPoint current_point = {0, 0 };
+  SkPoint last_point = {0, 0};
+  bool is_clicked = false;
+  bool is_hover = false;
+  float r = 220;
   void render(SkCanvas *canvas) override {
     fpsCounter.update(getCurrentTime());
 
     canvas->clear(skia_colors::white);
-    const SkPoint center = {
-      static_cast<float>(m_width / 2),
-      static_cast<float>(m_height / 2)
-    };
+    if (current_point.equals(0, 0)) {
+      current_point = {
+        static_cast<float>(m_width / 2),
+        static_cast<float>(m_height / 2)
+      };
+    }
 
     const SkFont font(typeface, 24);
-    canvas->drawCircle(center, 220, paint);
+    if (is_hover) {
+      r -= 1;
+      if (r < 20) r = 220;
+    }
+    canvas->drawCircle(current_point, r, paint);
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
+    canvas->drawString(std::format("current: {:.1f} {:.1f}",current_point.x(), current_point.y()).c_str(), 100, 530, font, paint);
+  }
+
+  void on_mouse_enter() override {
+
+  }
+
+  void on_mouse_leave() override {
+    yuri::info("鼠标移出 {}, {}", current_point.x(), current_point.y());
+  }
+
+  void on_mouse_move(const float x, const float y) override {
+    const auto rect = SkRect::MakeLTRB(
+      current_point.x() - r,
+      current_point.y() - r,
+      current_point.x() + r,
+      current_point.y() + r
+    );
+    if (rect.contains(x, y)) {
+      is_hover = true;
+    } else {
+      is_hover = false;
+    }
+    if (is_clicked) {
+      const auto new_x = x - last_point.x();
+      const auto new_y = y - last_point.y();
+      current_point.set(current_point.x() + new_x, current_point.y() + new_y);
+      last_point.set(x, y);
+    }
+  }
+
+  void on_mouse_left_pressed() override {
+    is_clicked = true;
+    last_point = get_cursor_position();
+  }
+
+  void on_mouse_left_released() override {
+    is_clicked = false;
   }
 };
 
