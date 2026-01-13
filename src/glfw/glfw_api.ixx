@@ -16,9 +16,19 @@ using ::glfwShowWindow;
 using ::glfwWindowShouldClose;
 using ::glfwPollEvents;
 using ::glfwSetFramebufferSizeCallback;
+using ::glfwSetCursorPosCallback;
+using ::glfwSetMouseButtonCallback;
+using ::glfwSetCursorEnterCallback;
 using ::glfwSetWindowUserPointer;
 using ::glfwGetWindowUserPointer;
 using ::glfwPollEvents;
+using ::glfwMakeContextCurrent;
+using ::glfwGetCursorPos;
+
+constexpr auto left_mouse_button = GLFW_MOUSE_BUTTON_LEFT;
+constexpr auto right_mouse_button = GLFW_MOUSE_BUTTON_RIGHT;
+constexpr auto button_pressed = GLFW_PRESS;
+constexpr auto button_released = GLFW_RELEASE;
 
 class Application final {
 public:

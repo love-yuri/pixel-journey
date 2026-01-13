@@ -18,7 +18,7 @@ protected:
   int m_height;               // 窗口高度
   GLFWwindow *m_window{};     // 窗口指针
   std::string m_title{};      // 窗口标题
-  WindowContext context;     // context
+  WindowContext context;      // context
 
 public:
   Window(int width, int height, std::string_view title = "yuri");
@@ -38,7 +38,7 @@ public:
    * 检查窗口状态
    * @return 是否应该关闭窗口
    */
-  bool should_close() const;
+  [[nodiscard]] bool should_close() const;
 
   /**
    * 展示窗口
@@ -63,6 +63,12 @@ public:
   virtual void render(skia::SkCanvas* canvas) = 0;
 
   /**
+   * 获取当前鼠标指针位置
+   * @return 鼠标位置
+   */
+  skia::SkPoint get_cursor_position() const;
+
+  /**
    * 展示debug信息
    */
   void show_debug_info() const;
@@ -76,9 +82,55 @@ private:
   void on_resize(int width, int height);
 
   /**
+   * 鼠标移动事件
+   * @param x x: 相对于左上角
+   * @param y y: 相对于左上角
+   */
+  virtual void on_mouse_move(float x, float y) {}
+
+  /**
+   * 鼠标进入
+   */
+  virtual void on_mouse_enter() {
+  }
+
+  /**
+   * 鼠标移出
+   */
+  virtual void on_mouse_leave() {
+  }
+
+  /**
+   * 鼠标左侧点击事件
+   */
+  virtual void on_mouse_left_pressed() {
+  }
+
+  /**
+   * 鼠标左侧松开事件
+   */
+  virtual void on_mouse_left_released() {
+  }
+
+  /**
    * 静态size更改回调函数
    */
-  static void on_resize_static(GLFWwindow* window, const int width, const int height);
+  static void on_resize_static(GLFWwindow* window, int width, int height);
+
+  /**
+   * 静态 鼠标移动事件回调
+   */
+  static void on_mouse_move_static(GLFWwindow* window, double x, double y);
+
+  /**
+  * 静态 鼠标进入/进出事件回调
+  */
+  static void on_mouse_enter_static(GLFWwindow* window, int is_entered);
+
+  /**
+   * 静态 鼠标点击回调
+   */
+  static void on_mouse_button_static(GLFWwindow* window, int button, int action, int mods);
 };
 
 Window::Window(const int width, const int height, const std::string_view title) :
@@ -91,6 +143,9 @@ Window::Window(const int width, const int height, const std::string_view title) 
   // GLFW 窗口大小回调
   glfwSetWindowUserPointer(m_window, this);
   glfwSetFramebufferSizeCallback(m_window, on_resize_static);
+  glfwSetCursorPosCallback(m_window, on_mouse_move_static);
+  glfwSetMouseButtonCallback(m_window, on_mouse_button_static);
+  glfwSetCursorEnterCallback(m_window, on_mouse_enter_static);
 
   // 打印debug信息
   if constexpr (is_debug_mode) {
@@ -117,6 +172,31 @@ void Window::on_resize_static(GLFWwindow *window, const int width, const int hei
     self->m_width = width;
     self->m_height = height;
     self->on_resize(width, height);
+  }
+}
+
+void Window::on_mouse_move_static(GLFWwindow *window, const double x, const double y) {
+  const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+  self->on_mouse_move(static_cast<float>(x), static_cast<float>(y));
+}
+
+void Window::on_mouse_enter_static(GLFWwindow *window, const int is_entered) {
+  const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+  if (is_entered) {
+    self->on_mouse_enter();
+  } else {
+    self->on_mouse_leave();
+  }
+}
+
+void Window::on_mouse_button_static(GLFWwindow *window,const  int button, const int action, const int mods) {
+  const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+  if (button == left_mouse_button) {
+    if (action == button_pressed) {
+      self->on_mouse_left_pressed();
+    } else if (action == button_released) {
+      self->on_mouse_left_released();
+    }
   }
 }
 
@@ -160,6 +240,15 @@ void Window::run() {
 
     glfwPollEvents();
   }
+}
+
+skia::SkPoint Window::get_cursor_position() const {
+  double x, y;
+  glfwGetCursorPos(m_window, &x, &y);
+  return {
+    static_cast<float>(x),
+    static_cast<float>(y),
+  };
 }
 
 void Window::show_debug_info() const {
