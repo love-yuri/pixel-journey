@@ -66,7 +66,6 @@ using ::SkFontMgr_New_FontConfig;
 using ::SkFontScanner_Make_FreeType;
 #endif
 
-
 /* inline constexpr */
 constexpr auto SKColorRed = SK_ColorRED;
 constexpr auto SKColorYellow = SK_ColorYELLOW;
@@ -78,17 +77,17 @@ constexpr auto SKColorWhite = SK_ColorWHITE;
 /**
  * skgpu
  */
-export namespace skia::skgpu {
+export namespace skia::gpu {
 
 using ::skgpu::VulkanBackendContext;
-using ::skgpu::VulkanBackendContext;
+using ::skgpu::MutableTextureState;
 
 } // namespace skia::skgpu
 
 /**
  * MutableTextureStates
  */
-export namespace skia::skgpu::MutableTextureStates {
+export namespace skia::gpu::MutableTextureStates {
 
 using ::skgpu::MutableTextureStates::MakeVulkan;
 
