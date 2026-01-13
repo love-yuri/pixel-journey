@@ -12,16 +12,17 @@ import std;
 
 export namespace glfw {
 
-class glfw_window {
+class Window {
+protected:
   int m_width;                // 窗口宽度
   int m_height;               // 窗口高度
   GLFWwindow *m_window{};     // 窗口指针
   std::string m_title{};      // 窗口标题
-  window_context context;     // context
+  WindowContext context;     // context
 
 public:
-  glfw_window(int width, int height, std::string_view title = "yuri");
-  virtual ~glfw_window();
+  Window(int width, int height, std::string_view title = "yuri");
+  virtual ~Window();
 
   /**
    * 获取窗口宽度
@@ -42,7 +43,7 @@ public:
   /**
    * 展示窗口
    */
-  void show() const;
+  void show();
 
   /**
    * 获取下一个渲染帧数据
@@ -59,7 +60,7 @@ public:
   /**
    * 绘制
    */
-  // virtual void render() = 0;
+  virtual void render(skia::SkCanvas* canvas) = 0;
 
   /**
    * 展示debug信息
@@ -80,7 +81,7 @@ private:
   static void on_resize_static(GLFWwindow* window, const int width, const int height);
 };
 
-glfw_window::glfw_window(const int width, const int height, const std::string_view title) :
+Window::Window(const int width, const int height, const std::string_view title) :
   m_width(width),
   m_height(height),
   m_title(title),
@@ -97,19 +98,19 @@ glfw_window::glfw_window(const int width, const int height, const std::string_vi
   }
 }
 
-glfw_window::~glfw_window() {
+Window::~Window() {
   destroy_window(m_window);
 }
 
-void glfw_window::on_resize(int width, int height) {
+void Window::on_resize(int width, int height) {
   context.destroy_swapchain();
   context.create_swapchain();
 }
 
-void glfw_window::on_resize_static(GLFWwindow *window, const int width, const int height) {
+void Window::on_resize_static(GLFWwindow *window, const int width, const int height) {
   // 忽略最小化
   if (width > 0 && height > 0) {
-    const auto self = static_cast<glfw_window*>(glfwGetWindowUserPointer(window));
+    const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
     if (width == self->m_width && height == self->m_height) {
       return;
     }
@@ -119,76 +120,41 @@ void glfw_window::on_resize_static(GLFWwindow *window, const int width, const in
   }
 }
 
-int glfw_window::width() const {
+int Window::width() const {
   return m_width;
 }
 
-int glfw_window::height() const {
+int Window::height() const {
   return m_height;
 }
 
-bool glfw_window::should_close() const {
+bool Window::should_close() const {
   return glfwWindowShouldClose(m_window);
 }
 
-void glfw_window::show() const {
+void Window::show() {
   glfwShowWindow(m_window);
+  run();
 }
 
-render_frame* glfw_window::acquire_next_frame() {
+render_frame* Window::acquire_next_frame() {
   return context.acquire_next_frame();
 }
 
-void glfw_window::run() {
+void Window::run() {
   while (!should_close()) {
+    // 获取下一帧图像
     const auto frame = acquire_next_frame();
     frame->begin_frame();
 
-    skia::GrVkImageInfo imageInfo{};
-    imageInfo.fImage = *frame->image;
-    imageInfo.fImageLayout = vk::VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.fFormat = vk::VK_FORMAT_B8G8R8A8_UNORM;
-    imageInfo.fImageTiling = vk::VK_IMAGE_TILING_OPTIMAL;
-    imageInfo.fLevelCount = 1;
-    imageInfo.fCurrentQueueFamily = vulkan_context->queue_family_index;
+    // 渲染
+    render(frame->sk_surface->getCanvas());
 
-    // skia::GrBackendRenderTarget backendRT = GrBackendRenderTargets::MakeVk(
-    //   width(),
-    //   height(),
-    //   imageInfo
-    // );
+    // 提交skia指令并转换布局
+    vulkan_context->skia_direct_context->flush(frame->sk_surface, {}, &vulkan_context->present_state);
+    vulkan_context->skia_direct_context->submit(skia::GrSyncCpu::kNo);
 
-    // auto surface = SkSurfaces::WrapBackendRenderTarget(
-    //   grContext.get(),
-    //   backendRT,
-    //   kTopLeft_GrSurfaceOrigin,
-    //   kBGRA_8888_SkColorType,
-    //   nullptr,
-    //   &props
-    // );
-    //
-    // if (surface == nullptr) {
-    //   yuri::error("surface is null!");
-    //   return 0;
-    // }
-    //
-    // SkCanvas* canvas = surface->getCanvas();
-    // canvas->clear(SK_ColorWHITE);
-    // std::uniform_int_distribution dis_w(0, gw.width());
-    // std::uniform_int_distribution dis_h(0, gw.height());
-    //
-    // SkPoint center = {
-    //   static_cast<float>(gw.width() / 2),
-    //   static_cast<float>(gw.height() / 2)
-    // };
-    //
-    // canvas->drawCircle(center, 220, paint);
-    // canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
-    //
-    // // Flush 并转换到呈现布局
-    // grContext->flush(surface.get(), {}, &presentState);
-    // grContext->submit(GrSyncCpu::kNo);
-
+    // 提交绘制信息
     frame->submit();
     frame->present();
 
@@ -196,7 +162,7 @@ void glfw_window::run() {
   }
 }
 
-void glfw_window::show_debug_info() const {
+void Window::show_debug_info() const {
   auto caps = context.capabilities;
   yuri::info("Surface capabilities:");
   yuri::info("  minImageCount: {}", caps.minImageCount);

@@ -57,6 +57,7 @@ using ::kBGRA_8888_SkColorType;
 using ::GrSyncCpu;
 using ::GrDirectContext;
 using ::SkFontMgr;
+using ::SkColor;
 
 /* 字体相关 */
 #if defined(_WIN32)
@@ -66,11 +67,12 @@ using ::SkFontMgr_New_FontConfig;
 using ::SkFontScanner_Make_FreeType;
 #endif
 
-/* inline constexpr */
-constexpr auto SKColorRed = SK_ColorRED;
-constexpr auto SKColorYellow = SK_ColorYELLOW;
-constexpr auto SKColorGreen = SK_ColorGREEN;
-constexpr auto SKColorWhite = SK_ColorWHITE;
+/**
+ * 导出内联函数
+ */
+consteval SkColor SkColorSetARGB(const U8CPU a,const  U8CPU r, const U8CPU g, const U8CPU b) noexcept {
+  return ::SkColorSetARGB(a, r, g, b); // 调用原始函数
+}
 
 } // namespace skia
 
@@ -79,8 +81,8 @@ constexpr auto SKColorWhite = SK_ColorWHITE;
  */
 export namespace skia::gpu {
 
-using ::skgpu::VulkanBackendContext;
-using ::skgpu::MutableTextureState;
+using skgpu::VulkanBackendContext;
+using skgpu::MutableTextureState;
 
 } // namespace skia::skgpu
 
@@ -89,7 +91,7 @@ using ::skgpu::MutableTextureState;
  */
 export namespace skia::gpu::MutableTextureStates {
 
-using ::skgpu::MutableTextureStates::MakeVulkan;
+using skgpu::MutableTextureStates::MakeVulkan;
 
 }
 

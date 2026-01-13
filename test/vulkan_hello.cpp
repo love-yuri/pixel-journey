@@ -4,7 +4,7 @@ import std;
 import vulkan;
 import glfw;
 import yuri_log;
-import skia.font;
+import skia.resource;
 import skia;
 
 using namespace skia;
@@ -36,48 +36,35 @@ double getCurrentTime() {
   return std::chrono::duration<double>(duration).count();
 }
 
-int main() {
-  glfw::glfw_window gw = {200, 200, "yuri"};
-  gw.show();
-
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
-  sk_sp<SkTypeface> typeface = skia::font::load_from_file(skia::font::default_font_path);
-  SkFont font(typeface, 24);
-
-  SkPaint paint;
-  paint.setColor(SKColorRed);
-  paint.setAntiAlias(true);
-
+class Window: public glfw::Window {
+  using glfw::Window::Window;
   FPSCounter fpsCounter;
-  SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
-  while (!gw.should_close()) {
-    const auto frame = gw.acquire_next_frame();
-    frame->begin_frame();
+  sk_sp<SkTypeface> typeface = font::load_from_file(skia::font::default_font_path);
 
+  SkPaint paint = [] {
+    SkPaint paint;
+    paint.setColor(skia_colors::red);
+    paint.setAntiAlias(true);
+    return paint;
+  }();
+
+public:
+  void render(SkCanvas *canvas) override {
     fpsCounter.update(getCurrentTime());
 
-    auto surface = frame->sk_surface;
-
-    SkCanvas* canvas = surface->getCanvas();
-    canvas->clear(SKColorWhite);
-
-    SkPoint center = {
-      static_cast<float>(gw.width() / 2),
-      static_cast<float>(gw.height() / 2)
+    canvas->clear(skia_colors::white);
+    const SkPoint center = {
+      static_cast<float>(m_width / 2),
+      static_cast<float>(m_height / 2)
     };
 
+    const SkFont font(typeface, 24);
     canvas->drawCircle(center, 220, paint);
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
-
-    // Flush 并转换到呈现布局
-    vulkan_context->skia_direct_context->flush(surface, {}, &vulkan_context->present_state);
-    vulkan_context->skia_direct_context->submit(GrSyncCpu::kNo);
-
-    frame->submit();
-    frame->present();
-
-    glfw::glfwPollEvents();
   }
+};
+
+int main() {
+  Window gw = {200, 200, "yuri"};
+  gw.show();
 }

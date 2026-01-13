@@ -59,7 +59,7 @@ public:
  * GLFW窗口与Vulkan渲染上下文整合结构体
  * 管理窗口、Surface、交换链及帧渲染资源
  */
-export class window_context {
+export class WindowContext {
   int current_frame_index = -1;            // 当前使用的frame index
 public:
   // 当前帧正在使用的frame
@@ -78,12 +78,12 @@ public:
   std::vector<std::vector<vk::CommandBuffer>> command_buffers; // buffers
   std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;       // skia surface
 
-  explicit window_context(glfw::GLFWwindow *window);
+  explicit WindowContext(glfw::GLFWwindow *window);
 
   /**
    * 析构函数，释放资源
    */
-  ~window_context();
+  ~WindowContext();
 
   /**
   * 创建交换链
@@ -138,7 +138,7 @@ void render_frame::present() {
   vk::check_vk_result<false>(vulkan_context->queue.presentKHR(present_info), "呈现");
 }
 
-window_context::window_context(glfw::GLFWwindow *window) :
+WindowContext::WindowContext(glfw::GLFWwindow *window) :
   window(window),
   format(vk::defaults::default_surface_format),
   color_space(vk::defaults::default_surface_color_space) {
@@ -152,12 +152,12 @@ window_context::window_context(glfw::GLFWwindow *window) :
   create_swapchain();
 }
 
-window_context::~window_context() {
+WindowContext::~WindowContext() {
   destroy_swapchain();
   vulkan_context->instance.destroySurfaceKHR(surface);
 }
 
-void window_context::create_swapchain() {
+void WindowContext::create_swapchain() {
   // 获取caps
   capabilities = vulkan_context->get_surface_capabilities(surface);
 
@@ -213,7 +213,7 @@ void window_context::create_swapchain() {
   }
 }
 
-void window_context::destroy_swapchain() const {
+void WindowContext::destroy_swapchain() const {
   auto _ = vulkan_context->logic_device.waitIdle();
 
   for (auto &k : command_buffers) {
@@ -238,7 +238,7 @@ void window_context::destroy_swapchain() const {
   vulkan_context->logic_device.freeMemory();
 }
 
-render_frame* window_context::acquire_next_frame() {
+render_frame* WindowContext::acquire_next_frame() {
   // 获取下一帧
   current_frame_index = (current_frame_index + 1) % image_count;
 
