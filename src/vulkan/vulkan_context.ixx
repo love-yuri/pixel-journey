@@ -17,7 +17,7 @@ using namespace skia;
 /**
  * 全局vulkan上下文
  */
-class vulkan_context final {
+class VulkanContext final {
   glfw::application app;                   // glfw app
   DebugUtilsMessengerEXT debug_messenger_; // debug_messenger
 
@@ -33,8 +33,8 @@ public:
   sk_sp<GrDirectContext> skia_direct_context;      // GrDirectContext
   gpu::MutableTextureState present_state;  // skia present s
 
-  vulkan_context();
-  ~vulkan_context();
+  VulkanContext();
+  ~VulkanContext();
 
   /**
    * 分配command_buffer
@@ -73,7 +73,7 @@ private:
   void init_instance();
 };
 
-vulkan_context::vulkan_context() : instance(nullptr) {
+VulkanContext::VulkanContext() : instance(nullptr) {
   // 创建instance
   init_instance();
 
@@ -110,7 +110,7 @@ vulkan_context::vulkan_context() : instance(nullptr) {
   present_state = gpu::MutableTextureStates::MakeVulkan(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, queue_family_index);
 }
 
-vulkan_context::~vulkan_context() {
+VulkanContext::~VulkanContext() {
   skia_direct_context.reset();
   logic_device.destroyCommandPool(command_pool);
   logic_device.destroy();
@@ -120,7 +120,7 @@ vulkan_context::~vulkan_context() {
   instance.destroy();
 }
 
-std::vector<CommandBuffer> vulkan_context::allocate_command_buffer() const {
+std::vector<CommandBuffer> VulkanContext::allocate_command_buffer() const {
   auto command_buffers = std::vector<CommandBuffer>(command_buffer_size);
   const CommandBufferAllocateInfo allocInfo {
     command_pool,
@@ -131,7 +131,7 @@ std::vector<CommandBuffer> vulkan_context::allocate_command_buffer() const {
   return command_buffers;
 }
 
-Fence vulkan_context::create_fence() const {
+Fence VulkanContext::create_fence() const {
   Fence fence;
   constexpr FenceCreateInfo fence_create_info = {
     FenceCreateFlagBits::eSignaled
@@ -143,7 +143,7 @@ Fence vulkan_context::create_fence() const {
   return fence;
 }
 
-Semaphore vulkan_context::create_semaphore() const {
+Semaphore VulkanContext::create_semaphore() const {
   Semaphore semaphore;
   constexpr SemaphoreCreateInfo semaphore_create_info;
   check_vk_result(
@@ -153,21 +153,21 @@ Semaphore vulkan_context::create_semaphore() const {
   return semaphore;
 }
 
-SurfaceCapabilitiesKHR vulkan_context::get_surface_capabilities(const SurfaceKHR &surface) const {
+SurfaceCapabilitiesKHR VulkanContext::get_surface_capabilities(const SurfaceKHR &surface) const {
   return check_vk_result (
     physical_device.getSurfaceCapabilitiesKHR(surface),
     "获取 Surface Capabilities"
   );
 }
 
-std::vector<Image> vulkan_context::get_images(const SwapchainKHR & swapchain) const {
+std::vector<Image> VulkanContext::get_images(const SwapchainKHR & swapchain) const {
   return check_vk_result (
     logic_device.getSwapchainImagesKHR(swapchain),
     "获取 Swap Images"
   );
 }
 
-void vulkan_context::init_instance() {
+void VulkanContext::init_instance() {
   const detail::instance_create_info info;
   if (const auto res = createInstance(&info, nullptr, &instance); res != Result::eSuccess) {
     throw std::runtime_error(std::format("创建vulkan_instance 失败, 错误码: {}", to_string(res)));
@@ -192,5 +192,5 @@ void vulkan_context::init_instance() {
 }
 
 // 初始全局context
-auto vulkan_context_ = std::make_shared<vulkan_context>();
-export vulkan_context *vulkan_context = vulkan_context_.get();
+auto vulkan_context_ = std::make_shared<VulkanContext>();
+export VulkanContext *vulkan_context = vulkan_context_.get();
