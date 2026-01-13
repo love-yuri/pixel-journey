@@ -4,5 +4,5 @@
 
 export module skia;
 
-export import skia.font;
+export import skia.resource;
 export import skia.api;
