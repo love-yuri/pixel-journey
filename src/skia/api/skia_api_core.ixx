@@ -25,6 +25,7 @@ module;
 #include <include/core/SkFont.h>
 #include <include/core/SkSurface.h>
 #include <include/core/SkColor.h>
+#include <include/core/SkRRect.h>
 #include <include/private/chromium/GrVkSecondaryCBDrawContext.h>
 export module skia.api:core;
 
@@ -35,10 +36,12 @@ import std;
  */
 export namespace skia {
 
+using ::SkPathFillType;
 using ::SkPoint;
 using ::SkRect;
 using ::SkMatrix;
 using ::SkPath;
+using ::SkRRect;
 using ::SkStream;
 using ::SkSurface;
 using ::SkCanvas;
