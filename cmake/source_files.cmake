@@ -11,6 +11,7 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/resource/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/render/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/control/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
 )
 

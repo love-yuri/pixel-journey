@@ -5,3 +5,4 @@
 export module ui;
 
 export import ui.render;
+export import ui.control;
