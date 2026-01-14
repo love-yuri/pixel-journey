@@ -14,11 +14,11 @@ export namespace glfw {
 
 class Window {
 protected:
-  int m_width;                // 窗口宽度
-  int m_height;               // 窗口高度
-  GLFWwindow *m_window{};     // 窗口指针
-  std::string m_title{};      // 窗口标题
-  WindowContext context;      // context
+  float m_width;          // 窗口宽度
+  float m_height;         // 窗口高度
+  GLFWwindow *m_window{}; // 窗口指针
+  std::string m_title{};  // 窗口标题
+  WindowContext context;  // context
 
 public:
   Window(int width, int height, std::string_view title = "yuri");
@@ -73,20 +73,21 @@ public:
    */
   void show_debug_info() const;
 
-private:
+protected:
   /**
    * 窗口大小更改
    * @param width 新的宽度
    * @param height 新的高度
    */
-  void on_resize(int width, int height);
+  virtual void on_resize(int width, int height);
 
   /**
    * 鼠标移动事件
    * @param x x: 相对于左上角
    * @param y y: 相对于左上角
    */
-  virtual void on_mouse_move(float x, float y) {}
+  virtual void on_mouse_move(float x, float y) {
+  }
 
   /**
    * 鼠标进入
