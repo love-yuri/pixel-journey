@@ -39,3 +39,10 @@ sk_sp<SkTypeface> load_from_file(const std::string_view path) {
 }
 
 } // namespace skia::font
+
+sk_sp<SkTypeface> typeface = font::load_from_file(font::default_font_path);
+export namespace skia::font {
+
+SkFont default_font(typeface, 24);
+
+}

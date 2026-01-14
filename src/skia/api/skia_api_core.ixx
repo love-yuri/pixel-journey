@@ -61,6 +61,7 @@ using ::GrSyncCpu;
 using ::GrDirectContext;
 using ::SkFontMgr;
 using ::SkColor;
+using ::SkTextEncoding;
 
 /* 字体相关 */
 #if defined(_WIN32)
