@@ -4,8 +4,8 @@ import std;
 import vulkan;
 import glfw;
 import yuri_log;
-import skia.resource;
 import skia;
+import ui;
 
 using namespace skia;
 
@@ -39,12 +39,13 @@ double getCurrentTime() {
 class Window: public glfw::Window {
   using glfw::Window::Window;
   FPSCounter fpsCounter;
-  sk_sp<SkTypeface> typeface = font::load_from_file(skia::font::default_font_path);
+  sk_sp<SkTypeface> typeface = font::load_from_file(font::default_font_path);
 
   SkPaint paint = [] {
     SkPaint paint;
     paint.setColor(skia_colors::gray);
     paint.setAntiAlias(true);
+    paint.setStrokeWidth(8);
     return paint;
   }();
 
@@ -54,23 +55,34 @@ public:
   bool is_clicked = false;
   bool is_hover = false;
   float r = 220;
+  ui::render::RenderBorder border;
   void render(SkCanvas *canvas) override {
     fpsCounter.update(getCurrentTime());
 
     canvas->clear(skia_colors::white);
     if (current_point.equals(0, 0)) {
+      border.radius = 20;
       current_point = {
-        static_cast<float>(m_width / 2),
-        static_cast<float>(m_height / 2)
+        (m_width / 2),
+        (m_height / 2)
       };
+
+      border.rect = SkRect::MakeLTRB(
+        current_point.x() - r,
+        current_point.y() - r,
+          current_point.x() + r,
+        current_point.y() + r
+      );
     }
 
     const SkFont font(typeface, 24);
-    if (is_hover) {
-      r -= 1;
-      if (r < 20) r = 220;
+    float r = 220;
+    if (is_clicked) {
+      r = 120;
     }
     canvas->drawCircle(current_point, r, paint);
+    canvas->drawLine(50, 0, 50, m_height, paint);
+    border.render(canvas);
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
     canvas->drawString(std::format("current: {:.1f} {:.1f}",current_point.x(), current_point.y()).c_str(), 100, 530, font, paint);
   }
@@ -111,9 +123,17 @@ public:
   void on_mouse_left_released() override {
     is_clicked = false;
   }
+
+  void on_resize(const int width, const int height) override {
+    glfw::Window::on_resize(width, height);
+    current_point = {
+      m_width / 2,
+      (m_height / 2)
+    };
+  }
 };
 
 int main() {
-  Window gw = {200, 200, "yuri"};
+  Window gw = {1200, 800, "yuri"};
   gw.show();
 }
