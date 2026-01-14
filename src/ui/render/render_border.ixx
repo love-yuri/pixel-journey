@@ -11,7 +11,7 @@ export namespace ui::render {
 class RenderBorder : public RenderNode {
   SkPaint paint = [] {
     SkPaint paint;
-    paint.setColor(skia_colors::shadow);
+    paint.setColor(skia_colors::gray);
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setStrokeWidth(2);
     paint.setAntiAlias(true);
