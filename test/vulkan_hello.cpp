@@ -56,6 +56,7 @@ public:
   bool is_hover = false;
   float r = 220;
   ui::render::RenderBorder border;
+  ui::control::Button button { "yuri is" };
   void render(SkCanvas *canvas) override {
     fpsCounter.update(getCurrentTime());
 
@@ -78,11 +79,14 @@ public:
     const SkFont font(typeface, 24);
     float r = 220;
     if (is_clicked) {
-      r = 120;
+      r = 43.75;
     }
+    border.render(canvas);
+    button.render(canvas);
     canvas->drawCircle(current_point, r, paint);
     canvas->drawLine(50, 0, 50, m_height, paint);
-    border.render(canvas);
+
+
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
     canvas->drawString(std::format("current: {:.1f} {:.1f}",current_point.x(), current_point.y()).c_str(), 100, 530, font, paint);
   }
@@ -130,6 +134,13 @@ public:
       m_width / 2,
       (m_height / 2)
     };
+    border.radius = 20;
+    border.rect = SkRect::MakeLTRB(
+        current_point.x() - r,
+        current_point.y() - r,
+          current_point.x() + r,
+        current_point.y() + r
+      );
   }
 };
 
