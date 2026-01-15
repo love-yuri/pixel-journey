@@ -9,31 +9,41 @@ using namespace skia;
 export namespace ui::render {
 
 class RenderBorder : public RenderNode {
-  SkPaint paint = [] {
-    SkPaint paint;
-    paint.setColor(skia_colors::gray);
-    paint.setStyle(SkPaint::kStroke_Style);
-    paint.setStrokeWidth(2);
-    paint.setAntiAlias(true);
-    return paint;
-  }();
+  using RenderNode::RenderNode;
+  SkPaint paint = PaintDesc {
+    .color = skia_colors::gray,
+    .style = SkPaint::kStroke_Style
+  };
 
 public:
-  float radius = 0;
+  float radius = 0; // 圆角大小
 
-  void set_border(const float width) {
-    paint.setStrokeWidth(width);
-  }
+  /**
+   * 设置border宽度
+   * @param width 宽度
+   */
+  void set_border_width(float width);
 
-  void render(SkCanvas* canvas) override {
-    if (rect.isEmpty()) return;
-
-    if (radius <= 0) {
-      canvas->drawRect(rect, paint);
-    } else {
-      canvas->drawRoundRect(rect, radius, radius, paint);
-    }
-  }
+  /**
+   * render
+   */
+  void render(SkCanvas* canvas) override;
 };
+
+void RenderBorder::set_border_width(const float width) {
+  paint.setStrokeWidth(width);
+}
+
+void RenderBorder::render(SkCanvas *canvas) {
+  if (!visible) {
+    return;
+  }
+
+  if (radius <= 0) {
+    canvas->drawRect(rect, paint);
+  } else {
+    canvas->drawRoundRect(rect, radius, radius, paint);
+  }
+}
 
 } // namespace ui::render
