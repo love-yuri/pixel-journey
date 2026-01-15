@@ -21,7 +21,7 @@ export namespace skia::font {
 #if defined(_WIN32)
 constexpr auto default_font_path = R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-Medium.ttf)";
 #else
-constexpr auto default_font_path = "/usr/share/fonts/TTF/FiraCode-Medium.ttf";
+constexpr auto default_font_path = "/usr/share/fonts/maple/MapleMono-NF-CN-Medium.ttf";
 #endif
 
 /**
