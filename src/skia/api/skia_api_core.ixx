@@ -1,6 +1,7 @@
 //
 // Created by yuri on 2026/1/12.
 //
+// ReSharper disable CppUnusedIncludeDirective
 module;
 #include <include/core/SkFontMgr.h>
 #if defined(_WIN32)
@@ -24,9 +25,10 @@ module;
 #include <include/gpu/ganesh/GrDirectContext.h>
 #include <include/core/SkFont.h>
 #include <include/core/SkSurface.h>
+#include <include/core/SkFontMetrics.h>
 #include <include/core/SkColor.h>
 #include <include/core/SkRRect.h>
-#include <include/private/chromium/GrVkSecondaryCBDrawContext.h>
+#include <include/core/SkTextBlob.h>
 export module skia.api:core;
 
 import std;
@@ -37,6 +39,7 @@ import std;
 export namespace skia {
 
 using ::SkPathFillType;
+using ::SkTextBlob;
 using ::SkPoint;
 using ::SkRect;
 using ::SkMatrix;
@@ -62,6 +65,7 @@ using ::GrDirectContext;
 using ::SkFontMgr;
 using ::SkColor;
 using ::SkTextEncoding;
+using ::SkFontMetrics;
 
 /* 字体相关 */
 #if defined(_WIN32)
