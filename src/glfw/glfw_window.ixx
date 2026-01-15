@@ -9,6 +9,7 @@ import configuration;
 import skia.api;
 import yuri_log;
 import std;
+import ui;
 
 export namespace glfw {
 
@@ -21,6 +22,8 @@ protected:
   WindowContext context;  // context
 
 public:
+  ui::widgets::WidgetMouseGrid widget_mouse_grid;
+
   Window(int width, int height, std::string_view title = "yuri");
   virtual ~Window();
 
@@ -139,7 +142,7 @@ Window::Window(const int width, const int height, const std::string_view title) 
   m_height(height),
   m_title(title),
   m_window(create_window(width, height, title)),
-  context(m_window) {
+  context(m_window), widget_mouse_grid(width, height) {
 
   // GLFW 窗口大小回调
   glfwSetWindowUserPointer(m_window, this);
@@ -161,6 +164,7 @@ Window::~Window() {
 void Window::on_resize(int width, int height) {
   context.destroy_swapchain();
   context.create_swapchain();
+  widget_mouse_grid = {width, height};
 }
 
 void Window::on_resize_static(GLFWwindow *window, const int width, const int height) {

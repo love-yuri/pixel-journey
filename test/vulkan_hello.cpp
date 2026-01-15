@@ -126,6 +126,8 @@ public:
 
   void on_mouse_left_released() override {
     is_clicked = false;
+    const auto p = get_cursor_position();
+    widget_mouse_grid.check(p.x(), p.y());
   }
 
   void on_resize(const int width, const int height) override {
@@ -136,11 +138,12 @@ public:
     };
     border.radius = 20;
     border.rect = SkRect::MakeLTRB(
-        current_point.x() - r,
-        current_point.y() - r,
-          current_point.x() + r,
-        current_point.y() + r
-      );
+      current_point.x() - r,
+      current_point.y() - r,
+        current_point.x() + r,
+      current_point.y() + r
+    );
+    widget_mouse_grid.add_widget(&button.rect);
   }
 };
 
