@@ -22,9 +22,9 @@ class RenderText : public RenderNode {
   std::string text;                 // label
   SkPaint paint = PaintDesc{};      // paint
   sk_sp<SkTextBlob> blob;           // 文本blob
+  Alignment alignment = Alignment::TopLeft; // 对齐方式
 
 public:
-  Alignment alignment = Alignment::TopLeft; // 对齐方式
 
   /**
    * 构造一个文本节点
@@ -32,6 +32,11 @@ public:
    * @param rect 所占空间
    */
   RenderText(std::string_view text, const SkRect& rect);
+
+  /**
+   * 设置对齐方式
+   */
+  void set_alignment(Alignment alignment);
 
   /**
    * 设置字体大小
@@ -62,6 +67,11 @@ private:
 };
 
 RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
+  re_calculate();
+}
+
+void RenderText::set_alignment(const Alignment alignment) {
+  this->alignment = alignment;
   re_calculate();
 }
 
