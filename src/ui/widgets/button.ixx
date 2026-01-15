@@ -2,7 +2,7 @@
 // Created by yuri on 2026/1/14.
 //
 
-export module ui.control:button;
+export module ui.widgets:button;
 
 import std;
 import skia.api;
@@ -11,10 +11,9 @@ import ui.render;
 using namespace ui::render;
 using namespace skia;
 
-export namespace ui::control {
+export namespace ui::widgets {
 
 class Button {
-  RenderBorder border_;
   RenderText render_text_;
   RenderBorder render_border_;
 
@@ -29,12 +28,7 @@ public:
   void render(SkCanvas* canvas);
 };
 
-Button::Button(const std::string_view text) {
-
-  render_text_.set_text(text);
-  render_text_.rect = rect;
-  render_border_.rect = rect;
-  render_border_.radius = 12.0f;
+Button::Button(const std::string_view text): render_text_(text, rect), render_border_(rect) {
 }
 
 void Button::render(SkCanvas *canvas) {
