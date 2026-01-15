@@ -55,8 +55,8 @@ public:
   bool is_clicked = false;
   bool is_hover = false;
   float r = 220;
-  ui::render::RenderBorder border;
-  ui::control::Button button { "yuri is" };
+  ui::render::RenderBorder border {SkRect::MakeXYWH(0, 0, 2, 1)};
+  ui::widgets::Button button { "测试" };
   void render(SkCanvas *canvas) override {
     fpsCounter.update(getCurrentTime());
 
