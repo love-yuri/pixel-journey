@@ -36,23 +36,23 @@ public:
   /**
    * 设置对齐方式
    */
-  void set_alignment(Alignment alignment);
+  void setAlignment(Alignment alignment);
 
   /**
    * 设置字体大小
    * @param size 字体大小
    */
-  void set_font_size(float size);
+  void setFontSize(float size);
 
   /**
    * 设置字体颜色
    */
-  void set_color(SkColor color);
+  void setColor(SkColor color);
 
   /**
    * 设置文本
    */
-  void set_text(std::string_view text);
+  void setText(std::string_view text);
 
   /**
    * render
@@ -63,30 +63,30 @@ private:
   /**
    * 重新计算文本、位置等信息
    */
-  void re_calculate();
+  void reCalculate();
 };
 
 RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
-  re_calculate();
+  reCalculate();
 }
 
-void RenderText::set_alignment(const Alignment alignment) {
+void RenderText::setAlignment(const Alignment alignment) {
   this->alignment = alignment;
-  re_calculate();
+  reCalculate();
 }
 
-void RenderText::set_font_size(const float size) {
+void RenderText::setFontSize(const float size) {
   font.setSize(size);
-  re_calculate();
+  reCalculate();
 }
 
-void RenderText::set_color(const SkColor color) {
+void RenderText::setColor(const SkColor color) {
   paint.setColor(color);
 }
 
-void RenderText::set_text(const std::string_view text) {
+void RenderText::setText(const std::string_view text) {
   this->text = text;
-  re_calculate();
+  reCalculate();
 }
 
 void RenderText::render(SkCanvas *canvas) {
@@ -95,7 +95,7 @@ void RenderText::render(SkCanvas *canvas) {
   }
 }
 
-void RenderText::re_calculate() {
+void RenderText::reCalculate() {
   // 计算bound
   font.measureText(this->text.data(), this->text.size(), SkTextEncoding::kUTF8, &font_rect);
 
