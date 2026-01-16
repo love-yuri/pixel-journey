@@ -2,46 +2,34 @@ export module glfw.window;
 
 import glfw.api;
 import glfw.context;
-import vulkan.detail;
-import vulkan.api;
-import vulkan.context;
+import vulkan;
 import configuration;
-import skia.api;
+import skia;
 import yuri_log;
 import std;
 import ui;
 
+using namespace ui::widgets;
+
 export namespace glfw {
 
-class Window {
+class Window : public Widget {
 protected:
-  float m_width;          // 窗口宽度
-  float m_height;         // 窗口高度
   GLFWwindow *m_window{}; // 窗口指针
   std::string m_title{};  // 窗口标题
   WindowContext context;  // context
 
 public:
-  ui::widgets::WidgetMouseGrid widget_mouse_grid;
+  HitTestGrid hit_test_grid;
 
   Window(int width, int height, std::string_view title = "yuri");
-  virtual ~Window();
-
-  /**
-   * 获取窗口宽度
-   */
-  [[nodiscard]] int width() const;
-
-  /**
-   * 获取窗口高度
-   */
-  [[nodiscard]] int height() const;
+  ~Window() override;
 
   /**
    * 检查窗口状态
    * @return 是否应该关闭窗口
    */
-  [[nodiscard]] bool should_close() const;
+  [[nodiscard]] bool shouldClose() const;
 
   /**
    * 展示窗口
@@ -53,7 +41,7 @@ public:
    * 仅保证该帧在当前周期内有效，
    * 请不要保存该指针
    */
-  render_frame* acquire_next_frame();
+  render_frame* acquireNextFrame();
 
   /**
    * 开始执行绘制
@@ -61,20 +49,15 @@ public:
   void run();
 
   /**
-   * 绘制
-   */
-  virtual void render(skia::SkCanvas* canvas) = 0;
-
-  /**
    * 获取当前鼠标指针位置
    * @return 鼠标位置
    */
-  skia::SkPoint get_cursor_position() const;
+  skia::SkPoint getCursorPosition() const;
 
   /**
    * 展示debug信息
    */
-  void show_debug_info() const;
+  void showDebugInfo() const;
 
 protected:
   /**
@@ -82,78 +65,45 @@ protected:
    * @param width 新的宽度
    * @param height 新的高度
    */
-  virtual void on_resize(int width, int height);
-
-  /**
-   * 鼠标移动事件
-   * @param x x: 相对于左上角
-   * @param y y: 相对于左上角
-   */
-  virtual void on_mouse_move(float x, float y) {
-  }
-
-  /**
-   * 鼠标进入
-   */
-  virtual void on_mouse_enter() {
-  }
-
-  /**
-   * 鼠标移出
-   */
-  virtual void on_mouse_leave() {
-  }
-
-  /**
-   * 鼠标左侧点击事件
-   */
-  virtual void on_mouse_left_pressed() {
-  }
-
-  /**
-   * 鼠标左侧松开事件
-   */
-  virtual void on_mouse_left_released() {
-  }
+  virtual void onResize(int width, int height);
 
   /**
    * 静态size更改回调函数
    */
-  static void on_resize_static(GLFWwindow* window, int width, int height);
+  static void onResizeStatic(GLFWwindow* window, int width, int height);
 
   /**
    * 静态 鼠标移动事件回调
    */
-  static void on_mouse_move_static(GLFWwindow* window, double x, double y);
+  static void onMouseMoveStatic(GLFWwindow* window, double x, double y);
 
   /**
   * 静态 鼠标进入/进出事件回调
   */
-  static void on_mouse_enter_static(GLFWwindow* window, int is_entered);
+  static void onMouseEnterStatic(GLFWwindow* window, int is_entered);
 
   /**
    * 静态 鼠标点击回调
    */
-  static void on_mouse_button_static(GLFWwindow* window, int button, int action, int mods);
+  static void onMouseButtonStatic(GLFWwindow* window, int button, int action, int mods);
 };
 
 Window::Window(const int width, const int height, const std::string_view title) :
-  m_width(width),
-  m_height(height),
   m_title(title),
   m_window(create_window(width, height, title)),
-  context(m_window), widget_mouse_grid(width, height) {
+  context(m_window), hit_test_grid(width, height),
+  Widget({0, 0, static_cast<float>(width), static_cast<float>(height)}, nullptr) {
 
   // GLFW 窗口大小回调
   glfwSetWindowUserPointer(m_window, this);
-  glfwSetFramebufferSizeCallback(m_window, on_resize_static);
-  glfwSetCursorPosCallback(m_window, on_mouse_move_static);
-  glfwSetMouseButtonCallback(m_window, on_mouse_button_static);
-  glfwSetCursorEnterCallback(m_window, on_mouse_enter_static);
+  glfwSetFramebufferSizeCallback(m_window, onResizeStatic);
+  glfwSetCursorPosCallback(m_window, onMouseMoveStatic);
+  glfwSetMouseButtonCallback(m_window, onMouseButtonStatic);
+  glfwSetCursorEnterCallback(m_window, onMouseEnterStatic);
 
   // 打印debug信息
   if constexpr (is_debug_mode) {
-    show_debug_info();
+    showDebugInfo();
   }
 }
 
@@ -161,59 +111,51 @@ Window::~Window() {
   destroy_window(m_window);
 }
 
-void Window::on_resize(int width, int height) {
+void Window::onResize(int width, int height) {
   context.destroy_swapchain();
   context.create_swapchain();
-  widget_mouse_grid = {width, height};
+  hit_test_grid = {width, height};
 }
 
-void Window::on_resize_static(GLFWwindow *window, const int width, const int height) {
+void Window::onResizeStatic(GLFWwindow *window, const int width, const int height) {
   // 忽略最小化
   if (width > 0 && height > 0) {
     const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    if (width == self->m_width && height == self->m_height) {
+    if (width == self->width_ && height == self->height_) {
       return;
     }
-    self->m_width = width;
-    self->m_height = height;
-    self->on_resize(width, height);
+    self->width_ = width;
+    self->height_ = height;
+    self->onResize(width, height);
   }
 }
 
-void Window::on_mouse_move_static(GLFWwindow *window, const double x, const double y) {
+void Window::onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
   const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-  self->on_mouse_move(static_cast<float>(x), static_cast<float>(y));
+  self->onMouseMove(static_cast<float>(x), static_cast<float>(y));
 }
 
-void Window::on_mouse_enter_static(GLFWwindow *window, const int is_entered) {
+void Window::onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
   const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
   if (is_entered) {
-    self->on_mouse_enter();
+    self->onMouseEnter();
   } else {
-    self->on_mouse_leave();
+    self->onMouseLeave();
   }
 }
 
-void Window::on_mouse_button_static(GLFWwindow *window,const  int button, const int action, const int mods) {
+void Window::onMouseButtonStatic(GLFWwindow *window,const  int button, const int action, const int mods) {
   const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
   if (button == left_mouse_button) {
     if (action == button_pressed) {
-      self->on_mouse_left_pressed();
+      self->onMouseLeftPressed();
     } else if (action == button_released) {
-      self->on_mouse_left_released();
+      self->onMouseLeftReleased();
     }
   }
 }
 
-int Window::width() const {
-  return m_width;
-}
-
-int Window::height() const {
-  return m_height;
-}
-
-bool Window::should_close() const {
+bool Window::shouldClose() const {
   return glfwWindowShouldClose(m_window);
 }
 
@@ -222,14 +164,14 @@ void Window::show() {
   run();
 }
 
-render_frame* Window::acquire_next_frame() {
+render_frame* Window::acquireNextFrame() {
   return context.acquire_next_frame();
 }
 
 void Window::run() {
-  while (!should_close()) {
+  while (!shouldClose()) {
     // 获取下一帧图像
-    const auto frame = acquire_next_frame();
+    const auto frame = acquireNextFrame();
     frame->begin_frame();
 
     // 渲染
@@ -247,7 +189,7 @@ void Window::run() {
   }
 }
 
-skia::SkPoint Window::get_cursor_position() const {
+skia::SkPoint Window::getCursorPosition() const {
   double x, y;
   glfwGetCursorPos(m_window, &x, &y);
   return {
@@ -256,7 +198,7 @@ skia::SkPoint Window::get_cursor_position() const {
   };
 }
 
-void Window::show_debug_info() const {
+void Window::showDebugInfo() const {
   auto caps = context.capabilities;
   yuri::info("Surface capabilities:");
   yuri::info("  minImageCount: {}", caps.minImageCount);
