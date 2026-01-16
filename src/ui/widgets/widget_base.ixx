@@ -16,7 +16,6 @@ export namespace ui::widgets {
  * 控件基类
  */
 class Widget {
-public:
   std::vector<Widget*> children_; // 孩子
 protected:
   Widget *parent_; // 父控件
