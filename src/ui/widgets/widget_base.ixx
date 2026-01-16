@@ -129,7 +129,9 @@ Widget::~Widget() {
   }
   if (parent_ != nullptr) {
     auto &v = parent_->children_;
-    v.erase(std::ranges::remove(v, this).begin(), v.end());
+    if (const auto it = std::ranges::find(v, this); it != v.end()) {
+      v.erase(it);
+    }
   }
 }
 
