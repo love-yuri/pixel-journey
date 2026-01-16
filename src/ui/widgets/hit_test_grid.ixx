@@ -12,11 +12,11 @@ import :base;
 
 using namespace skia;
 
-using WidgetList = std::vector<ui::widgets::Widget*>;
+export namespace ui::widgets {
+
+using WidgetList = std::vector<Widget*>;
 using GridRow  = std::vector<WidgetList>;
 using WidgetGrid = std::vector<GridRow>;
-
-export namespace ui::widgets {
 
 /**
  * 鼠标操作网格窗口
@@ -38,7 +38,13 @@ public:
    */
   void addWidget(Widget* widget);
 
-  void check(float x, float y);
+  /**
+   * 检查并返回控件列表
+   * 如果超过控件树则返回nullptr
+   * @param x 鼠标x
+   * @param y 鼠标y
+   */
+  WidgetList* check(float x, float y);
 };
 
 HitTestGrid::HitTestGrid(const int width, const int height) :
@@ -67,14 +73,21 @@ void HitTestGrid::addWidget(Widget *widget) {
   }
 }
 
-void HitTestGrid::check(float x, float y) {
+WidgetList* HitTestGrid::check(float x, float y) {
   int row = x / kCellWidth;
   int col = y / kCellWidth;
+
+  if (row > rows_ || col > columns_) {
+    return nullptr;
+  }
+
   if (cellWidgets_[row][col].size() > 0) {
     yuri::error("check: {}", cellWidgets_[row][col].size());
   } else {
     yuri::info("没找到");
   }
+
+  return &cellWidgets_[row][col];
 }
 
 } // namespace ui::widgets
