@@ -36,8 +36,8 @@ struct PaintDesc {
 /**
  * render node基类
  */
-class  RenderNode {
-public:
+class RenderNode {
+protected:
   /**
    * 该node所占空间
    */
