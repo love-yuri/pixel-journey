@@ -8,6 +8,7 @@ import std;
 import skia.api;
 import ui.layout;
 import ui.render;
+import :base;
 
 using namespace ui::render;
 using namespace ui::layout;
@@ -15,29 +16,33 @@ using namespace skia;
 
 export namespace ui::widgets {
 
-class Button {
+class Button : public Widget {
+  SkRect rect;
   RenderText render_text_;
   RenderBorder render_border_;
 
-public:
-  SkRect rect = SkRect::MakeXYWH(150, 250, 200, 200);
 
-  explicit Button(std::string_view text);
+public:
+  explicit Button(std::string_view text, Widget *parent);
 
   /**
    * 绘制
    */
-  void render(SkCanvas* canvas);
+  void paint(SkCanvas *canvas) override;
 };
 
-Button::Button(const std::string_view text): render_text_(text, SkRect::MakeXYWH(150, 250, 200, 200)), render_border_(SkRect::MakeXYWH(150, 250, 200, 200)) {
+Button::Button(const std::string_view text, Widget *parent) :
+  Widget(SkRect::MakeXYWH(150, 250, 200, 200), parent),
+  rect(SkRect::MakeXYWH(150, 250, 200, 200)),
+  render_text_(text, rect),
+  render_border_(rect) {
 }
 
-void Button::render(SkCanvas *canvas) {
+void Button::paint(SkCanvas *canvas) {
   render_text_.render(canvas);
   render_border_.render(canvas);
 
-  render_text_.set_alignment(Alignment::Center);
+  render_text_.setAlignment(Alignment::Center);
 }
 
-} // namespace ui::control
+} // namespace ui::widgets
