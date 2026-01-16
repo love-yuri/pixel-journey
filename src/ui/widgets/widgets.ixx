@@ -5,4 +5,4 @@
 export module ui.widgets;
 
 export import :button;
-export import :widget_mouse_grid;
+export import :hit_test_grid;
