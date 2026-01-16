@@ -41,7 +41,7 @@ class Window: public glfw::Window {
   FPSCounter fpsCounter;
   sk_sp<SkTypeface> typeface = font::load_from_file(font::default_font_path);
 
-  SkPaint paint = [] {
+  SkPaint paint2 = [] {
     SkPaint paint;
     paint.setColor(skia_colors::gray);
     paint.setAntiAlias(true);
@@ -55,51 +55,50 @@ public:
   bool is_clicked = false;
   bool is_hover = false;
   float r = 220;
-  ui::render::RenderBorder border {SkRect::MakeXYWH(0, 0, 2, 1)};
-  ui::widgets::Button button { "测试" };
-  void render(SkCanvas *canvas) override {
-    fpsCounter.update(getCurrentTime());
+  ui::widgets::Button* button;
 
-    canvas->clear(skia_colors::white);
-    if (current_point.equals(0, 0)) {
-      border.radius = 20;
-      current_point = {
-        (m_width / 2),
-        (m_height / 2)
-      };
+  ~Window() override {
+    yuri::info("~Window");
+  }
 
-      border.rect = SkRect::MakeLTRB(
-        current_point.x() - r,
-        current_point.y() - r,
-          current_point.x() + r,
-        current_point.y() + r
-      );
-    }
+  Window(): glfw::Window(800, 800) {
+    button = new ui::widgets::Button("测试", this);
 
+    yuri::info("child: {}", children_.size());
+  }
+
+  void paint(SkCanvas *canvas) override {
     const SkFont font(typeface, 24);
     float r = 220;
     if (is_clicked) {
       r = 43.75;
     }
-    border.render(canvas);
-    button.render(canvas);
-    canvas->drawCircle(current_point, r, paint);
-    canvas->drawLine(50, 0, 50, m_height, paint);
 
+    canvas->drawCircle(current_point, r, paint2);
+    canvas->drawLine(50, 0, 50, height_, paint2);
 
-    canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint);
-    canvas->drawString(std::format("current: {:.1f} {:.1f}",current_point.x(), current_point.y()).c_str(), 100, 530, font, paint);
+    canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 100, 830, font, paint2);
+    canvas->drawString(std::format("current: {:.1f} {:.1f}",current_point.x(), current_point.y()).c_str(), 100, 530, font, paint2);
   }
 
-  void on_mouse_enter() override {
+  void render(SkCanvas *canvas) override {
+    fpsCounter.update(getCurrentTime());
+
+    canvas->clear(skia_colors::white);
+    Widget::render(canvas);
+  }
+
+  void onMouseEnter() override {
 
   }
 
-  void on_mouse_leave() override {
+  void onMouseLeave() override {
+    delete button;
+    button = nullptr;
     yuri::info("鼠标移出 {}, {}", current_point.x(), current_point.y());
   }
 
-  void on_mouse_move(const float x, const float y) override {
+  void onMouseMove(const float x, const float y) override {
     const auto rect = SkRect::MakeLTRB(
       current_point.x() - r,
       current_point.y() - r,
@@ -119,35 +118,27 @@ public:
     }
   }
 
-  void on_mouse_left_pressed() override {
+  void onMouseLeftPressed() override {
     is_clicked = true;
-    last_point = get_cursor_position();
+    last_point = getCursorPosition();
   }
 
-  void on_mouse_left_released() override {
+  void onMouseLeftReleased() override {
     is_clicked = false;
-    const auto p = get_cursor_position();
-    widget_mouse_grid.check(p.x(), p.y());
+    const auto p = getCursorPosition();
+    hit_test_grid.check(p.x(), p.y());
   }
 
-  void on_resize(const int width, const int height) override {
-    glfw::Window::on_resize(width, height);
+  void onResize(const int width, const int height) override {
+    glfw::Window::onResize(width, height);
     current_point = {
-      m_width / 2,
-      (m_height / 2)
+      width_ / 2,
+      (height_ / 2)
     };
-    border.radius = 20;
-    border.rect = SkRect::MakeLTRB(
-      current_point.x() - r,
-      current_point.y() - r,
-        current_point.x() + r,
-      current_point.y() + r
-    );
-    widget_mouse_grid.add_widget(&button.rect);
   }
 };
 
 int main() {
-  Window gw = {1200, 800, "yuri"};
+  Window gw = {};
   gw.show();
 }
