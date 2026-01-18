@@ -15,13 +15,14 @@ using namespace ui::layout;
 export namespace ui::render {
 
 class RenderText : public RenderNode {
-  SkRect font_rect;                 // 文本bound
-  float x = 0.0;                    // 渲染基线 x
-  float y = 0.0;                    // 渲染基线 y
-  SkFont font = font::default_font; // 字体
-  std::string text;                 // label
-  SkPaint paint = PaintDesc{};      // paint
-  sk_sp<SkTextBlob> blob;           // 文本blob
+  using RenderNode::RenderNode;
+  SkRect font_rect;                         // 文本bound
+  float x = 0.0;                            // 渲染基线 x
+  float y = 0.0;                            // 渲染基线 y
+  SkFont font = font::default_font;       // 字体
+  std::string text{};                       // label
+  SkPaint paint = PaintDesc{};            // paint
+  sk_sp<SkTextBlob> blob;                   // 文本blob
   Alignment alignment = Alignment::TopLeft; // 对齐方式
 
 public:
@@ -101,20 +102,20 @@ void RenderText::reCalculate() {
 
   // 计算起点x
   if (alignment & Alignment::Left) {
-    x = rect.left() - font_rect.left();
+    x = local_rect_.left() - font_rect.left();
   } else if (alignment & Alignment::Right) {
-    x = rect.right() - font_rect.right();
+    x = local_rect_.right() - font_rect.right();
   } else if (alignment & Alignment::HCenter) {
-    x = rect.centerX() - font_rect.centerX();
+    x = local_rect_.centerX() - font_rect.centerX();
   }
 
   // 计算起点y
   if (alignment & Alignment::Top) {
-    y = rect.top() - font_rect.top();
+    y = local_rect_.top() - font_rect.top();
   } else if (alignment & Alignment::Bottom) {
-    y = rect.bottom() - font_rect.bottom();
+    y = local_rect_.bottom() - font_rect.bottom();
   } else if (alignment & Alignment::VCenter) {
-    y = rect.centerY() - font_rect.centerY();
+    y = local_rect_.centerY() - font_rect.centerY();
   }
 
   // 计算blob

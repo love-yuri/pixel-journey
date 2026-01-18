@@ -40,9 +40,9 @@ void RenderBorder::render(SkCanvas *canvas) {
   }
 
   if (radius <= 0) {
-    canvas->drawRect(rect, paint);
+    canvas->drawRect(local_rect_, paint);
   } else {
-    canvas->drawRoundRect(rect, radius, radius, paint);
+    canvas->drawRoundRect(local_rect_, radius, radius, paint);
   }
 }
 

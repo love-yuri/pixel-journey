@@ -6,6 +6,7 @@ export module ui.render:base;
 
 import skia.api;
 import skia.resource;
+import ui.core;
 
 using namespace skia;
 
@@ -36,30 +37,25 @@ struct PaintDesc {
 /**
  * render node基类
  */
-class RenderNode {
-protected:
-  /**
-   * 该node所占空间
-   */
-  SkRect rect;
-
+class RenderNode: public core::RectTransform {
+  using RectTransform::RectTransform;
 public:
   /**
   * 是否显示
+  * 默认为true
   */
-  bool visible = false;
+  bool visible = true;
 
-  RenderNode(const SkRect& rect) :rect(rect) {
-    visible = true;
+  explicit RenderNode(const SkRect& rect) {
+    local_rect_ = rect;
   }
-
-  virtual ~RenderNode() = default;
 
   /**
    * 绘制改node
    * @param canvas canvas
    */
   virtual void render(SkCanvas* canvas) = 0;
+
 };
 
-}
+} // namespace ui::render
