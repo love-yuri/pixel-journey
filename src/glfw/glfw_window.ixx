@@ -1,3 +1,4 @@
+// ReSharper disable CppTooWideScopeInitStatement
 export module glfw.window;
 
 import glfw.api;
@@ -14,14 +15,15 @@ using namespace ui::widgets;
 export namespace glfw {
 
 class Window : public Widget {
+
 protected:
-  GLFWwindow *m_window{}; // 窗口指针
-  std::string m_title{};  // 窗口标题
-  WindowContext context;  // context
+  GLFWwindow *window_ = nullptr;  // 窗口指针
+  std::string title_{};   // 窗口标题
+  WindowContext context_; // context
+  float cursor_x = 0.0f;  // 鼠标位置—x
+  float cursor_y = 0.0f;  // 鼠标位置-y
 
 public:
-  HitTestGrid hit_test_grid;
-
   Window(int width, int height, std::string_view title = "yuri");
   ~Window() override;
 
@@ -41,7 +43,7 @@ public:
    * 仅保证该帧在当前周期内有效，
    * 请不要保存该指针
    */
-  render_frame* acquireNextFrame();
+  render_frame *acquireNextFrame();
 
   /**
    * 开始执行绘制
@@ -52,7 +54,7 @@ public:
    * 获取当前鼠标指针位置
    * @return 鼠标位置
    */
-  skia::SkPoint getCursorPosition() const;
+  [[nodiscard]] skia::SkPoint getCursorPosition() const;
 
   /**
    * 展示debug信息
@@ -67,60 +69,19 @@ protected:
    */
   virtual void onResize(int width, int height);
 
-  /**
-   * 静态size更改回调函数
-   */
-  static void onResizeStatic(GLFWwindow* window, int width, int height);
-
-  /**
-   * 静态 鼠标移动事件回调
-   */
-  static void onMouseMoveStatic(GLFWwindow* window, double x, double y);
-
-  /**
-  * 静态 鼠标进入/进出事件回调
-  */
-  static void onMouseEnterStatic(GLFWwindow* window, int is_entered);
-
-  /**
-   * 静态 鼠标点击回调
-   */
-  static void onMouseButtonStatic(GLFWwindow* window, int button, int action, int mods);
+  friend void onResizeStatic(GLFWwindow *window, int width, int height);
+  friend void onMouseMoveStatic(GLFWwindow *window, double x, double y);
+  friend void onMouseEnterStatic(GLFWwindow *window, int is_entered);
+  friend void onMouseButtonStatic(GLFWwindow *window, int button, int action, int mods);
 };
 
-Window::Window(const int width, const int height, const std::string_view title) :
-  m_title(title),
-  m_window(create_window(width, height, title)),
-  context(m_window), hit_test_grid(width, height),
-  Widget({0, 0, static_cast<float>(width), static_cast<float>(height)}, nullptr) {
-
-  // GLFW 窗口大小回调
-  glfwSetWindowUserPointer(m_window, this);
-  glfwSetFramebufferSizeCallback(m_window, onResizeStatic);
-  glfwSetCursorPosCallback(m_window, onMouseMoveStatic);
-  glfwSetMouseButtonCallback(m_window, onMouseButtonStatic);
-  glfwSetCursorEnterCallback(m_window, onMouseEnterStatic);
-
-  // 打印debug信息
-  if constexpr (is_debug_mode) {
-    showDebugInfo();
-  }
-}
-
-Window::~Window() {
-  destroy_window(m_window);
-}
-
-void Window::onResize(int width, int height) {
-  context.destroy_swapchain();
-  context.create_swapchain();
-  hit_test_grid = {width, height};
-}
-
-void Window::onResizeStatic(GLFWwindow *window, const int width, const int height) {
+/**
+ * 静态size更改回调函数
+ */
+void onResizeStatic(GLFWwindow *window, const int width, const int height) {
   // 忽略最小化
   if (width > 0 && height > 0) {
-    const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
     if (width == self->width_ && height == self->height_) {
       return;
     }
@@ -130,42 +91,84 @@ void Window::onResizeStatic(GLFWwindow *window, const int width, const int heigh
   }
 }
 
-void Window::onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
-  const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-  self->onMouseMove(static_cast<float>(x), static_cast<float>(y));
-}
-
-void Window::onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
-  const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-  if (is_entered) {
-    self->onMouseEnter();
-  } else {
-    self->onMouseLeave();
+/**
+ * 静态 鼠标移动事件回调
+ */
+void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
+  const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (self->visible) {
+    self->cursor_x = x;
+    self->cursor_y = y;
+    self->MouseMove(self->cursor_x, self->cursor_y);
   }
 }
 
-void Window::onMouseButtonStatic(GLFWwindow *window,const  int button, const int action, const int mods) {
-  const auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-  if (button == left_mouse_button) {
+/**
+ * 静态 鼠标进入/进出事件回调
+ */
+void onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
+  const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (self->visible) {
+    is_entered ? self->MouseEnter(self->cursor_x, self->cursor_y) : self->MouseLeave(self->cursor_x, self->cursor_y);
+  }
+}
+
+/**
+ * 静态 鼠标点击回调
+ */
+void onMouseButtonStatic(GLFWwindow *window, const int button, const int action, const int mods) {
+  const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (self->visible && button == left_mouse_button) {
     if (action == button_pressed) {
-      self->onMouseLeftPressed();
+      self->MouseLeftPressed(self->cursor_x, self->cursor_y);
     } else if (action == button_released) {
-      self->onMouseLeftReleased();
+      self->MouseLeftReleased(self->cursor_x, self->cursor_y);
     }
   }
 }
 
+Window::Window(const int width, const int height, const std::string_view title) :
+  Widget(nullptr),
+  title_(title),
+  window_(create_window(width, height, title)),
+  context_(window_) {
+
+  width_ = width;
+  height_ = height;
+
+  // GLFW 窗口大小回调
+  glfwSetWindowUserPointer(window_, this);
+  glfwSetFramebufferSizeCallback(window_, onResizeStatic);
+  glfwSetCursorPosCallback(window_, onMouseMoveStatic);
+  glfwSetMouseButtonCallback(window_, onMouseButtonStatic);
+  glfwSetCursorEnterCallback(window_, onMouseEnterStatic);
+
+  // 打印debug信息
+  if constexpr (is_debug_mode) {
+    showDebugInfo();
+  }
+}
+
+Window::~Window() {
+  destroy_window(window_);
+}
+
+void Window::onResize(int width, int height) {
+  context_.destroy_swapchain();
+  context_.create_swapchain();
+}
+
 bool Window::shouldClose() const {
-  return glfwWindowShouldClose(m_window);
+  return glfwWindowShouldClose(window_);
 }
 
 void Window::show() {
-  glfwShowWindow(m_window);
+  glfwShowWindow(window_);
   run();
 }
 
-render_frame* Window::acquireNextFrame() {
-  return context.acquire_next_frame();
+render_frame *Window::acquireNextFrame() {
+  return context_.acquire_next_frame();
 }
 
 void Window::run() {
@@ -191,21 +194,21 @@ void Window::run() {
 
 skia::SkPoint Window::getCursorPosition() const {
   double x, y;
-  glfwGetCursorPos(m_window, &x, &y);
+  glfwGetCursorPos(window_, &x, &y);
   return {
     static_cast<float>(x),
     static_cast<float>(y),
   };
 }
 
-void Window::showDebugInfo() const {
-  auto caps = context.capabilities;
+void Window::showDebugInfo() const { // NOLINT(*-convert-member-functions-to-static)
+  auto caps = context_.capabilities;
   yuri::info("Surface capabilities:");
   yuri::info("  minImageCount: {}", caps.minImageCount);
   yuri::info("  maxImageCount: {}", caps.maxImageCount);
   yuri::info("  currentExtent: {} x {}", caps.currentExtent.width, caps.currentExtent.height);
 
-  const auto formats = vulkan_context->physical_device.getSurfaceFormatsKHR(context.surface);
+  const auto formats = vulkan_context->physical_device.getSurfaceFormatsKHR(context_.surface);
   auto res = vk::check_surface_format_support(formats.value, vk::defaults::default_surface_format, vk::defaults::default_surface_color_space);
   yuri::info("format: {}, space_khr: {} 支持情况 -> {}", vk::to_string(vk::defaults::default_surface_format), vk::to_string(vk::defaults::default_surface_color_space), res);
 }
