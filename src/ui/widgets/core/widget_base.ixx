@@ -180,6 +180,7 @@ void Widget::MouseMove(float x, float y) {
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseMove(x, y);
+      break;
     }
   }
 }
@@ -191,6 +192,7 @@ void Widget::MouseEnter(float x, float y) {
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseEnter(x, y);
+      break;
     }
   }
 }
@@ -202,6 +204,7 @@ void Widget::MouseLeave(float x, float y) {
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseLeave(x, y);
+      break;
     }
   }
 }
@@ -213,6 +216,7 @@ void Widget::MouseLeftPressed(float x, float y) {
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseLeftPressed(x, y);
+      break;
     }
   }
 }
@@ -224,6 +228,7 @@ void Widget::MouseLeftReleased(float x, float y) {
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseLeftReleased(x, y);
+      break;
     }
   }
 }
