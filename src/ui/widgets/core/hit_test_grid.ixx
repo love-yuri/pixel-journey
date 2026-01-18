@@ -44,14 +44,14 @@ public:
    * @param x 鼠标x
    * @param y 鼠标y
    */
-  WidgetList* check(float x, float y);
+  const WidgetList* check(float x, float y) const;
 };
 
 HitTestGrid::HitTestGrid(const int width, const int height) :
   width_(width),
   height_(height),
-  rows_(math::ceil(width, kCellWidth)),
-  columns_(math::ceil(height, kCellWidth)) {
+  rows_(math::ceil(height, kCellWidth)),
+  columns_(math::ceil(width, kCellWidth)) {
   cellWidgets_ = std::vector(rows_, std::vector(columns_, std::vector<Widget*>()));
 }
 
@@ -67,17 +67,16 @@ void HitTestGrid::addWidget(Widget *widget) {
   // 添加 Widget
   for (int row = left_x; row <= right_x; ++row) {
     for (int col = top_y; col <= bottom_y; ++col) {
-      yuri::info("add: {} {}", row, col);
       cellWidgets_[row][col].emplace_back(widget);
     }
   }
 }
 
-WidgetList* HitTestGrid::check(float x, float y) {
-  int row = x / kCellWidth;
-  int col = y / kCellWidth;
+const WidgetList* HitTestGrid::check(const float x, const float y) const {
+  const int row = x / kCellWidth;
+  const int col = y / kCellWidth;
 
-  if (row > rows_ || col > columns_) {
+  if (row < 0 || col < 0 || row >= rows_ || col >= columns_) {
     return nullptr;
   }
 

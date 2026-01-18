@@ -1,11 +1,11 @@
 //
 // Created by yuri on 2026/1/14.
 //
+module;
 
 export module ui.widgets:button;
 
 import std;
-import skia.api;
 import ui.layout;
 import ui.render;
 import :base;
@@ -17,10 +17,8 @@ using namespace skia;
 export namespace ui::widgets {
 
 class Button : public Widget {
-  SkRect rect;
   RenderText render_text_;
   RenderBorder render_border_;
-
 
 public:
   explicit Button(std::string_view text, Widget *parent);
@@ -29,20 +27,28 @@ public:
    * 绘制
    */
   void paint(SkCanvas *canvas) override;
+
+  void onMouseMove(float x, float y) override {
+    // yuri::info("x: {}, y: {}", x, y);
+  }
+
+  void onMouseLeftPressed(float x, float y) override {
+    yuri::info("左侧按下: {} {}", x, y);
+  }
 };
 
-Button::Button(const std::string_view text, Widget *parent) :
-  Widget(SkRect::MakeXYWH(150, 250, 200, 200), parent),
-  rect(SkRect::MakeXYWH(150, 250, 200, 200)),
-  render_text_(text, rect),
-  render_border_(rect) {
+Button::Button(const std::string_view text, Widget *parent) : Widget(parent) {
+  constexpr auto rect_ = SkRect::MakeXYWH(250, 250, 200, 200);
+  setGeometry(rect_);
+  render_text_.resize(width_, height_);
+  render_border_.resize(width_, height_);
+  render_text_.setText(text);
+  render_text_.setAlignment(Alignment::Center);
 }
 
 void Button::paint(SkCanvas *canvas) {
   render_text_.render(canvas);
   render_border_.render(canvas);
-
-  render_text_.setAlignment(Alignment::Center);
 }
 
 } // namespace ui::widgets
