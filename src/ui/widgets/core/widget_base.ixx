@@ -22,6 +22,7 @@ class Widget: public core::RectTransform {
 protected:
   Widget *parent_ = nullptr;          // 父控件何
   bool visible = true;                // 是否展示
+  bool hovered_ = false;              // 是否正在被hover
 
   /**
    * 添加控件
@@ -45,16 +46,6 @@ protected:
    * @param y y: 相对于左上角
    */
   void MouseMove(float x, float y);
-
-  /**
-   * 鼠标进入
-   */
-  void MouseEnter(float x, float y);
-
-  /**
-   * 鼠标移出
-   */
-  void MouseLeave(float x, float y);
 
   /**
    * 鼠标左侧点击事件
@@ -176,35 +167,23 @@ const SkRect& Widget::hitTestBounds() const {
 void Widget::MouseMove(float x, float y) {
   x -= local_rect_.x();
   y -= local_rect_.y();
+
+  // 先处理enter
+  if (!hovered_) {
+    hovered_ = true;
+    onMouseEnter(x, y);
+  }
+
+  // 再处理move
   onMouseMove(x, y);
   for (const auto child : children_) {
-    if (child->visible && child->hitTestBounds().contains(x, y)) {
-      child->MouseMove(x, y);
-      break;
-    }
-  }
-}
-
-void Widget::MouseEnter(float x, float y) {
-  x -= local_rect_.x();
-  y -= local_rect_.y();
-  onMouseEnter(x, y);
-  for (const auto child : children_) {
-    if (child->visible && child->hitTestBounds().contains(x, y)) {
-      child->MouseEnter(x, y);
-      break;
-    }
-  }
-}
-
-void Widget::MouseLeave(float x, float y) {
-  onMouseLeave(x, y);
-  x -= local_rect_.x();
-  y -= local_rect_.y();
-  for (const auto child : children_) {
-    if (child->visible && child->hitTestBounds().contains(x, y)) {
-      child->MouseLeave(x, y);
-      break;
+    if (child->visible) {
+      if (child->hitTestBounds().contains(x, y)) {
+        child->MouseMove(x, y);
+      } else if (child->hovered_) {
+        child->hovered_ = false;
+        child->onMouseLeave(x, y);
+      }
     }
   }
 }

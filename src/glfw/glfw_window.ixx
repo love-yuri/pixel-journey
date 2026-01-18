@@ -97,8 +97,8 @@ void onResizeStatic(GLFWwindow *window, const int width, const int height) {
 void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
   if (self->visible) {
-    self->cursor_x = x;
-    self->cursor_y = y;
+    self->cursor_x = static_cast<float>(x);
+    self->cursor_y = static_cast<float>(y);
     self->MouseMove(self->cursor_x, self->cursor_y);
   }
 }
@@ -108,8 +108,8 @@ void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
  */
 void onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (self->visible) {
-    is_entered ? self->MouseEnter(self->cursor_x, self->cursor_y) : self->MouseLeave(self->cursor_x, self->cursor_y);
+  if (self->visible && !is_entered) {
+    self->onMouseLeave(self->cursor_x, self->cursor_y);
   }
 }
 
