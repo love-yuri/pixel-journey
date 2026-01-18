@@ -173,7 +173,9 @@ const SkRect& Widget::hitTestBounds() const {
   return local_rect_;
 }
 
-void Widget::MouseMove(const float x, const float y) {
+void Widget::MouseMove(float x, float y) {
+  x -= local_rect_.x();
+  y -= local_rect_.y();
   onMouseMove(x, y);
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
@@ -182,7 +184,9 @@ void Widget::MouseMove(const float x, const float y) {
   }
 }
 
-void Widget::MouseEnter(const float x, const float y) {
+void Widget::MouseEnter(float x, float y) {
+  x -= local_rect_.x();
+  y -= local_rect_.y();
   onMouseEnter(x, y);
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
@@ -191,8 +195,10 @@ void Widget::MouseEnter(const float x, const float y) {
   }
 }
 
-void Widget::MouseLeave(const float x, const float y) {
+void Widget::MouseLeave(float x, float y) {
   onMouseLeave(x, y);
+  x -= local_rect_.x();
+  y -= local_rect_.y();
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseLeave(x, y);
@@ -200,7 +206,9 @@ void Widget::MouseLeave(const float x, const float y) {
   }
 }
 
-void Widget::MouseLeftPressed(const float x, const float y) {
+void Widget::MouseLeftPressed(float x, float y) {
+  x -= local_rect_.x();
+  y -= local_rect_.y();
   onMouseLeftPressed(x, y);
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
@@ -209,7 +217,9 @@ void Widget::MouseLeftPressed(const float x, const float y) {
   }
 }
 
-void Widget::MouseLeftReleased(const float x, const float y) {
+void Widget::MouseLeftReleased(float x, float y) {
+  x -= local_rect_.x();
+  y -= local_rect_.y();
   onMouseLeftReleased(x, y);
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
