@@ -15,7 +15,7 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/animation/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/core/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/components/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/components/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
 )

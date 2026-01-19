@@ -9,16 +9,20 @@ import std;
 import ui.layout;
 import ui.render;
 import :base;
+import ui.animation;
 
 using namespace ui::render;
 using namespace ui::layout;
 using namespace skia;
+
+using namespace ui::animation;
 
 export namespace ui::widgets {
 
 class Button : public Widget {
   RenderText render_text_;
   RenderBorder render_border_;
+  LinearAnimation<float> *animation_;
 
 public:
   explicit Button(std::string_view text, Widget *parent);
@@ -33,7 +37,7 @@ public:
   }
 
   void onMouseLeftPressed(float x, float y) override {
-    yuri::info("左侧按下: {} {}", x, y);
+    animation_manager->start(0.f, 40.f, 500, &render_border_.radius);
   }
 };
 

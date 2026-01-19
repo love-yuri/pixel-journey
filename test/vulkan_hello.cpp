@@ -53,13 +53,8 @@ public:
   SkPoint current_point = {0, 0 };
   SkPoint last_point = {0, 0};
   bool is_clicked = false;
-  bool is_hover = false;
   float r = 220;
-  ui::widgets::Button* button;
-
-  ~Window() override {
-    yuri::info("~Window");
-  }
+  ui::widgets::Button* button = nullptr;
 
   Window(): glfw::Window(800, 800) {
     button = new ui::widgets::Button("测试", this);
@@ -86,28 +81,7 @@ public:
     Widget::render(canvas);
   }
 
-  void onMouseEnter() override {
-
-  }
-
-  void onMouseLeave() override {
-    delete button;
-    button = nullptr;
-    yuri::info("鼠标移出 {}, {}", current_point.x(), current_point.y());
-  }
-
   void onMouseMove(const float x, const float y) override {
-    const auto rect = SkRect::MakeLTRB(
-      current_point.x() - r,
-      current_point.y() - r,
-      current_point.x() + r,
-      current_point.y() + r
-    );
-    if (rect.contains(x, y)) {
-      is_hover = true;
-    } else {
-      is_hover = false;
-    }
     if (is_clicked) {
       const auto new_x = x - last_point.x();
       const auto new_y = y - last_point.y();
@@ -116,15 +90,13 @@ public:
     }
   }
 
-  void onMouseLeftPressed() override {
+  void onMouseLeftPressed(const float x, const float y) override {
     is_clicked = true;
     last_point = getCursorPosition();
   }
 
-  void onMouseLeftReleased() override {
+  void onMouseLeftReleased(const float x, const float y) override {
     is_clicked = false;
-    const auto p = getCursorPosition();
-    hit_test_grid.check(p.x(), p.y());
   }
 
   void onResize(const int width, const int height) override {
