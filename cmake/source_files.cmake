@@ -12,6 +12,7 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/render/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/core/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/animation/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/core/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/components/*.ixx

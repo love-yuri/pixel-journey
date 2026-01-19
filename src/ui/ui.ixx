@@ -8,3 +8,4 @@ export import ui.core;
 export import ui.render;
 export import ui.widgets;
 export import ui.layout;
+export import ui.animation;
