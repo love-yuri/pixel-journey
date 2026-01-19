@@ -177,6 +177,9 @@ void Window::run() {
     const auto frame = acquireNextFrame();
     frame->begin_frame();
 
+    // 更新动画
+    animation_manager->update();
+
     // 渲染
     render(frame->sk_surface->getCanvas());
 
