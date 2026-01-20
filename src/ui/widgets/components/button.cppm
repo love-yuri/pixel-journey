@@ -36,8 +36,12 @@ public:
     // yuri::info("x: {}, y: {}", x, y);
   }
 
-  void onMouseLeftPressed(float x, float y) override {
-    animation_manager->start(0.f, 40.f, 500, &render_border_.radius);
+  void onMouseEnter(float x, float y) override {
+    animation_manager->start(0.f, 30.f, 200, &render_border_.radius);
+  }
+
+  void onMouseLeave(float x, float y) override {
+    animation_manager->start(30.f, 0.f, 200, &render_border_.radius);
   }
 };
 
