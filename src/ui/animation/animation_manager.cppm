@@ -45,9 +45,11 @@ void AnimationManager::start(const float from, const float to, const float durat
 
 } // namespace ui::animation
 
+#ifdef __clang__
 bool operator==(const std::vector<LinearAnimation<float> *>::iterator & it, const std::vector<LinearAnimation<float> *>::iterator & end) {
   return it.base() == end.base();
 }
+#endif
 
 void AnimationManager::update() {
   clock.update();
