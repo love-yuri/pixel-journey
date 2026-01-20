@@ -4,36 +4,33 @@
 
 export module ui.animation:linear_animation;
 
-import :clock;
+import :core;
 import yuri_log;
 import std;
 
 export namespace ui::animation {
 
-template <typename T>
-struct LinearAnimation {
-  T from;                        // 起点值
-  T to;                          // 目标值
-  float duration = 0;            // 持续时间，单位ms
-  T *value = nullptr;            // 待修改的value
-  const std::int64_t start_time; // 开始时间-仅初始化
-
-  LinearAnimation(const std::int64_t now) : start_time(now) {
-  }
-
+template <CanAnimation T>
+class LinearAnimation : public IAnimation<T> {
+public:
   /**
    * 更新参数
    */
-  bool update(const std::int64_t now) {
-    const auto left = now - start_time;
-    if (left >= duration * 1000) {
-      return false;
-    }
-
-    *value = from + (to - from) * left / (duration * 1000.0);
-    yuri::info("from: {}, to: {}, value: {}", from, to, *value);
-    return true;
-  }
+  void update(std::uint64_t now) override;
 };
+
+template <CanAnimation T>
+void LinearAnimation<T>::update(const std::uint64_t now) {
+  for (size_t i = 0; i < this->values.size(); ++i) {
+    if (const float t = (now - this->start_time[i]) * this->inv_duration[i]; t < 1.f) {
+      *this->values[i] = this->from[i] + (this->to[i] - this->from[i]) * t;
+    } else {
+      *this->values[i] = this->to[i]; // 更新为末尾值
+      this->swapRemove(i);            // 弹出最后值
+      --i;                            // 重置i
+    }
+  }
+}
+
 
 }
