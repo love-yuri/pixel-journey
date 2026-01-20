@@ -4,7 +4,7 @@
 
 export module ui.animation:animation_manager;
 
-import :clock;
+import :core;
 import :linear_animation;
 import std;
 
@@ -14,7 +14,7 @@ export namespace ui::animation {
 
 class AnimationManager {
   FrameClock clock; // 动画计时clock
-  std::vector<LinearAnimation<float>*> animations {};
+  LinearAnimation<float> animations {};
 
 public:
   /**
@@ -34,13 +34,7 @@ public:
 };
 
 void AnimationManager::start(const float from, const float to, const float duration, float *value) {
-  *value = from;
-  const auto animation = new LinearAnimation<float>(clock.now);
-  animation->from = from;
-  animation->to = to;
-  animation->duration = duration;
-  animation->value = value;
-  animations.push_back(animation);
+  animations.start(clock.now, from, to, duration, value);
 }
 
 } // namespace ui::animation
@@ -53,14 +47,7 @@ bool operator==(const std::vector<LinearAnimation<float> *>::iterator & it, cons
 
 void AnimationManager::update() {
   clock.update();
-  for (auto it = animations.begin(); it != animations.end();) {
-    if (!(*it)->update(clock.now)) {
-      delete *it;
-      it = animations.erase(it);
-    } else {
-      ++it;
-    }
-  }
+  animations.update(clock.now);
 }
 
 auto animation_manager_ = std::make_shared<AnimationManager>();
