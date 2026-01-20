@@ -29,7 +29,7 @@ protected:
   * 交换移除元素
   * @param i pos
   */
-  void swapRemove(size_t i);
+  void swapRemove(std::size_t i);
 
 public:
 
@@ -61,7 +61,7 @@ void IAnimation<T>::start(const std::uint64_t now, const T& from_val, const T& t
 }
 
 template <CanAnimation T>
-void IAnimation<T>::swapRemove(size_t i) {
+void IAnimation<T>::swapRemove(std::size_t i) {
   values[i] = values.back();
   values.pop_back();
   from[i] = from.back();
