@@ -38,7 +38,7 @@ public:
    * 设置控件几何状态
    * @param rect 控件所占rect，基于父控件
    */
-  void setGeometry(const SkRect &rect);
+  virtual void setGeometry(const SkRect &rect);
 
   /**
    * 设置控件几何状态
@@ -54,7 +54,7 @@ public:
    * @param width 控件宽度
    * @param height 控件高度
    */
-  void resize(float width, float height);
+  virtual void resize(float width, float height);
 
   /**
    * 移动控件位置
