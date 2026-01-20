@@ -9,6 +9,7 @@ import std;
 import ui.layout;
 import ui.render;
 import :base;
+import :box;
 import ui.animation;
 
 using namespace ui::render;
@@ -19,9 +20,8 @@ using namespace ui::animation;
 
 export namespace ui::widgets {
 
-class Button : public Widget {
+class Button : public Box {
   RenderText render_text_;
-  RenderBorder render_border_;
   LinearAnimation<float> *animation_;
 
 public:
@@ -37,19 +37,27 @@ public:
   }
 
   void onMouseEnter(float x, float y) override {
-    animation_manager->start(0.f, 30.f, 200, &render_border_.radius);
+    setPadding(20);
   }
 
   void onMouseLeave(float x, float y) override {
-    animation_manager->start(30.f, 0.f, 200, &render_border_.radius);
+    setPadding(0);
   }
+
+  void onMouseLeftPressed(float x, float y) override {
+    animation_manager->start(0.f, 30.f, 200,  &radius);
+  }
+
+  void onMouseLeftReleased(float x, float y) override {
+    animation_manager->start(30.f, 0.f, 200,  &radius);
+  }
+
 };
 
-Button::Button(const std::string_view text, Widget *parent) : Widget(parent) {
+Button::Button(const std::string_view text, Widget *parent) : Box(parent) {
   constexpr auto rect_ = SkRect::MakeXYWH(250, 250, 200, 200);
-  setGeometry(rect_);
+  Box::setGeometry(rect_);
   render_text_.resize(width_, height_);
-  render_border_.resize(width_, height_);
   render_text_.setText(text);
   render_text_.setAlignment(Alignment::Center);
 }
