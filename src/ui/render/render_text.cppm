@@ -33,6 +33,7 @@ public:
    * @param rect 所占空间
    */
   RenderText(std::string_view text, const SkRect& rect);
+  RenderText() = default;
 
   /**
    * 设置对齐方式

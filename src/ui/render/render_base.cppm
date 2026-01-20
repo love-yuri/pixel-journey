@@ -38,7 +38,6 @@ struct PaintDesc {
  * render node基类
  */
 class RenderNode: public core::RectTransform {
-  using RectTransform::RectTransform;
 public:
   /**
   * 是否显示
@@ -46,6 +45,7 @@ public:
   */
   bool visible = true;
 
+  RenderNode() = default;
   explicit RenderNode(const SkRect& rect) {
     local_rect_ = rect;
   }
