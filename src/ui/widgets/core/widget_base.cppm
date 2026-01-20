@@ -64,7 +64,7 @@ public:
    * 不传递任何layout信息
    * 需要子类自行指定
    */
-  explicit Widget(Widget* parent);
+  explicit Widget(Widget* parent = nullptr);
 
   /**
    * 命中检测边界

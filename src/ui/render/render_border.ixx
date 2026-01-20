@@ -9,7 +9,6 @@ using namespace skia;
 export namespace ui::render {
 
 class RenderBorder : public RenderNode {
-  using RenderNode::RenderNode;
   SkPaint paint = PaintDesc {
     .color = skia_colors::gray,
     .style = SkPaint::kStroke_Style
