@@ -34,6 +34,7 @@ public:
    */
   RenderText(std::string_view text, const SkRect& rect);
   RenderText() = default;
+  void resize(float width, float height) noexcept override;
 
   /**
    * 设置对齐方式
@@ -69,6 +70,11 @@ private:
 };
 
 RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
+  reCalculate();
+}
+
+void RenderText::resize(float width, float height) noexcept {
+  RenderNode::resize(width, height);
   reCalculate();
 }
 
