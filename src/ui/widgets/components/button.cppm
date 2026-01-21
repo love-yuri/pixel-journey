@@ -37,19 +37,19 @@ public:
   }
 
   void onMouseEnter(float x, float y) override {
-    setPadding(20);
-  }
-
-  void onMouseLeave(float x, float y) override {
-    setPadding(0);
-  }
-
-  void onMouseLeftPressed(float x, float y) override {
     animation_manager->start(0.f, 30.f, 200,  &radius);
   }
 
-  void onMouseLeftReleased(float x, float y) override {
+  void onMouseLeave(float x, float y) override {
     animation_manager->start(30.f, 0.f, 200,  &radius);
+  }
+
+  void onMouseLeftPressed(float x, float y) override {
+    animation_manager->start(0.f, 30.f, 100, this, &memberThunk<Box, float, &Box::setPadding>);
+  }
+
+  void onMouseLeftReleased(float x, float y) override {
+    animation_manager->start(30.f, 0.f, 100, this, &memberThunk<Box, float, &Box::setPadding>);
   }
 
 };
