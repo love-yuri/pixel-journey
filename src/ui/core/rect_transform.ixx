@@ -17,20 +17,20 @@ protected:
   float height_ = 0;                  // 控件高度
 
 public:
-  RectTransform() = default;
-  virtual ~RectTransform() = default;
+  RectTransform() noexcept = default;
+  virtual ~RectTransform() noexcept = default;
 
   /**
    * 获取控件宽度
    */
-  [[nodiscard]] float width() const {
+  [[nodiscard]] float width() const noexcept {
     return width_;
   }
 
   /**
    * 获取控件高度
    */
-  [[nodiscard]] float height() const {
+  [[nodiscard]] float height() const noexcept {
     return height_;
   }
 
@@ -38,7 +38,7 @@ public:
    * 设置控件几何状态
    * @param rect 控件所占rect，基于父控件
    */
-  virtual void setGeometry(const SkRect &rect);
+  virtual void setGeometry(const SkRect &rect) noexcept;
 
   /**
    * 设置控件几何状态
@@ -47,27 +47,27 @@ public:
    * @param width 控件宽度
    * @param height 控件高度
    */
-  void setGeometry(float x, float y, float width, float height);
+  void setGeometry(float x, float y, float width, float height) noexcept;
 
   /**
    * 修改控件的宽高
    * @param width 控件宽度
    * @param height 控件高度
    */
-  virtual void resize(float width, float height);
+  virtual void resize(float width, float height) noexcept;
 
   /**
    * 移动控件位置
    * @param x 新的坐标
    * @param y 新的坐标
    */
-  void move(float x, float y);
+  void move(float x, float y) noexcept;
 
   /**
    * 移动控件位置
    * @param point 目标点
    */
-  void move(const SkPoint& point);
+  void move(const SkPoint& point) noexcept;
 
   /**
    * 重新计算
@@ -75,29 +75,29 @@ public:
   virtual void update() {}
 };
 
-void RectTransform::setGeometry(const SkRect &rect) {
+void RectTransform::setGeometry(const SkRect &rect) noexcept {
   this->local_rect_ = rect;
   width_ = rect.width();
   height_ = rect.height();
 }
 
-void RectTransform::setGeometry(const float x, const float y, const float width, const float height) {
+void RectTransform::setGeometry(const float x, const float y, const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   local_rect_.setXYWH(x, y, width, height);
 }
 
-void RectTransform::resize(const float width, const float height) {
+void RectTransform::resize(const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   local_rect_.setXYWH(local_rect_.x(), local_rect_.y(), width, height);
 }
 
-void RectTransform::move(const float x, const float y) {
+void RectTransform::move(const float x, const float y) noexcept {
   local_rect_.setXYWH(x, y, width_, height_);
 }
 
-void RectTransform::move(const SkPoint &point) {
+void RectTransform::move(const SkPoint &point) noexcept {
   move(point.x(), point.y());
 }
 

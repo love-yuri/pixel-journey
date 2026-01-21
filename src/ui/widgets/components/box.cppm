@@ -34,37 +34,37 @@ protected:
   float &radius = render_border_.radius;
 
 public:
-  void resize(float width, float height) override;
-  void setGeometry(const SkRect &rect) override;
+  void resize(float width, float height) noexcept override;
+  void setGeometry(const SkRect &rect) noexcept override;
 
   /**
    * 设置内边距
    */
-  void setPadding(float padding);
+  void setPadding(float padding) noexcept;
 
 private:
   /**
    * 重新计算border的size
    */
-  void borderResize();
+  void borderResize() noexcept;
 };
 
-void Box::resize(const float width, const float height) {
+void Box::resize(const float width, const float height) noexcept {
   Widget::resize(width, height);
   borderResize();
 }
 
-void Box::setGeometry(const SkRect &rect) {
+void Box::setGeometry(const SkRect &rect) noexcept {
   Widget::setGeometry(rect);
   borderResize();
 }
 
-void Box::setPadding(const float padding) {
+void Box::setPadding(const float padding) noexcept {
   padding_left = padding_right = padding_top = padding_bottom = padding;
   borderResize();
 }
 
-void Box::borderResize() {
+void Box::borderResize() noexcept {
   render_border_.setGeometry(padding_left, padding_top, width_ - padding_left - padding_right, height_ - padding_top - padding_bottom);
 }
 
