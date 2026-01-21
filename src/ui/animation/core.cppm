@@ -16,19 +16,59 @@ template <typename T>
 concept CanAnimation = requires(T a, T b, float t) { a + b; a - b; a * t; };
 
 template <CanAnimation T>
+struct AnimationTarget {
+  enum class Kind : std::uint8_t {
+    RawPtr,  // 普通变量
+    MemberFn // 成员函数
+  };
+
+  Kind kind = Kind::RawPtr;
+
+  union {
+    T *raw;
+    struct {
+      void *obj;
+      void (*fn)(void *, const T &) noexcept;
+    } cb;
+  };
+
+  inline void apply(const T &v) noexcept {
+    if (kind == Kind::RawPtr) {
+      *raw = v;
+    } else {
+      cb.fn(cb.obj, v);
+    }
+  }
+};
+
+/**
+ * 成员函数转普通函数
+ * @tparam Obj 类 类型
+ * @tparam T 参数类型
+ * @tparam Method 成员函数
+ */
+template <typename Obj, typename T, void (Obj::*Method)(T)>
+void memberThunk(void* obj, const T& v) noexcept {
+  (static_cast<Obj*>(obj)->*Method)(v);
+}
+
+template <CanAnimation T>
 class IAnimation {
+public:
+  using memberFunc = void (*)(void *, const T&) noexcept; // 成员函数类型
 protected:
-  std::vector<T> from{};                   // 初始值容器
-  std::vector<T> to{};                     // 目标值容器
-  std::vector<T *> values{};               // value容器
-  std::vector<float> inv_duration{};       // 持续时间 inv容器 1/ 500 ...
-  std::vector<std::uint64_t> start_time{}; // 开始时间容器
-  std::mutex mutex{};                      // 锁-单线程暂未考虑
+  std::vector<T> from{};                                   // 初始值容器
+  std::vector<T> to{};                                     // 目标值容器
+  std::vector<AnimationTarget<T>> values{};                // value容器
+  std::vector<memberFunc> func_values{};                   // func_values容器
+  std::vector<float> inv_duration{};                       // 持续时间 inv容器 1/ 500 ...
+  std::vector<std::uint64_t> start_time{};                 // 开始时间容器
+  std::mutex mutex{};                                      // 锁-单线程暂未考虑
 
   /**
-  * 交换移除元素
-  * @param i pos
-  */
+   * 交换移除元素
+   * @param i pos
+   */
   void swapRemove(std::size_t i);
 
 public:
@@ -49,6 +89,17 @@ public:
    * @param val_ptr 值value
    */
   void start(std::uint64_t now, const T& from_val, const T& to_val, float dur, T *val_ptr);
+
+  /**
+  * 开始一个新动画
+  * @param now 当前时间
+  * @param from_val 起始值
+  * @param to_val 目标值
+  * @param dur 持续时间
+  * @param obj this 指针
+  * @param func 回调函数
+  */
+  void start(std::uint64_t now, const T& from_val, const T& to_val, float dur, void* obj, memberFunc func);
 };
 
 template <CanAnimation T>
@@ -57,7 +108,23 @@ void IAnimation<T>::start(const std::uint64_t now, const T& from_val, const T& t
   to.emplace_back(to_val);
   inv_duration.emplace_back(1.f / dur / 1000.f);
   start_time.emplace_back(now);
-  values.emplace_back(val_ptr);
+
+  AnimationTarget<T> target { AnimationTarget<T>::Kind::RawPtr };
+  target.cb.obj = val_ptr;
+  values.emplace_back(target);
+}
+
+template <CanAnimation T>
+void IAnimation<T>::start(std::uint64_t now, const T &from_val, const T &to_val, const float dur, void* obj, memberFunc func) {
+  from.emplace_back(from_val);
+  to.emplace_back(to_val);
+  inv_duration.emplace_back(1.f / dur / 1000.f);
+  start_time.emplace_back(now);
+
+  AnimationTarget<T> target { AnimationTarget<T>::Kind::MemberFn };
+  target.cb.fn = func;
+  target.cb.obj = obj;
+  values.emplace_back(target);
 }
 
 template <CanAnimation T>

@@ -31,10 +31,25 @@ public:
    * @param value value指针
    */
   void start(float from, float to, float duration, float* value);
+
+  /**
+   * 开启动画
+   * @tparam T 参数类型
+   * @param from 起始参数
+   * @param to 目标参数
+   * @param duration 持续时间-ms
+   * @param obj this 指针
+   * @param func 回调函数指针
+   */
+  void start(float from, float to, float duration, void* obj, LinearAnimation<float>::memberFunc func);
 };
 
 void AnimationManager::start(const float from, const float to, const float duration, float *value) {
   animations.start(clock.now, from, to, duration, value);
+}
+
+void AnimationManager::start(const float from, const float to, const float duration, void* obj, LinearAnimation<float>::memberFunc func) {
+  animations.start(clock.now, from, to, duration, obj, func);
 }
 
 } // namespace ui::animation
