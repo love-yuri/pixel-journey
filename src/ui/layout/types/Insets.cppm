@@ -29,7 +29,7 @@ struct Insets {
     left = all;
     right = all;
     top = all;
-    right = all;
+    bottom = all;
   }
 };
 
