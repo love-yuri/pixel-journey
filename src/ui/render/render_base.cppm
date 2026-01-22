@@ -7,7 +7,6 @@ export module ui.render:base;
 import skia.api;
 import skia.resource;
 import std;
-import ui.core;
 
 using namespace skia;
 
