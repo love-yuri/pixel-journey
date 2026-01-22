@@ -32,9 +32,8 @@ public:
    * @param text 显示的文本
    * @param rect 所占空间
    */
-  RenderText(std::string_view text, const SkRect& rect);
+  RenderText(std::string_view text, const SkRect* rect);
   RenderText() = default;
-  void resize(float width, float height) noexcept override;
 
   /**
    * 设置对齐方式
@@ -58,23 +57,22 @@ public:
   void setText(std::string_view text);
 
   /**
+   * 设置文本和对齐方式
+   */
+  void setTextAndAlignment(std::string_view text, Alignment alignment);
+
+  /**
    * render
    */
   void render(SkCanvas *canvas) override;
 
-private:
   /**
    * 重新计算文本、位置等信息
    */
   void reCalculate();
 };
 
-RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
-  reCalculate();
-}
-
-void RenderText::resize(float width, float height) noexcept {
-  RenderNode::resize(width, height);
+RenderText::RenderText(const std::string_view text, const SkRect* rect): RenderNode(rect), text(text) {
   reCalculate();
 }
 
@@ -97,6 +95,12 @@ void RenderText::setText(const std::string_view text) {
   reCalculate();
 }
 
+void RenderText::setTextAndAlignment(std::string_view text, Alignment alignment) {
+  this->text = text;
+  this->alignment = alignment;
+  reCalculate();
+}
+
 void RenderText::render(SkCanvas *canvas) {
   if (visible) {
     canvas->drawTextBlob(blob, x, y, paint);
@@ -109,20 +113,20 @@ void RenderText::reCalculate() {
 
   // 计算起点x
   if (alignment & Alignment::Left) {
-    x = local_rect_.left() - font_rect.left();
+    x = self_box->left() - font_rect.left();
   } else if (alignment & Alignment::Right) {
-    x = local_rect_.right() - font_rect.right();
+    x = self_box->right() - font_rect.right();
   } else if (alignment & Alignment::HCenter) {
-    x = local_rect_.centerX() - font_rect.centerX();
+    x = self_box->centerX() - font_rect.centerX();
   }
 
   // 计算起点y
   if (alignment & Alignment::Top) {
-    y = local_rect_.top() - font_rect.top();
+    y = self_box->top() - font_rect.top();
   } else if (alignment & Alignment::Bottom) {
-    y = local_rect_.bottom() - font_rect.bottom();
+    y = self_box->bottom() - font_rect.bottom();
   } else if (alignment & Alignment::VCenter) {
-    y = local_rect_.centerY() - font_rect.centerY();
+    y = self_box->centerY() - font_rect.centerY();
   }
 
   // 计算blob

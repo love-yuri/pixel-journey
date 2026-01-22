@@ -2,6 +2,7 @@ export module ui.render:border;
 
 import :base;
 import skia.resource;
+import yuri_log;
 import std;
 
 using namespace skia;
@@ -9,6 +10,7 @@ using namespace skia;
 export namespace ui::render {
 
 class RenderBorder : public RenderNode {
+  using RenderNode::RenderNode;
   SkPaint paint = PaintDesc {
     .color = skia_colors::gray,
     .style = SkPaint::kStroke_Style
@@ -39,9 +41,9 @@ void RenderBorder::render(SkCanvas *canvas) {
   }
 
   if (radius <= 0) {
-    canvas->drawRect(local_rect_, paint);
+    canvas->drawRect(*self_box, paint);
   } else {
-    canvas->drawRoundRect(local_rect_, radius, radius, paint);
+    canvas->drawRoundRect(*self_box, radius, radius, paint);
   }
 }
 

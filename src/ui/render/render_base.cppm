@@ -6,6 +6,7 @@ export module ui.render:base;
 
 import skia.api;
 import skia.resource;
+import std;
 import ui.core;
 
 using namespace skia;
@@ -37,8 +38,14 @@ struct PaintDesc {
 /**
  * render node基类
  */
-class RenderNode: public core::RectTransform {
+class RenderNode {
 public:
+  /**
+   * node 几何边界指针
+   * 严格跟随调用widget
+   */
+  const SkRect *self_box{};
+
   /**
   * 是否显示
   * 默认为true
@@ -46,16 +53,19 @@ public:
   bool visible = true;
 
   RenderNode() = default;
-  explicit RenderNode(const SkRect& rect) {
-    local_rect_ = rect;
+  explicit RenderNode(const SkRect* rect): self_box(rect) {
+    if (rect == nullptr) {
+      throw std::runtime_error("node的边界不能为空!");
+    }
   }
+
+  virtual ~RenderNode() = default;
 
   /**
    * 绘制改node
    * @param canvas canvas
    */
   virtual void render(SkCanvas* canvas) = 0;
-
 };
 
 } // namespace ui::render
