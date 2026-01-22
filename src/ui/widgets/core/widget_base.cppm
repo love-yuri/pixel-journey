@@ -17,7 +17,7 @@ export namespace ui::widgets {
  * 控件基类
  */
 class Widget: public core::RectTransform {
-  std::vector<Widget*> children_; // 子控件列表
+  std::vector<Widget*> children_{};   // 子控件列表
 
 protected:
   Widget *parent_ = nullptr;          // 父控件何

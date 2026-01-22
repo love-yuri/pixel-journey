@@ -38,7 +38,7 @@ public:
    * 设置控件几何状态
    * @param rect 控件所占rect，基于父控件
    */
-  virtual void setGeometry(const SkRect &rect) noexcept;
+  inline virtual void setGeometry(const SkRect &rect) noexcept;
 
   /**
    * 设置控件几何状态
@@ -47,7 +47,7 @@ public:
    * @param width 控件宽度
    * @param height 控件高度
    */
-  void setGeometry(float x, float y, float width, float height) noexcept;
+  inline virtual void setGeometry(float x, float y, float width, float height) noexcept;
 
   /**
    * 修改控件的宽高
@@ -61,13 +61,13 @@ public:
    * @param x 新的坐标
    * @param y 新的坐标
    */
-  void move(float x, float y) noexcept;
+  inline void move(float x, float y) noexcept;
 
   /**
    * 移动控件位置
    * @param point 目标点
    */
-  void move(const SkPoint& point) noexcept;
+  inline void move(const SkPoint& point) noexcept;
 
   /**
    * 重新计算
@@ -75,29 +75,29 @@ public:
   virtual void update() {}
 };
 
-void RectTransform::setGeometry(const SkRect &rect) noexcept {
+inline void RectTransform::setGeometry(const SkRect &rect) noexcept {
   this->local_rect_ = rect;
   width_ = rect.width();
   height_ = rect.height();
 }
 
-void RectTransform::setGeometry(const float x, const float y, const float width, const float height) noexcept {
+inline void RectTransform::setGeometry(const float x, const float y, const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   local_rect_.setXYWH(x, y, width, height);
 }
 
-void RectTransform::resize(const float width, const float height) noexcept {
+inline inline void RectTransform::resize(const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   local_rect_.setXYWH(local_rect_.x(), local_rect_.y(), width, height);
 }
 
-void RectTransform::move(const float x, const float y) noexcept {
+inline void RectTransform::move(const float x, const float y) noexcept {
   local_rect_.setXYWH(x, y, width_, height_);
 }
 
-void RectTransform::move(const SkPoint &point) noexcept {
+inline void RectTransform::move(const SkPoint &point) noexcept {
   move(point.x(), point.y());
 }
 

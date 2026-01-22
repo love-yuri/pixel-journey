@@ -34,37 +34,43 @@ protected:
   float &radius = render_border_.radius;
 
 public:
-  void resize(float width, float height) noexcept override;
-  void setGeometry(const SkRect &rect) noexcept override;
+  inline void resize(float width, float height) noexcept override;
+  inline void setGeometry(const SkRect &rect) noexcept override;
+  inline void setGeometry(float x, float y, float width, float height) noexcept override;
 
   /**
    * 设置内边距
    */
-  void setPadding(float padding) noexcept;
+  inline void setPadding(float padding) noexcept;
 
 private:
   /**
    * 重新计算border的size
    */
-  void borderResize() noexcept;
+  inline void borderResize() noexcept;
 };
 
-void Box::resize(const float width, const float height) noexcept {
+inline void Box::resize(const float width, const float height) noexcept {
   Widget::resize(width, height);
   borderResize();
 }
 
-void Box::setGeometry(const SkRect &rect) noexcept {
+inline void Box::setGeometry(const SkRect &rect) noexcept {
   Widget::setGeometry(rect);
   borderResize();
 }
 
-void Box::setPadding(const float padding) noexcept {
+inline void Box::setGeometry(const float x, const float y, const float width, const float height) noexcept {
+  Widget::setGeometry(x, y, width, height);
+  borderResize();
+}
+
+inline void Box::setPadding(const float padding) noexcept {
   padding_left = padding_right = padding_top = padding_bottom = padding;
   borderResize();
 }
 
-void Box::borderResize() noexcept {
+inline void Box::borderResize() noexcept {
   render_border_.setGeometry(padding_left, padding_top, width_ - padding_left - padding_right, height_ - padding_top - padding_bottom);
 }
 
