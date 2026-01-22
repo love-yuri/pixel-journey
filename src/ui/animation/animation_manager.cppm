@@ -12,6 +12,10 @@ using namespace ui::animation;
 
 export namespace ui::animation {
 
+/**
+ * 动画管理
+ * 使用方法: 1: animation_manager->start(0.f, 30.f, 100, this, &memberThunk<Box, float, &Box::setPadding>);
+ */
 class AnimationManager {
   FrameClock clock; // 动画计时clock
   LinearAnimation<float> animations {};
