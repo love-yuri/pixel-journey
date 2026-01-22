@@ -8,6 +8,7 @@ export module ui.widgets:button;
 import std;
 import ui.layout;
 import ui.render;
+import skia.resource;
 import :base;
 import :box;
 import ui.animation;
@@ -30,44 +31,53 @@ public:
    * 绘制
    */
   void paint(SkCanvas *canvas) override;
-  void resize(float width, float height) noexcept override;
-  void setGeometry(const SkRect &rect) noexcept override;
+
+  /**
+   * 返回字体节点
+   */
+  inline RenderText text() noexcept {
+    return render_text_;
+  }
+
+  void onMouseMove(float x, float y) override {
+    move(x, y);
+  }
 
   void onMouseEnter(float x, float y) override {
-    animation_manager->start(0.f, 30.f, 200,  &radius);
+    animation_manager->start(0.f, 12.f, 200,  &radius);
   }
 
   void onMouseLeave(float x, float y) override {
-    animation_manager->start(30.f, 0.f, 200,  &radius);
+    animation_manager->start(12.f, 0.f, 200,  &radius);
   }
 
   void onMouseLeftPressed(float x, float y) override {
-    animation_manager->start(0.f, 30.f, 100, this, &memberThunk<Box, float, &Box::setPadding>);
+    setPadding({0, 10, 0, 0});
   }
 
   void onMouseLeftReleased(float x, float y) override {
-    animation_manager->start(30.f, 0.f, 100, this, &memberThunk<Box, float, &Box::setPadding>);
+    setPadding(0);
   }
+
+  void layoutChildren() override;
 };
 
-Button::Button(const std::string_view text, Widget *parent) : Box(parent) {
-  render_text_.resize(width_, height_);
-  render_text_.setText(text);
-  render_text_.setAlignment(Alignment::Center);
+Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text_(&content_box) {
+  render_text_.setTextAndAlignment(text, Alignment::Center);
+  render_bg.setColor(skia_colors::green);
 }
 
 void Button::paint(SkCanvas *canvas) {
+  render_bg.render(canvas);
   render_text_.render(canvas);
-  render_border_.render(canvas);
+  render_border.render(canvas);
+
+  yuri::info("x: {}, y: {}", self_box.x(), self_box.y());
 }
 
-void Button::resize(const float width, const float height) noexcept {
-  Box::resize(width, height);
-  render_text_.resize(width, height);
-}
-
-void Button::setGeometry(const SkRect &rect) noexcept {
-  Box::setGeometry(rect);
+void Button::layoutChildren() {
+  Box::layoutChildren();
+  render_text_.reCalculate();
 }
 
 } // namespace ui::widgets

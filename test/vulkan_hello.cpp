@@ -39,7 +39,6 @@ double getCurrentTime() {
 class Window: public glfw::Window {
   using glfw::Window::Window;
   FPSCounter fpsCounter;
-  sk_sp<SkTypeface> typeface = font::load_from_file(font::default_font_path);
 
   SkPaint sk_paint_ = [] {
     SkPaint paint;
@@ -54,8 +53,7 @@ public:
 
   Window(): glfw::Window(800, 800) {
     button = new ui::widgets::Button("测试", this);
-    button->move(50, 250);
-    button->resize(200, 200);
+    button->setGeometry(50, 230, 200, 50);
   }
 
   void paint(SkCanvas *canvas) override {
