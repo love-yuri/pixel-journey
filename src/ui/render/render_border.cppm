@@ -17,33 +17,38 @@ class RenderBorder : public RenderNode {
   };
 
 public:
-  float radius = 0; // 圆角大小
-
-  /**
-   * 设置border宽度
-   * @param width 宽度
-   */
-  void set_border_width(float width);
+  float* radius = nullptr; // 圆角大小
 
   /**
    * render
    */
   void render(SkCanvas* canvas) override;
-};
 
-void RenderBorder::set_border_width(const float width) {
-  paint.setStrokeWidth(width);
-}
+  /**
+   * 设置border宽度
+   * @param width 宽度
+   */
+  inline void setWidth(const float width) noexcept {
+    paint.setStrokeWidth(width);
+  }
+
+  /**
+   * 设置边框颜色
+   */
+  inline void setColor(const SkColor c) noexcept {
+    paint.setColor(c);
+  }
+};
 
 void RenderBorder::render(SkCanvas *canvas) {
   if (!visible) {
     return;
   }
 
-  if (radius <= 0) {
+  if (radius == nullptr || *radius <= 0) {
     canvas->drawRect(*self_box, paint);
   } else {
-    canvas->drawRoundRect(*self_box, radius, radius, paint);
+    canvas->drawRoundRect(*self_box, *radius, *radius, paint);
   }
 }
 

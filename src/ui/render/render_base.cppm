@@ -51,7 +51,7 @@ public:
   */
   bool visible = true;
 
-  RenderNode() = default;
+  RenderNode() noexcept = default;
   explicit RenderNode(const SkRect* rect): self_box(rect) {
     if (rect == nullptr) {
       throw std::runtime_error("node的边界不能为空!");
