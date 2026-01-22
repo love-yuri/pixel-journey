@@ -226,7 +226,9 @@ void Widget::render(SkCanvas *canvas) {
   canvas->translate(self_box.x(), self_box.y());
   paint(canvas);
   for (const auto child : children_) {
-    child->render(canvas);
+    if (child->visible) {
+      child->render(canvas);
+    }
   }
   canvas->restore();
 }
