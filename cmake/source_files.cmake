@@ -7,6 +7,7 @@ file(GLOB IXX_MODULES
 
     # glfw
     ${CMAKE_CURRENT_SOURCE_DIR}/src/glfw/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/glfw/*.cppm
 
     # vulkan
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/*.ixx
@@ -18,17 +19,23 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/api/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/resource/*.ixx
 
-    # ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/render/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/render/*.cppm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/core/*.ixx
+    # ui - core
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/animation/*.cppm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/core/*.ixx
+
+    # ui - render
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/render/*.cppm
+
+    # ui - widgets
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/core/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/widgets/components/*.cppm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/*.ixx
+
+    # ui - layout
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/types/*.cppm
+
+    # configuration
     ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
 )
 
