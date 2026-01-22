@@ -5,3 +5,4 @@
 export module ui.layout;
 
 export import :alignment;
+export import :insets;
