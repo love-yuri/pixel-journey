@@ -68,7 +68,7 @@ protected:
    * @param height 新的高度
    */
   virtual void onResize(int width, int height);
-
+  void layoutChildren() override;
   friend void onResizeStatic(GLFWwindow *window, int width, int height);
   friend void onMouseMoveStatic(GLFWwindow *window, double x, double y);
   friend void onMouseEnterStatic(GLFWwindow *window, int is_entered);
@@ -158,6 +158,12 @@ void Window::onResize(int width, int height) {
   context_.create_swapchain();
 }
 
+void Window::layoutChildren() {
+  for (const auto child : this->children_) {
+    child->updateLayout();
+  }
+}
+
 bool Window::shouldClose() const {
   return glfwWindowShouldClose(window_);
 }
@@ -179,6 +185,9 @@ void Window::run() {
 
     // 更新动画
     animation_manager->update();
+
+    // 更新布局
+    updateLayout();
 
     // 渲染
     render(frame->sk_surface->getCanvas());
