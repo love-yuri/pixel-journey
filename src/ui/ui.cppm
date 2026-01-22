@@ -4,7 +4,6 @@
 
 export module ui;
 
-export import ui.core;
 export import ui.render;
 export import ui.widgets;
 export import ui.layout;

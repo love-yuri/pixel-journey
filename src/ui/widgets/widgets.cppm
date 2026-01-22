@@ -5,6 +5,4 @@
 export module ui.widgets;
 
 export import :button;
-export import :hit_test_grid;
 export import :base;
-export import :widget_tree;
