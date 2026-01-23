@@ -33,6 +33,7 @@ inline LayoutDirty& operator|=(LayoutDirty &a, LayoutDirty b) {
  * 控件基类
  */
 class Widget {
+  Widget* mouse_capture = nullptr;    // 正在被点击的控件
 protected:
   std::vector<Widget*> children_{};   // 子控件列表
 
@@ -42,8 +43,19 @@ protected:
   float width_ = 0;                   // 控件宽度
   float height_ = 0;                  // 控件高度
   Widget *parent_ = nullptr;          // 父控件何
-  bool visible = true;                // 是否展示
-  bool hovered_ = false;              // 是否正在被hover
+  bool visible = true;                // 是否展示 - 手动修改
+
+  /**
+   * 是否正在被hover - 自动修改
+   * 判断鼠标是否在控件内，该属性自动修改，无需手动赋值
+   */
+  bool hovered_ = false;
+
+  /**
+   * 鼠标是否正在被拖拽 - 手动修改
+   * 开启后move事件将不再检查是否在控件内
+   */
+  bool is_dragging = false;
 
   /**
    * 添加控件
@@ -321,7 +333,7 @@ void Widget::MouseMove(float x, float y) {
   onMouseMove(x, y);
   for (const auto child : children_) {
     if (child->visible) {
-      if (child->hitTestBounds().contains(x, y)) {
+      if (child->hitTestBounds().contains(x, y) || child->is_dragging) {
         child->MouseMove(x, y);
       } else if (child->hovered_) {
         child->hovered_ = false;
@@ -334,24 +346,26 @@ void Widget::MouseMove(float x, float y) {
 void Widget::MouseLeftPressed(float x, float y) {
   x -= self_box.x();
   y -= self_box.y();
-  onMouseLeftPressed(x, y);
   for (const auto child : children_) {
     if (child->visible && child->hitTestBounds().contains(x, y)) {
       child->MouseLeftPressed(x, y);
-      break;
+      mouse_capture = child;
+      return;
     }
   }
+
+  onMouseLeftPressed(x, y);
 }
 
 void Widget::MouseLeftReleased(float x, float y) {
   x -= self_box.x();
   y -= self_box.y();
-  onMouseLeftReleased(x, y);
-  for (const auto child : children_) {
-    if (child->visible && child->hitTestBounds().contains(x, y)) {
-      child->MouseLeftReleased(x, y);
-      break;
-    }
+
+  if (mouse_capture) {
+    mouse_capture->MouseLeftReleased(x, y);
+    mouse_capture = nullptr;
+  } else {
+    onMouseLeftReleased(x, y);
   }
 }
 
