@@ -24,6 +24,7 @@ using ::glfwGetWindowUserPointer;
 using ::glfwPollEvents;
 using ::glfwMakeContextCurrent;
 using ::glfwGetCursorPos;
+using ::glfwSetWindowPos;
 
 constexpr auto left_mouse_button = GLFW_MOUSE_BUTTON_LEFT;
 constexpr auto right_mouse_button = GLFW_MOUSE_BUTTON_RIGHT;
@@ -58,13 +59,14 @@ std::vector<const char*> get_vk_extensions() {
 
 /**
  * 创建窗口
+ * 使用 const std::string& 避免字符串越界
  * @param width 窗口宽度
  * @param height 窗口高度
  * @param title 窗口标题
  * @return 窗口指针
  */
-GLFWwindow* create_window(const int width, const int height, const std::string_view title) {
-  return glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
+GLFWwindow* create_window(const int width, const int height, const std::string& title) {
+  return glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 }
 
 /**
@@ -86,6 +88,17 @@ std::tuple<std::uint32_t, std::uint32_t> get_buffer_size(GLFWwindow* window) {
     static_cast<std::uint32_t>(width),
     static_cast<std::uint32_t>(height)
   };
+}
+
+/**
+ * 获取屏幕尺寸
+ * @return <width, height>
+ */
+std::tuple<int, int> getPrimaryMonitorSize() {
+  GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+
+  return { mode->width, mode->height };
 }
 
 }

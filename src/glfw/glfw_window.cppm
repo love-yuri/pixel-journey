@@ -17,8 +17,8 @@ export namespace glfw {
 class Window : public Widget {
 
 protected:
-  GLFWwindow *window_ = nullptr;  // 窗口指针
   std::string title_{};   // 窗口标题
+  GLFWwindow *window_ = nullptr;  // 窗口指针
   WindowContext context_; // context
   float cursor_x = 0.0f;  // 鼠标位置—x
   float cursor_y = 0.0f;  // 鼠标位置-y
@@ -130,11 +130,15 @@ void onMouseButtonStatic(GLFWwindow *window, const int button, const int action,
 Window::Window(const int width, const int height, const std::string_view title) :
   Widget(nullptr),
   title_(title),
-  window_(create_window(width, height, title)),
+  window_(create_window(width, height, title_)),
   context_(window_) {
 
   width_ = width;
   height_ = height;
+
+  // 窗口居中
+  auto [w, h] = getPrimaryMonitorSize();
+  glfwSetWindowPos(window_, (w - width_) / 2, (h - height_) / 2);
 
   // GLFW 窗口大小回调
   glfwSetWindowUserPointer(window_, this);
