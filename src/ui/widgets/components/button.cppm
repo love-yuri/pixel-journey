@@ -22,7 +22,9 @@ using namespace ui::animation;
 export namespace ui::widgets {
 
 class Button : public Box {
-  RenderText render_text_;
+  RenderText render_text;   // 字体节点
+  bool is_clicked = false;  // 是否被点击
+  SkPoint last_point{};     // 上次被处理的点
 
 public:
   explicit Button(std::string_view text, Widget *parent);
@@ -36,11 +38,15 @@ public:
    * 返回字体节点
    */
   inline RenderText text() noexcept {
-    return render_text_;
+    return render_text;
   }
 
-  void onMouseMove(float x, float y) override {
-    move(x, y);
+  void onMouseMove(const float x, const float y) override {
+    if (!is_clicked) {
+      return;
+    }
+
+    move(self_box.x() + x - last_point.x(), self_box.y() + y - last_point.y());
   }
 
   void onMouseEnter(float x, float y) override {
@@ -51,33 +57,38 @@ public:
     animation_manager->start(12.f, 0.f, 200,  &radius);
   }
 
-  void onMouseLeftPressed(float x, float y) override {
+  void onMouseLeftPressed(const float x, const float y) override {
+    is_clicked = true;
+    is_dragging = true;
+    last_point.set(x, y);
+
     setPadding({0, 10, 0, 0});
   }
 
   void onMouseLeftReleased(float x, float y) override {
     setPadding(0);
+    is_clicked = false;
   }
 
   void layoutChildren() override;
 };
 
-Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text_(&content_box) {
-  render_text_.setTextAndAlignment(text, Alignment::Center);
+Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&content_box) {
+  render_text.setTextAndAlignment(text, Alignment::Center);
   render_bg.setColor(skia_colors::green);
 }
 
 void Button::paint(SkCanvas *canvas) {
   render_bg.render(canvas);
-  render_text_.render(canvas);
+  render_text.render(canvas);
   render_border.render(canvas);
 
-  yuri::info("x: {}, y: {}", self_box.x(), self_box.y());
+  // yuri::info("x: {}, y: {}", self_box.x(), self_box.y());
 }
 
 void Button::layoutChildren() {
   Box::layoutChildren();
-  render_text_.reCalculate();
+  render_text.reCalculate();
 }
 
 } // namespace ui::widgets
