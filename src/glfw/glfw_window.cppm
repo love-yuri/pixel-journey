@@ -17,11 +17,11 @@ export namespace glfw {
 class Window : public Widget {
 
 protected:
-  std::string title_{};   // 窗口标题
-  GLFWwindow *window_ = nullptr;  // 窗口指针
-  WindowContext context_; // context
-  float cursor_x = 0.0f;  // 鼠标位置—x
-  float cursor_y = 0.0f;  // 鼠标位置-y
+  std::string title_{};          // 窗口标题
+  GLFWwindow *window_ = nullptr; // 窗口指针
+  WindowContext context_;        // context
+  float cursor_x = 0.0f;         // 鼠标位置—x
+  float cursor_y = 0.0f;         // 鼠标位置-y
 
 public:
   Window(int width, int height, std::string_view title = "yuri");

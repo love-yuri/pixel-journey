@@ -29,9 +29,9 @@ public:
   std::uint32_t queue_family_index = 0;            // 选择的index
   CommandPool command_pool;                        // command pool
   DispatchLoaderDynamic instance_dynamic_dispatch; // instance 动态加载器
-  gpu::VulkanBackendContext skia_vk_context;     // vk_context
+  gpu::VulkanBackendContext skia_vk_context;       // vk_context
   sk_sp<GrDirectContext> skia_direct_context;      // GrDirectContext
-  gpu::MutableTextureState present_state;  // skia present s
+  gpu::MutableTextureState present_state;          // skia present state
 
   VulkanContext();
   ~VulkanContext();
