@@ -2,6 +2,7 @@
 file(GLOB IXX_MODULES
     # 工具配置相关
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
 
     # glfw
