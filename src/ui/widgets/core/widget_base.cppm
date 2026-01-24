@@ -213,18 +213,6 @@ public:
   }
 };
 
-#ifdef __clang__
-/**
- * 重载==防止clangd报错（实际能跑）
- * @param it it
- * @param end end
- * @return 是否相等
- */
-bool operator==(const std::vector<Widget *>::iterator & it, const std::vector<Widget *>::iterator & end) {
-  return it.base() == end.base();
-}
-#endif
-
 void Widget::addWidget(Widget * widget) {
   if (widget == nullptr) {
     return;
