@@ -11,23 +11,29 @@ import ui.render;
 import skia.resource;
 import :base;
 import :box;
+import signal;
 import ui.animation;
 
 using namespace ui::render;
 using namespace ui::layout;
 using namespace skia;
-
 using namespace ui::animation;
 
 export namespace ui::widgets {
 
 class Button : public Box {
-  RenderText render_text;   // 字体节点
-  bool is_clicked = false;  // 是否被点击
-  SkPoint last_point{};     // 上次被处理的点
+  RenderText render_text;     // 字体节点
+  bool is_clicked = false;    // 是否被点击
+  SkPoint last_point{};       // 上次被处理的点
 
 public:
+  Signal<> clicked; // 点击事件
+
   explicit Button(std::string_view text, Widget *parent);
+
+  void onClick() {
+    yuri::info("button clicked!");
+  }
 
   /**
    * 绘制
@@ -68,6 +74,8 @@ public:
   void onMouseLeftReleased(float x, float y) override {
     setPadding(0);
     is_clicked = false;
+    is_dragging = false;
+    clicked.emit();
   }
 
   void layoutChildren() override;
@@ -76,6 +84,9 @@ public:
 Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&content_box) {
   render_text.setTextAndAlignment(text, Alignment::Center);
   render_bg.setColor(skia_colors::green);
+
+  // 连接信号
+  clicked.connect<&Button::onClick>(this);
 }
 
 void Button::paint(SkCanvas *canvas) {
