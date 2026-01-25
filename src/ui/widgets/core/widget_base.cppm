@@ -6,6 +6,7 @@ export module ui.widgets:base;
 
 import skia.api;
 import yuri_log;
+import ui.layout;
 import std;
 import signal;
 
@@ -168,6 +169,12 @@ public:
   }
 
   /**
+   * 获取该控件所有子控件
+   * @return child 合集
+   */
+  inline std::vector<Widget*>& children() noexcept;
+
+  /**
    * 设置控件几何状态
    * @param rect 控件所占rect，基于父控件
    */
@@ -277,6 +284,10 @@ Widget::Widget(Widget *parent): parent_(parent) {
     return;
   }
   parent_->children_.push_back(this);
+}
+
+inline std::vector<Widget *> &Widget::children() noexcept {
+  return children_;
 }
 
 inline void Widget::setGeometry(const SkRect &rect) noexcept {
