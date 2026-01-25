@@ -7,6 +7,7 @@ export module ui.widgets:base;
 import skia.api;
 import yuri_log;
 import std;
+import signal;
 
 using namespace skia;
 
@@ -58,12 +59,6 @@ protected:
   bool is_dragging = false;
 
   /**
-   * 添加控件
-   * @param widget 控件指针-可为空
-   */
-  void addWidget(Widget * widget);
-
-  /**
    * 控件长什么样？
    */
   virtual void paint(SkCanvas *canvas) = 0;
@@ -72,6 +67,12 @@ protected:
    * 绘制所有控件
    */
   virtual void render(SkCanvas *canvas);
+
+  /**
+   * 添加控件
+   * @param widget 控件指针-可为空
+   */
+  void addWidget(Widget * widget);
 
   /**
    * 鼠标移动事件
