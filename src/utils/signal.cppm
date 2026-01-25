@@ -96,7 +96,7 @@ public:
    */
   template <auto ptr, typename T>
   inline void connect(T* obj) noexcept {
-    slots.emplace_back(SignalType::template from<T, ptr>(obj));
+    slots.emplace_back(SignalType::template from<ptr, T>(obj));
   }
 
   /**
