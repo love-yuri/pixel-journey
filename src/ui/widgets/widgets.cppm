@@ -6,3 +6,4 @@ export module ui.widgets;
 
 export import :button;
 export import :base;
+export import :box;

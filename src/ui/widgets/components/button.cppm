@@ -32,7 +32,6 @@ public:
   explicit Button(std::string_view text, Widget *parent);
 
   void onClick() {
-    yuri::info("button clicked!");
   }
 
   /**
@@ -43,7 +42,7 @@ public:
   /**
    * 返回字体节点
    */
-  inline RenderText text() noexcept {
+  inline RenderText& text() noexcept {
     return render_text;
   }
 
@@ -83,7 +82,7 @@ public:
 
 Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&content_box) {
   render_text.setTextAndAlignment(text, Alignment::Center);
-  render_bg.setColor(skia_colors::green);
+  render_bg.setColor(skia_colors::light_pink);
 
   // 连接信号
   clicked.connect<&Button::onClick>(this);
