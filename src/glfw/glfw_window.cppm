@@ -133,8 +133,8 @@ Window::Window(const int width, const int height, const std::string_view title) 
   window_(create_window(width, height, title_)),
   context_(window_) {
 
-  width_ = width;
-  height_ = height;
+  // 更新几何信息
+  setGeometry(0, 0, width, height);
 
   // 窗口居中
   auto [w, h] = getPrimaryMonitorSize();
@@ -160,9 +160,13 @@ Window::~Window() {
 void Window::onResize(int width, int height) {
   context_.destroy_swapchain();
   context_.create_swapchain();
+  layoutChildren();
 }
 
 void Window::layoutChildren() {
+  constexpr VBoxLayout<Widget> layout;
+  // layout.apply(this);
+
   for (const auto child : this->children_) {
     child->updateLayout();
   }
