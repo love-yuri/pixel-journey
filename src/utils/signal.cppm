@@ -41,7 +41,7 @@ public:
    * @param obj 成员实例指针
    * @return
    */
-  template <typename T, auto ptr>
+  template <auto ptr, typename T>
   static function_ref from(T *obj) noexcept {
     const auto func = [](void *this_, Args &&...args) -> R {
       return (static_cast<T *>(this_)->*ptr)(std::forward<Args>(args)...);
@@ -84,7 +84,7 @@ private:
 };
 
 export template <typename ...Args>
-class Signal {
+class Signal { // NOLINT(*-pro-type-member-init)
   using SignalType = function_ref<void(Args...)>;
   std::vector<SignalType> slots{};
 
@@ -94,7 +94,7 @@ public:
    * 创建信号连接
    * @param obj this
    */
-  template <typename T, auto ptr>
+  template <auto ptr, typename T>
   inline void connect(T* obj) noexcept {
     slots.emplace_back(SignalType::template from<T, ptr>(obj));
   }
