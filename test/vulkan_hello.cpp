@@ -51,11 +51,15 @@ class Window: public glfw::Window {
 public:
   ui::widgets::Button* button = nullptr;
 
-  Window(): glfw::Window(800, 800) {
-    button = new ui::widgets::Button("测试", this);
-    button->setGeometry(50, 230, 200, 50);
+  void onClick() {
+    animation_manager->start(200.f, 300.f, 400, this, ui::animation::memberThunk<Widget, float, &Widget::setPadding>);
+  }
 
-    setPadding({100, 300, 0, 0});
+  Window(): glfw::Window(800, 800) {
+    setPadding(200);
+    button = new ui::widgets::Button("测试", this);
+    button->resize(200, 50);
+    button->clicked.connect<&Window::onClick>(this);
   }
 
   void paint(SkCanvas *canvas) override {

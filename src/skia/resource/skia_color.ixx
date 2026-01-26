@@ -6,12 +6,10 @@ export module skia.resource:color;
 
 import skia.api;
 
-export namespace skia {
-
 /**
  * 常用颜色
  */
-namespace skia_colors {
+export namespace skia::skia_colors {
 
 // 基础颜色
 constexpr SkColor red = SkColorSetARGB(0xFF, 0xFF, 0x00, 0x00);
@@ -51,5 +49,3 @@ constexpr SkColor accent_green = SkColorSetARGB(0xFF, 0x00, 0xC8, 0x53);
 constexpr SkColor accent_red = SkColorSetARGB(0xFF, 0xE8, 0x11, 0x23);
 
 } // namespace skia_colors
-
-} // namespace skia
