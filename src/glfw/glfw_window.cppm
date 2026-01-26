@@ -161,6 +161,7 @@ void Window::onResize(int width, int height) {
   context_.destroy_swapchain();
   context_.create_swapchain();
   layoutChildren();
+  updateContentBox();
 }
 
 void Window::layoutChildren() {

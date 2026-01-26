@@ -12,9 +12,9 @@ template <typename Widget>
 struct VBoxLayout : Layout<Widget> {
   void apply(Widget* widget) const override {
     const auto &children = widget->children();
-    const auto width = widget->width();
+    const auto width = widget->contentWidth();
     int y = 0;
-    int h = widget->height() / children.size();
+    int h = widget->contentHeight() / children.size();
 
     for (auto* child : children) {
       child->setGeometry(0, y, width, h);

@@ -38,15 +38,7 @@ public:
   inline RenderBorder& border() noexcept {
     return render_border;
   }
-
-
-protected:
-  void layoutChildren() override;
 };
-
-void Box::layoutChildren() {
-  content_box.setXYWH(padding_.left, padding_.top, width_ - padding_.left - padding_.right, height_ - padding_.top - padding_.bottom);
-}
 
 Box::Box(Widget *parent): Widget(parent), render_border(&self_box), render_bg(&self_box) {
   render_border.radius = &radius;

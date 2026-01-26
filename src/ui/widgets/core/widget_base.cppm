@@ -160,6 +160,20 @@ public:
   }
 
   /**
+   * 获取控件内容宽度-去除padding区域
+   */
+  [[nodiscard]] inline float contentWidth() const noexcept {
+    return content_box.width();
+  }
+
+  /**
+   * 获取控件内容宽度-去除padding区域
+   */
+  [[nodiscard]] inline float contentHeight() const noexcept {
+    return content_box.height();
+  }
+
+  /**
    * 获取该控件所有子控件
    * @return child 合集
    */
@@ -229,7 +243,7 @@ public:
    */
   inline void setPadding(const Insets& insets) noexcept;
 
-private:
+protected:
   /**
    * 重新计算内容box大小
    */
