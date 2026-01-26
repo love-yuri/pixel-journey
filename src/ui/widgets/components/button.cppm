@@ -52,6 +52,7 @@ public:
     }
 
     move(self_box.x() + x - last_point.x(), self_box.y() + y - last_point.y());
+    render_text.reCalculate();
   }
 
   void onMouseEnter(float x, float y) override {
@@ -67,20 +68,21 @@ public:
     is_dragging = true;
     last_point.set(x, y);
 
-    setPadding({0, 10, 0, 0});
+    yuri::info("move x: {}， y: {}", x, y);
   }
 
   void onMouseLeftReleased(float x, float y) override {
-    setPadding(0);
     is_clicked = false;
     is_dragging = false;
     clicked.emit();
+
+    yuri::info("move x: {}， y: {}", x, y);
   }
 
   void layoutChildren() override;
 };
 
-Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&content_box) {
+Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&self_box) {
   render_text.setTextAndAlignment(text, Alignment::Center);
   render_bg.setColor(skia_colors::light_pink);
 
@@ -90,10 +92,8 @@ Button::Button(const std::string_view text, Widget *parent) : Box(parent), rende
 
 void Button::paint(SkCanvas *canvas) {
   render_bg.render(canvas);
-  render_text.render(canvas);
   render_border.render(canvas);
-
-  // yuri::info("x: {}, y: {}", self_box.x(), self_box.y());
+  render_text.render(canvas);
 }
 
 void Button::layoutChildren() {

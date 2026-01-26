@@ -54,6 +54,8 @@ public:
   Window(): glfw::Window(800, 800) {
     button = new ui::widgets::Button("测试", this);
     button->setGeometry(50, 230, 200, 50);
+
+    setPadding({100, 300, 0, 0});
   }
 
   void paint(SkCanvas *canvas) override {

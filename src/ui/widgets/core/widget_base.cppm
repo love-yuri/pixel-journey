@@ -11,53 +11,44 @@ import std;
 import signal;
 
 using namespace skia;
+using namespace ui::layout;
 
 export namespace ui::widgets {
-
-enum class LayoutDirty : std::uint8_t {
-  None = 0,            // 没有改变
-  Self = 1 << 0,       // 自身尺寸/位置改变
-  Children = 1 << 1    // 子节点改变
-};
-
-inline LayoutDirty operator|(LayoutDirty a, LayoutDirty b) {
-  return static_cast<LayoutDirty>(
-      static_cast<std::uint8_t>(a) | static_cast<std::uint8_t>(b)
-  );
-}
-
-inline LayoutDirty& operator|=(LayoutDirty &a, LayoutDirty b) {
-  a = a | b;
-  return a;
-}
 
 /**
  * 控件基类
  */
 class Widget {
-  Widget* mouse_capture = nullptr;    // 正在被点击的控件
+  Widget *mouse_capture = nullptr; // 正在被点击的控件
 protected:
-  std::vector<Widget*> children_{};   // 子控件列表
+  Widget *parent_ = nullptr;         // 父控件
+  std::vector<Widget *> children_{}; // 子控件列表
+  Layout<Widget> *layout_ = nullptr; // 布局
+  LayoutDirty layout_dirty{};        // 脏布局类型
 
-  // 自身box模型，不包含margin
-  SkRect self_box {0, 0, 0, 0 };
-  LayoutDirty layout_dirty{};        // 布局是否变脏
-  float width_ = 0;                   // 控件宽度
-  float height_ = 0;                  // 控件高度
-  Widget *parent_ = nullptr;          // 父控件何
-  bool visible = true;                // 是否展示 - 手动修改
+  /* 控件几何信息 */
+  float width_ = 0.f;   // 控件宽度
+  float height_ = 0.f;  // 控件高度
+  SkRect self_box{};    // 自身box模型 [x, y] 相对于父布局开始
+  SkRect content_box{}; // 内容box模型 [pl, pt] 开始
+  Insets padding_{};    // 内边距
+
+  /**
+   * 是否展示 - 手动修改
+   */
+  std::uint8_t visible : 1 = 1;
 
   /**
    * 是否正在被hover - 自动修改
    * 判断鼠标是否在控件内，该属性自动修改，无需手动赋值
    */
-  bool hovered_ = false;
+  std::uint8_t hovered_ : 1 = 0;
 
   /**
    * 鼠标是否正在被拖拽 - 手动修改
    * 开启后move事件将不再检查是否在控件内
    */
-  bool is_dragging = false;
+  std::uint8_t is_dragging : 1 = 0;
 
   /**
    * 控件长什么样？
@@ -73,7 +64,7 @@ protected:
    * 添加控件
    * @param widget 控件指针-可为空
    */
-  void addWidget(Widget * widget);
+  virtual void addWidget(Widget * widget);
 
   /**
    * 鼠标移动事件
@@ -219,6 +210,30 @@ public:
    */
   virtual void layoutChildren() {
   }
+
+  /**
+   * 获取内边距
+   * @return 内边距合集
+   */
+  inline Insets padding() const noexcept {
+    return padding_;
+  }
+
+  /**
+   * 设置内边距
+   */
+  inline void setPadding(float padding) noexcept;
+
+  /**
+   * 设置内边距
+   */
+  inline void setPadding(const Insets& insets) noexcept;
+
+private:
+  /**
+   * 重新计算内容box大小
+   */
+  void updateContentBox();
 };
 
 void Widget::addWidget(Widget * widget) {
@@ -231,8 +246,11 @@ void Widget::addWidget(Widget * widget) {
 
 void Widget::render(SkCanvas *canvas) {
   canvas->save();
-  canvas->translate(self_box.x(), self_box.y());
+  // 绘制自身
   paint(canvas);
+
+  // 变换后绘制children
+  canvas->translate(self_box.x() + padding_.left, self_box.y() + padding_.top);
   for (const auto child : children_) {
     if (child->visible) {
       child->render(canvas);
@@ -267,8 +285,31 @@ inline void Widget::updateLayout() {
   layout_dirty = LayoutDirty::None;
 }
 
+inline void Widget::setPadding(const float padding) noexcept {
+  padding_.setAll(padding);
+  updateContentBox();
+  markLayoutDirty(LayoutDirty::Self);
+}
+
+void Widget::setPadding(const Insets& insets) noexcept {
+  padding_ = insets;
+  updateContentBox();
+  markLayoutDirty(LayoutDirty::Self);
+}
+
+void Widget::updateContentBox() {
+  content_box.setXYWH(
+    padding_.left,
+    padding_.top,
+    width_ - padding_.left - padding_.right,
+    height_ - padding_.top - padding_.bottom
+  );
+}
+
 Widget::~Widget() {
   for (const auto child : children_) {
+    // 本控件析构不需要再次处理自身
+    child->parent_ = nullptr;
     delete child;
   }
   if (parent_ != nullptr) {
@@ -294,6 +335,7 @@ inline void Widget::setGeometry(const SkRect &rect) noexcept {
   this->self_box = rect;
   width_ = rect.width();
   height_ = rect.height();
+  updateContentBox();
   markLayoutDirty(LayoutDirty::Self);
 }
 
@@ -301,6 +343,7 @@ inline void Widget::setGeometry(const float x, const float y, const float width,
   width_ = width;
   height_ = height;
   self_box.setXYWH(x, y, width, height);
+  updateContentBox();
   markLayoutDirty(LayoutDirty::Self);
 }
 
@@ -308,6 +351,7 @@ inline void Widget::resize(const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   self_box.setXYWH(self_box.x(), self_box.y(), width, height);
+  updateContentBox();
   markLayoutDirty(LayoutDirty::Self);
 }
 
@@ -319,11 +363,7 @@ inline void Widget::move(const SkPoint &point) noexcept {
   move(point.x(), point.y());
 }
 
-void Widget::MouseMove(float x, float y) {
-  x -= self_box.x();
-  y -= self_box.y();
-
-  // 先处理enter
+void Widget::MouseMove(const float x, const float y) {
   if (!hovered_) {
     hovered_ = true;
     onMouseEnter(x, y);
@@ -331,38 +371,49 @@ void Widget::MouseMove(float x, float y) {
 
   // 再处理move
   onMouseMove(x, y);
+
   for (const auto child : children_) {
     if (child->visible) {
       if (child->hitTestBounds().contains(x, y) || child->is_dragging) {
-        child->MouseMove(x, y);
+        child->MouseMove(x - child->hitTestBounds().x(), y - child->hitTestBounds().y());
       } else if (child->hovered_) {
         child->hovered_ = false;
-        child->onMouseLeave(x, y);
+        child->onMouseLeave(x - child->hitTestBounds().x(), y - child->hitTestBounds().y());
       }
     }
   }
 }
 
-void Widget::MouseLeftPressed(float x, float y) {
-  x -= self_box.x();
-  y -= self_box.y();
+void Widget::MouseLeftPressed(const float x, const float y) {
+  // 减去padding 再开始判定
+  const auto child_x = x - padding_.left;
+  const auto child_y = y - padding_.top;
+
   for (const auto child : children_) {
-    if (child->visible && child->hitTestBounds().contains(x, y)) {
-      child->MouseLeftPressed(x, y);
+    if (child->visible && child->self_box.contains(child_x, child_y)) {
+      child->MouseLeftPressed(
+        child_x - child->self_box.x(),
+        child_y - child->self_box.y()
+      );
       mouse_capture = child;
       return;
     }
   }
 
+  // 使用原坐标处理自身
   onMouseLeftPressed(x, y);
 }
 
-void Widget::MouseLeftReleased(float x, float y) {
-  x -= self_box.x();
-  y -= self_box.y();
+void Widget::MouseLeftReleased(const float x, const float y) {
+  // 减去padding 再开始判定
+  const auto child_x = x - padding_.left;
+  const auto child_y = y - padding_.top;
 
   if (mouse_capture) {
-    mouse_capture->MouseLeftReleased(x, y);
+    mouse_capture->MouseLeftReleased(
+      child_x - mouse_capture->self_box.x(),
+      child_y - mouse_capture->self_box.y()
+    );
     mouse_capture = nullptr;
   } else {
     onMouseLeftReleased(x, y);

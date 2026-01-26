@@ -22,9 +22,6 @@ class Box : public Widget {
 protected:
   RenderBorder render_border; // border节点
   RenderBackground render_bg; // background节点
-  SkRect content_box{};       // 内容box
-  SkRect border_box{};        // border box
-  Insets padding_{};          // 内边距
 
 public:
   float radius = 0; // 圆角
@@ -42,37 +39,16 @@ public:
     return render_border;
   }
 
-  /**
-   * 设置内边距
-   */
-  inline void setPadding(float padding) noexcept;
-
-  /**
-   * 设置内边距
-   */
-  inline void setPadding(const Insets& insets) noexcept;
 
 protected:
   void layoutChildren() override;
 };
 
-inline void Box::setPadding(const float padding) noexcept {
-  padding_.setAll(padding);
-  markLayoutDirty(LayoutDirty::Self);
-}
-
-void Box::setPadding(const Insets& insets) noexcept {
-  padding_ = insets;
-  markLayoutDirty(LayoutDirty::Self);
-}
-
 void Box::layoutChildren() {
   content_box.setXYWH(padding_.left, padding_.top, width_ - padding_.left - padding_.right, height_ - padding_.top - padding_.bottom);
-  border_box.fRight = width_;
-  border_box.fBottom = height_;
 }
 
-Box::Box(Widget *parent): Widget(parent), render_border(&border_box), render_bg(&border_box) {
+Box::Box(Widget *parent): Widget(parent), render_border(&self_box), render_bg(&self_box) {
   render_border.radius = &radius;
   render_bg.radius = &radius;
 }
