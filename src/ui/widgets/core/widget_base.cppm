@@ -372,13 +372,23 @@ void Widget::MouseMove(const float x, const float y) {
   // 再处理move
   onMouseMove(x, y);
 
+  // 减去padding 再开始判定
+  const auto child_x = x - padding_.left;
+  const auto child_y = y - padding_.top;
+
   for (const auto child : children_) {
     if (child->visible) {
-      if (child->hitTestBounds().contains(x, y) || child->is_dragging) {
-        child->MouseMove(x - child->hitTestBounds().x(), y - child->hitTestBounds().y());
+      if (child->self_box.contains(child_x, child_y) || child->is_dragging) {
+        child->MouseMove(
+          child_x - child->self_box.x(),
+          child_y - child->self_box.y()
+        );
       } else if (child->hovered_) {
         child->hovered_ = false;
-        child->onMouseLeave(x - child->hitTestBounds().x(), y - child->hitTestBounds().y());
+        child->onMouseLeave(
+          child_x - child->self_box.x(),
+          child_y - child->self_box.y()
+        );
       }
     }
   }
