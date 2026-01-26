@@ -164,7 +164,7 @@ void Window::onResize(int width, int height) {
 }
 
 void Window::layoutChildren() {
-  constexpr VBoxLayout<Widget> layout;
+  constexpr ui::layout::VBoxLayout<Widget> layout;
   // layout.apply(this);
 
   for (const auto child : this->children_) {

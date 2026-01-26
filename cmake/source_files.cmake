@@ -34,6 +34,8 @@ file(GLOB IXX_MODULES
     # ui - layout
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/types/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/core/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/layouts/*.cppm
 )
 
 # 收集源文件
