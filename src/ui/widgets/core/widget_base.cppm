@@ -28,11 +28,12 @@ protected:
   LayoutDirty layout_dirty{};        // 脏布局类型
 
   /* 控件几何信息 */
-  float width_ = 0.f;   // 控件宽度
-  float height_ = 0.f;  // 控件高度
-  SkRect self_box{};    // 自身box模型 [x, y] 相对于父布局开始
-  SkRect content_box{}; // 内容box模型 [pl, pt] 开始
-  Insets padding_{};    // 内边距
+  float width_ = 0.f;               // 控件宽度
+  float height_ = 0.f;              // 控件高度
+  SkRect self_box{};                // 自身box模型 [x, y] 相对于父布局开始
+  SkRect content_box{};             // 内容box模型 [pl, pt] 开始
+  Insets padding_{};                // 内边距
+  SizeConstraints size_constraints; // 布局约束信息
 
   /**
    * 是否展示 - 手动修改
@@ -196,6 +197,14 @@ public:
   }
 
   /**
+   * 获取控件尺寸约束
+   * @return 约束合集
+   */
+  [[nodiscard]] inline const SizeConstraints& sizeConstraints() const noexcept {
+    return size_constraints;
+  }
+
+  /**
    * 设置控件几何状态
    * @param rect 控件所占rect，基于父控件
    */
@@ -219,6 +228,23 @@ public:
    * 设置内边距
    */
   inline void setPadding(const Insets& insets) noexcept;
+
+  /**
+   * 设置最大尺寸
+   * @param w 最大宽度
+   * @param h 最大高度
+   */
+  inline void setMaxSize(float w, float h) noexcept;
+
+  /**
+   * 设置最大宽度
+   */
+  inline void setMaxWidth(float w) noexcept;
+
+  /**
+   * 设置最大高度
+   */
+  inline void setMaxHeight(float h) noexcept;
 
   /**
    * 修改控件的宽高
@@ -362,6 +388,19 @@ void Widget::setPadding(const Insets& insets) noexcept {
   markLayoutDirty(LayoutDirty::Self);
 }
 
+void Widget::setMaxSize(const float w, const float h) noexcept {
+  size_constraints.max_w = std::max(w, size_constraints.min_w);
+  size_constraints.max_h = std::max(h, size_constraints.min_h);
+}
+
+inline void Widget::setMaxWidth(const float w) noexcept {
+  size_constraints.max_w = std::max(w, size_constraints.min_w);
+}
+
+inline void Widget::setMaxHeight(const float h) noexcept {
+  size_constraints.max_h = std::max(h, size_constraints.min_h);
+}
+
 inline void Widget::resize(const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
@@ -371,6 +410,9 @@ inline void Widget::resize(const float width, const float height) noexcept {
 }
 
 inline void Widget::move(const float x, const float y) noexcept {
+  if (parent_ != nullptr && parent_->layout_ != nullptr) {
+    return;
+  }
   self_box.setXYWH(x, y, width_, height_);
 }
 
