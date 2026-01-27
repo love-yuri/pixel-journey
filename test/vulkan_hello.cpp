@@ -60,6 +60,9 @@ public:
     button = new ui::widgets::Button("测试", this);
     button->resize(200, 50);
     button->clicked.connect<&Window::onClick>(this);
+    auto text = new ui::widgets::Text("哈哈哈哈", this);
+    // text->resize(100, 100);
+    text->move(0, 100);
   }
 
   void paint(SkCanvas *canvas) override {
