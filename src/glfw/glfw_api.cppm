@@ -25,6 +25,8 @@ using ::glfwPollEvents;
 using ::glfwMakeContextCurrent;
 using ::glfwGetCursorPos;
 using ::glfwSetWindowPos;
+using ::glfwSetWindowIconifyCallback;
+using ::glfwWaitEvents;
 
 constexpr auto left_mouse_button = GLFW_MOUSE_BUTTON_LEFT;
 constexpr auto right_mouse_button = GLFW_MOUSE_BUTTON_RIGHT;

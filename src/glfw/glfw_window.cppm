@@ -73,6 +73,7 @@ protected:
   friend void onMouseMoveStatic(GLFWwindow *window, double x, double y);
   friend void onMouseEnterStatic(GLFWwindow *window, int is_entered);
   friend void onMouseButtonStatic(GLFWwindow *window, int button, int action, int mods);
+  friend void onSetWindowIconifyStatic(GLFWwindow *window, int iconified);
 };
 
 /**
@@ -82,11 +83,11 @@ void onResizeStatic(GLFWwindow *window, const int width, const int height) {
   // 忽略最小化
   if (width > 0 && height > 0) {
     const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-    if (width == self->width_ && height == self->height_) {
+    if (width == static_cast<int>(self->width_) && height == static_cast<int>(self->height_)) {
       return;
     }
-    self->width_ = width;
-    self->height_ = height;
+    self->width_ = width;   // NOLINT(*-narrowing-conversions)
+    self->height_ = height; // NOLINT(*-narrowing-conversions)
     self->onResize(width, height);
   }
 }
@@ -127,6 +128,11 @@ void onMouseButtonStatic(GLFWwindow *window, const int button, const int action,
   }
 }
 
+void onSetWindowIconifyStatic(GLFWwindow *window, const int iconified) {
+  const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  self->visible = !iconified;
+}
+
 Window::Window(const int width, const int height, const std::string_view title) :
   Widget(nullptr),
   title_(title),
@@ -134,11 +140,11 @@ Window::Window(const int width, const int height, const std::string_view title) 
   context_(window_) {
 
   // 更新几何信息
-  setGeometry(0, 0, width, height);
+  setGeometry(0, 0, width, height); // NOLINT(*-narrowing-conversions)
 
   // 窗口居中
   auto [w, h] = getPrimaryMonitorSize();
-  glfwSetWindowPos(window_, (w - width_) / 2, (h - height_) / 2);
+  glfwSetWindowPos(window_, (w - width_) / 2, (h - height_) / 2);  // NOLINT(*-narrowing-conversions)
 
   // GLFW 窗口大小回调
   glfwSetWindowUserPointer(window_, this);
@@ -146,6 +152,7 @@ Window::Window(const int width, const int height, const std::string_view title) 
   glfwSetCursorPosCallback(window_, onMouseMoveStatic);
   glfwSetMouseButtonCallback(window_, onMouseButtonStatic);
   glfwSetCursorEnterCallback(window_, onMouseEnterStatic);
+  glfwSetWindowIconifyCallback(window_, onSetWindowIconifyStatic);
 
   // 打印debug信息
   if constexpr (is_debug_mode) {
@@ -188,6 +195,12 @@ render_frame *Window::acquireNextFrame() {
 
 void Window::run() {
   while (!shouldClose()) {
+    if (!visible) {
+      // 不可见时阻塞等待事件
+      glfwWaitEvents();
+      continue;
+    }
+
     // 获取下一帧图像
     const auto frame = acquireNextFrame();
     frame->begin_frame();
