@@ -52,7 +52,7 @@ public:
   ui::widgets::Button* button = nullptr;
 
   void onClick() {
-    animation_manager->start(200.f, 300.f, 400, this, ui::animation::memberThunk<Widget, float, &Widget::setPadding>);
+    // animation_manager->start(200.f, 300.f, 400, this, ui::animation::memberThunk<Widget, float, &Widget::setPadding>);
   }
 
   Window(): glfw::Window(800, 800) {
@@ -60,9 +60,11 @@ public:
     button = new ui::widgets::Button("测试", this);
     button->resize(200, 50);
     button->clicked.connect<&Window::onClick>(this);
-    auto text = new ui::widgets::Text("哈哈哈哈", this);
-    // text->resize(100, 100);
-    text->move(0, 100);
+    layout_ = new ui::layout::VBoxLayout<Widget>();
+    button->setMaxHeight(50);
+    const auto text = new ui::widgets::Text("哈哈哈哈", this);
+    text->setAlignment(ui::layout::Alignment::Center);
+    text->setMaxHeight(50);
   }
 
   void paint(SkCanvas *canvas) override {
