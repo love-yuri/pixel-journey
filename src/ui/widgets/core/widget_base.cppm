@@ -20,6 +20,7 @@ export namespace ui::widgets {
  */
 class Widget {
   Widget *mouse_capture = nullptr; // 正在被点击的控件
+  friend Layout<Widget>;           // 友元layout组件
 protected:
   Widget *parent_ = nullptr;         // 父控件
   std::vector<Widget *> children_{}; // 子控件列表
@@ -129,6 +130,11 @@ protected:
    */
   void markLayoutDirty(LayoutDirty reason = LayoutDirty::Self);
 
+  /**
+  * 重新计算内容box大小
+  */
+  void updateContentBox();
+
 public:
   virtual ~Widget();
 
@@ -177,7 +183,17 @@ public:
    * 获取该控件所有子控件
    * @return child 合集
    */
-  inline std::vector<Widget*>& children() noexcept;
+  [[nodiscard]] inline std::vector<Widget*>& children() noexcept {
+    return children_;
+  }
+
+  /**
+   * 获取内边距
+   * @return 内边距合集
+   */
+  [[nodiscard]] inline Insets padding() const noexcept {
+    return padding_;
+  }
 
   /**
    * 设置控件几何状态
@@ -193,6 +209,16 @@ public:
    * @param height 控件高度
    */
   inline void setGeometry(float x, float y, float width, float height) noexcept;
+
+  /**
+   * 设置内边距
+   */
+  inline void setPadding(float padding) noexcept;
+
+  /**
+   * 设置内边距
+   */
+  inline void setPadding(const Insets& insets) noexcept;
 
   /**
    * 修改控件的宽高
@@ -224,30 +250,6 @@ public:
    */
   virtual void layoutChildren() {
   }
-
-  /**
-   * 获取内边距
-   * @return 内边距合集
-   */
-  [[nodiscard]] inline Insets padding() const noexcept {
-    return padding_;
-  }
-
-  /**
-   * 设置内边距
-   */
-  inline void setPadding(float padding) noexcept;
-
-  /**
-   * 设置内边距
-   */
-  inline void setPadding(const Insets& insets) noexcept;
-
-protected:
-  /**
-   * 重新计算内容box大小
-   */
-  void updateContentBox();
 };
 
 void Widget::addWidget(Widget * widget) {
@@ -290,6 +292,15 @@ void Widget::markLayoutDirty(const LayoutDirty reason) {
   }
 }
 
+void Widget::updateContentBox() {
+  content_box.setXYWH(
+    padding_.left,
+    padding_.top,
+    width_ - padding_.left - padding_.right,
+    height_ - padding_.top - padding_.bottom
+  );
+}
+
 inline void Widget::updateLayout() {
   // 无需更新
   if (layout_dirty == LayoutDirty::None) {
@@ -300,27 +311,6 @@ inline void Widget::updateLayout() {
 
   // 清空 dirty
   layout_dirty = LayoutDirty::None;
-}
-
-inline void Widget::setPadding(const float padding) noexcept {
-  padding_.setAll(padding);
-  updateContentBox();
-  markLayoutDirty(LayoutDirty::Self);
-}
-
-void Widget::setPadding(const Insets& insets) noexcept {
-  padding_ = insets;
-  updateContentBox();
-  markLayoutDirty(LayoutDirty::Self);
-}
-
-void Widget::updateContentBox() {
-  content_box.setXYWH(
-    padding_.left,
-    padding_.top,
-    width_ - padding_.left - padding_.right,
-    height_ - padding_.top - padding_.bottom
-  );
 }
 
 Widget::~Widget() {
@@ -344,10 +334,6 @@ Widget::Widget(Widget *parent): parent_(parent) {
   parent_->children_.push_back(this);
 }
 
-inline std::vector<Widget *> &Widget::children() noexcept {
-  return children_;
-}
-
 inline void Widget::setGeometry(const SkRect &rect) noexcept {
   this->self_box = rect;
   width_ = rect.width();
@@ -360,6 +346,18 @@ inline void Widget::setGeometry(const float x, const float y, const float width,
   width_ = width;
   height_ = height;
   self_box.setXYWH(x, y, width, height);
+  updateContentBox();
+  markLayoutDirty(LayoutDirty::Self);
+}
+
+inline void Widget::setPadding(const float padding) noexcept {
+  padding_.setAll(padding);
+  updateContentBox();
+  markLayoutDirty(LayoutDirty::Self);
+}
+
+void Widget::setPadding(const Insets& insets) noexcept {
+  padding_ = insets;
   updateContentBox();
   markLayoutDirty(LayoutDirty::Self);
 }
