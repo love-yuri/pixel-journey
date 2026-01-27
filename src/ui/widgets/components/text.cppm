@@ -25,6 +25,43 @@ public:
   void layoutChildren() override {
     renderText.reCalculate();
   }
+
+  /**
+   * 设置对齐方式
+   */
+  inline void setAlignment(const Alignment alignment) {
+    renderText.setAlignment(alignment);
+  }
+
+  /**
+   * 设置字体大小
+   * @param size 字体大小
+   */
+  inline void setFontSize(const float size) {
+    renderText.setFontSize(size);
+  }
+
+  /**
+   * 设置字体颜色
+   */
+  inline void setColor(const SkColor color) {
+    renderText.setColor(color);
+  }
+
+  /**
+   * 设置文本
+   */
+  inline void setText(const std::string_view text) {
+    renderText.setText(text);
+  }
+
+  /**
+   * 设置文本和对齐方式
+   */
+  inline void setTextAndAlignment(const std::string_view text, const Alignment alignment) {
+    renderText.setTextAndAlignment(text, alignment);
+  }
+
 };
 
 
