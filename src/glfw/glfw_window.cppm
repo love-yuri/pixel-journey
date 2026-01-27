@@ -62,13 +62,8 @@ public:
   void showDebugInfo() const;
 
 protected:
-  /**
-   * 窗口大小更改
-   * @param width 新的宽度
-   * @param height 新的高度
-   */
-  virtual void onResize(int width, int height);
   void layoutChildren() override;
+
   friend void onResizeStatic(GLFWwindow *window, int width, int height);
   friend void onMouseMoveStatic(GLFWwindow *window, double x, double y);
   friend void onMouseEnterStatic(GLFWwindow *window, int is_entered);
@@ -86,9 +81,12 @@ void onResizeStatic(GLFWwindow *window, const int width, const int height) {
     if (width == static_cast<int>(self->width_) && height == static_cast<int>(self->height_)) {
       return;
     }
-    self->width_ = width;   // NOLINT(*-narrowing-conversions)
-    self->height_ = height; // NOLINT(*-narrowing-conversions)
-    self->onResize(width, height);
+    // 重建交换链
+    self->context_.destroy_swapchain();
+    self->context_.create_swapchain();
+
+    // 调用resize
+    self->resize(static_cast<float>(width), static_cast<float>(height));
   }
 }
 
@@ -164,17 +162,13 @@ Window::~Window() {
   destroy_window(window_);
 }
 
-void Window::onResize(int width, int height) {
-  context_.destroy_swapchain();
-  context_.create_swapchain();
-  layoutChildren();
-  updateContentBox();
-}
-
 void Window::layoutChildren() {
-  constexpr ui::layout::VBoxLayout<Widget> layout;
-  // layout.apply(this);
+  // 重新布局
+  if (layout_ != nullptr) {
+    layout_->apply(this);
+  }
 
+  // 更新自控件布局
   for (const auto child : this->children_) {
     child->updateLayout();
   }
