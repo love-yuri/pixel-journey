@@ -31,7 +31,7 @@ public:
    * 默认构造函数
    * 自行处理指针
    */
-  function_ref(void *obj, member_invoke_fn method) noexcept : object_ptr(obj), member_fn(method) {
+  function_ref(void *obj, const member_invoke_fn method) noexcept : object_ptr(obj), member_fn(method) {
   }
 
   /**

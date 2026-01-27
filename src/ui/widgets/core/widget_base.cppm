@@ -229,7 +229,7 @@ public:
    * 获取内边距
    * @return 内边距合集
    */
-  inline Insets padding() const noexcept {
+  [[nodiscard]] inline Insets padding() const noexcept {
     return padding_;
   }
 
@@ -279,10 +279,13 @@ void Widget::markLayoutDirty(const LayoutDirty reason) {
     return;
   }
 
-  layout_dirty = reason;
+  layout_dirty |= reason;
 
-  // 子节点变化通常影响父容器布局
-  if (parent_ != nullptr) {
+  if (parent_ == nullptr || parent_->layout_ == nullptr) {
+    // 如果没有parent 或者 parent 没有布局则仅更新自己
+    updateLayout();
+  } else {
+    // 否则标记parent 需要更新
     parent_->markLayoutDirty(LayoutDirty::Children);
   }
 }
