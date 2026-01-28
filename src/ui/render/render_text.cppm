@@ -36,6 +36,12 @@ public:
   RenderText() = default;
 
   /**
+   * 获取字体显示所需bound
+   * @return 字体bound
+   */
+  const SkRect& textBound() const;
+
+  /**
    * 设置对齐方式
    */
   void setAlignment(Alignment alignment);
@@ -74,6 +80,10 @@ public:
 
 RenderText::RenderText(const std::string_view text, const SkRect* rect): RenderNode(rect), text(text) {
   update();
+}
+
+const SkRect& RenderText::textBound() const {
+  return font_rect;
 }
 
 void RenderText::setAlignment(const Alignment alignment) {
