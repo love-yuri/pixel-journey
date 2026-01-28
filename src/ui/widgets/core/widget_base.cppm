@@ -148,35 +148,35 @@ public:
   /**
    * 命中检测边界
    */
-  [[nodiscard]] inline const SkRect& hitTestBounds() const noexcept {
+  [[nodiscard]] const SkRect& hitTestBounds() const noexcept {
     return self_box;
   }
 
   /**
    * 获取控件宽度
    */
-  [[nodiscard]] inline float width() const noexcept {
+  [[nodiscard]] float width() const noexcept {
     return width_;
   }
 
   /**
    * 获取控件高度
    */
-  [[nodiscard]] inline float height() const noexcept {
+  [[nodiscard]] float height() const noexcept {
     return height_;
   }
 
   /**
    * 获取控件内容宽度-去除padding区域
    */
-  [[nodiscard]] inline float contentWidth() const noexcept {
+  [[nodiscard]] float contentWidth() const noexcept {
     return content_box.width();
   }
 
   /**
    * 获取控件内容宽度-去除padding区域
    */
-  [[nodiscard]] inline float contentHeight() const noexcept {
+  [[nodiscard]] float contentHeight() const noexcept {
     return content_box.height();
   }
 
@@ -184,7 +184,7 @@ public:
    * 获取该控件所有子控件
    * @return child 合集
    */
-  [[nodiscard]] inline std::vector<Widget*>& children() noexcept {
+  [[nodiscard]] std::vector<Widget*>& children() noexcept {
     return children_;
   }
 
@@ -192,7 +192,7 @@ public:
    * 获取内边距
    * @return 内边距合集
    */
-  [[nodiscard]] inline Insets padding() const noexcept {
+  [[nodiscard]] Insets padding() const noexcept {
     return padding_;
   }
 
@@ -200,7 +200,7 @@ public:
    * 获取控件尺寸约束
    * @return 约束合集
    */
-  [[nodiscard]] inline const SizeConstraints& sizeConstraints() const noexcept {
+  [[nodiscard]] const SizeConstraints& sizeConstraints() const noexcept {
     return size_constraints;
   }
 
@@ -208,7 +208,7 @@ public:
    * 设置控件几何状态
    * @param rect 控件所占rect，基于父控件
    */
-  inline void setGeometry(const SkRect &rect) noexcept;
+  void setGeometry(const SkRect &rect) noexcept;
 
   /**
    * 设置控件几何状态
@@ -217,59 +217,76 @@ public:
    * @param width 控件宽度
    * @param height 控件高度
    */
-  inline void setGeometry(float x, float y, float width, float height) noexcept;
+  void setGeometry(float x, float y, float width, float height) noexcept;
 
   /**
    * 设置内边距
    */
-  inline void setPadding(float padding) noexcept;
+  void setPadding(float padding) noexcept;
 
   /**
    * 设置内边距
    */
-  inline void setPadding(const Insets& insets) noexcept;
+  void setPadding(const Insets& insets) noexcept;
 
   /**
    * 设置最大尺寸
    * @param w 最大宽度
    * @param h 最大高度
    */
-  inline void setMaxSize(float w, float h) noexcept;
+  void setMaxSize(float w, float h) noexcept;
+
+  /**
+   * 设置最小尺寸
+   * @param w 最小宽度
+   * @param h 最小高度
+   */
+  void setMinSize(float w, float h) noexcept;
 
   /**
    * 设置最大宽度
    */
-  inline void setMaxWidth(float w) noexcept;
+  void setMaxWidth(float w) noexcept;
+
+  /**
+   * 设置最小宽度
+   */
+  void setMinWidth(float w) noexcept;
 
   /**
    * 设置最大高度
    */
-  inline void setMaxHeight(float h) noexcept;
+  void setMaxHeight(float h) noexcept;
+
+  /**
+   * 设置最小高度
+   */
+  void setMinHeight(float h) noexcept;
 
   /**
    * 修改控件的宽高
    * @param width 控件宽度
    * @param height 控件高度
    */
-  inline void resize(float width, float height) noexcept;
+  void resize(float width, float height) noexcept;
 
   /**
    * 移动控件位置
    * @param x 新的坐标
    * @param y 新的坐标
    */
-  inline void move(float x, float y) noexcept;
+  void move(float x, float y) noexcept;
 
   /**
    * 移动控件位置
    * @param point 目标点
    */
-  inline void move(const SkPoint& point) noexcept;
+  void move(const SkPoint& point) noexcept;
 
   /**
    * 更新布局
    */
-  inline void updateLayout();
+  void updateLayout();
 
   /**
    * 更新孩子布局
@@ -324,7 +341,7 @@ void Widget::updateContentBox() {
   );
 }
 
-inline void Widget::updateLayout() {
+void Widget::updateLayout() {
   // 无需更新
   if (layout_dirty == LayoutDirty::None) {
     return;
@@ -357,7 +374,7 @@ Widget::Widget(Widget *parent): parent_(parent) {
   parent_->children_.push_back(this);
 }
 
-inline void Widget::setGeometry(const SkRect &rect) noexcept {
+void Widget::setGeometry(const SkRect &rect) noexcept {
   this->self_box = rect;
   width_ = rect.width();
   height_ = rect.height();
@@ -365,7 +382,7 @@ inline void Widget::setGeometry(const SkRect &rect) noexcept {
   markLayoutDirty(LayoutDirty::Self);
 }
 
-inline void Widget::setGeometry(const float x, const float y, const float width, const float height) noexcept {
+void Widget::setGeometry(const float x, const float y, const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   self_box.setXYWH(x, y, width, height);
@@ -373,7 +390,7 @@ inline void Widget::setGeometry(const float x, const float y, const float width,
   markLayoutDirty(LayoutDirty::Self);
 }
 
-inline void Widget::setPadding(const float padding) noexcept {
+void Widget::setPadding(const float padding) noexcept {
   padding_.setAll(padding);
   updateContentBox();
   markLayoutDirty(LayoutDirty::Self);
@@ -390,15 +407,28 @@ void Widget::setMaxSize(const float w, const float h) noexcept {
   size_constraints.max_h = std::max(h, size_constraints.min_h);
 }
 
-inline void Widget::setMaxWidth(const float w) noexcept {
+void Widget::setMinSize(const float w, const float h) noexcept {
+  size_constraints.min_w = std::min(w, size_constraints.max_w);
+  size_constraints.min_h = std::min(h, size_constraints.max_h);
+}
+
+void Widget::setMaxWidth(const float w) noexcept {
   size_constraints.max_w = std::max(w, size_constraints.min_w);
 }
 
-inline void Widget::setMaxHeight(const float h) noexcept {
+void Widget::setMinWidth(const float w) noexcept {
+  size_constraints.min_w = std::min(w, size_constraints.max_w);
+}
+
+void Widget::setMaxHeight(const float h) noexcept {
   size_constraints.max_h = std::max(h, size_constraints.min_h);
 }
 
-inline void Widget::resize(const float width, const float height) noexcept {
+void Widget::setMinHeight(const float h) noexcept {
+  size_constraints.min_h = std::min(h, size_constraints.max_h);
+}
+
+void Widget::resize(const float width, const float height) noexcept {
   width_ = width;
   height_ = height;
   self_box.setXYWH(self_box.x(), self_box.y(), width, height);
@@ -406,14 +436,14 @@ inline void Widget::resize(const float width, const float height) noexcept {
   markLayoutDirty(LayoutDirty::Self);
 }
 
-inline void Widget::move(const float x, const float y) noexcept {
+void Widget::move(const float x, const float y) noexcept {
   if (parent_ != nullptr && parent_->layout_ != nullptr) {
     return;
   }
   self_box.setXYWH(x, y, width_, height_);
 }
 
-inline void Widget::move(const SkPoint &point) noexcept {
+void Widget::move(const SkPoint &point) noexcept {
   move(point.x(), point.y());
 }
 
