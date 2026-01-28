@@ -6,6 +6,7 @@ export module ui.layout:vbox_layout;
 
 import :base;
 import :size_constraints;
+import yuri_log;
 import std;
 
 // import ui.widgets;
@@ -14,11 +15,17 @@ import std;
 export namespace ui::layout {
 
 template <typename Widget>
-struct VBoxLayout : Layout<Widget> {
-  void apply(Widget* widget) const override {
-    const auto &children = widget->children();
-    const auto width = widget->contentWidth();
-    const float single_h = widget->contentHeight() / children.size();
+class VBoxLayout : public Layout<Widget> {
+
+public:
+  explicit VBoxLayout(Widget* widget): Layout<Widget>(widget) {
+
+  }
+
+  void apply() const override {
+    const auto &children = this->widget_->children();
+    const auto width = this->widget_->contentWidth();
+    const float single_h = this->widget_->contentHeight() / children.size();
 
     int y = 0;
     for (auto* child : children) {

@@ -10,9 +10,19 @@ export namespace ui::layout {
 
 template <typename Widget>
 class Layout {
+protected:
+  Widget* widget_; // 控件指针
 public:
+  explicit Layout(Widget* widget)  {
+    if (widget == nullptr) {
+      throw std::invalid_argument("widget is null!");
+    }
+    widget_ = widget;
+    widget->markLayoutDirty();
+  }
+
   virtual ~Layout() = default;
-  virtual void apply(Widget* widget) const = 0;
+  virtual void apply() const = 0;
 };
 
-}
+} // namespace ui::layout
