@@ -23,7 +23,7 @@ public:
   }
 
   void layoutChildren() override {
-    renderText.reCalculate();
+    renderText.update();
   }
 
   /**

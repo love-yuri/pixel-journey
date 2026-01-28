@@ -69,21 +69,21 @@ public:
   /**
    * 重新计算文本、位置等信息
    */
-  void reCalculate();
+  void update();
 };
 
 RenderText::RenderText(const std::string_view text, const SkRect* rect): RenderNode(rect), text(text) {
-  reCalculate();
+  update();
 }
 
 void RenderText::setAlignment(const Alignment alignment) {
   this->alignment = alignment;
-  reCalculate();
+  update();
 }
 
 void RenderText::setFontSize(const float size) {
   font.setSize(size);
-  reCalculate();
+  update();
 }
 
 void RenderText::setColor(const SkColor color) {
@@ -92,13 +92,13 @@ void RenderText::setColor(const SkColor color) {
 
 void RenderText::setText(const std::string_view text) {
   this->text = text;
-  reCalculate();
+  update();
 }
 
 void RenderText::setTextAndAlignment(std::string_view text, Alignment alignment) {
   this->text = text;
   this->alignment = alignment;
-  reCalculate();
+  update();
 }
 
 void RenderText::render(SkCanvas *canvas) {
@@ -107,7 +107,7 @@ void RenderText::render(SkCanvas *canvas) {
   }
 }
 
-void RenderText::reCalculate() {
+void RenderText::update() {
   // 计算bound
   font.measureText(this->text.data(), this->text.size(), SkTextEncoding::kUTF8, &font_rect);
 

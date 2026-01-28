@@ -49,7 +49,7 @@ public:
     }
 
     move(self_box.x() + x - last_point.x(), self_box.y() + y - last_point.y());
-    render_text.reCalculate();
+    render_text.update();
   }
 
   void onMouseEnter(float x, float y) override {
@@ -88,7 +88,7 @@ void Button::paint(SkCanvas *canvas) {
 
 void Button::layoutChildren() {
   Box::layoutChildren();
-  render_text.reCalculate();
+  render_text.update();
 }
 
 } // namespace ui::widgets
