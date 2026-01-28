@@ -22,10 +22,10 @@ class Widget {
   Widget *mouse_capture = nullptr; // 正在被点击的控件
   friend Layout<Widget>;           // 友元layout组件
 protected:
-  Widget *parent_ = nullptr;         // 父控件
-  std::vector<Widget *> children_{}; // 子控件列表
-  Layout<Widget> *layout_ = nullptr; // 布局
-  LayoutDirty layout_dirty{};        // 脏布局类型
+  Widget *parent_ = nullptr;                          // 父控件
+  std::vector<Widget *> children_{};                  // 子控件列表
+  std::unique_ptr<Layout<Widget>> layout_ = nullptr;  // 布局
+  LayoutDirty layout_dirty{};                         // 脏布局类型
 
   /* 控件几何信息 */
   float width_ = 0.f;               // 控件宽度
@@ -309,11 +309,8 @@ void Widget::markLayoutDirty(const LayoutDirty reason) {
 
   layout_dirty |= reason;
 
-  if (parent_ == nullptr || parent_->layout_ == nullptr) {
-    // 如果没有parent 或者 parent 没有布局则仅更新自己
-    updateLayout();
-  } else {
-    // 否则标记parent 需要更新
+  // 传播标记
+  if (parent_ != nullptr) {
     parent_->markLayoutDirty(LayoutDirty::Children);
   }
 }

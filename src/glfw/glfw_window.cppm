@@ -165,7 +165,7 @@ Window::~Window() {
 void Window::layoutChildren() {
   // 重新布局
   if (layout_ != nullptr) {
-    layout_->apply(this);
+    layout_->apply();
   }
 
   // 更新自控件布局
