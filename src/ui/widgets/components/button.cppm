@@ -53,17 +53,19 @@ public:
   }
 
   void onMouseEnter(float x, float y) override {
-    animation_manager->start(0.f, 12.f, 200,  &radius);
+    // animation_manager->start(0.f, 12.f, 200,  &radius);
   }
 
   void onMouseLeave(float x, float y) override {
-    animation_manager->start(12.f, 0.f, 200,  &radius);
+    // animation_manager->start(12.f, 0.f, 200,  &radius);
   }
 
   void onMouseLeftPressed(const float x, const float y) override {
     is_clicked = true;
     is_dragging = true;
     last_point.set(x, y);
+
+
   }
 
   void onMouseLeftReleased(float x, float y) override {
@@ -77,7 +79,13 @@ public:
 
 Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&self_box) {
   render_text.setTextAndAlignment(text, Alignment::Center);
-  render_bg.setColor(skia_colors::light_pink);
+  render_bg.setColor(SkColorSetARGB(0xff, 145, 209, 123));
+
+  radius = 4;
+
+  // 默认大小要能够显示字体
+  const auto &textBound = render_text.textBound();
+  resize(textBound.width() + 32, textBound.height() + 18);
 }
 
 void Button::paint(SkCanvas *canvas) {

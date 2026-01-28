@@ -51,7 +51,7 @@ class Window: public glfw::Window {
   }();
 
 public:
-  ui::widgets::Button* button = nullptr;
+  Button* button = nullptr;
 
   void onClick() {
     // animation_manager->start(200.f, 300.f, 400, this, ui::animation::memberThunk<Widget, float, &Widget::setPadding>);
@@ -60,13 +60,13 @@ public:
   Window(): glfw::Window(800, 800) {
     setPadding(200);
     button = new Button("测试", this);
-    button->resize(200, 50);
     button->clicked.connect<&Window::onClick>(this);
-    layout_ = std::make_unique<VBoxLayout<Widget>>(this);
+    // layout_ = std::make_unique<VBoxLayout<Widget>>(this);
     button->setMaxHeight(50);
-    const auto text = new Text("哈哈哈哈", this);
-    text->setAlignment(Alignment::Center);
-    text->setMaxHeight(50);
+    button->resize(100, 50);
+    // const auto text = new Text("哈哈哈哈", this);
+    // text->setAlignment(Alignment::Center);
+    // text->setMaxHeight(50);
   }
 
   void paint(SkCanvas *canvas) override {
