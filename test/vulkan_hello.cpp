@@ -8,6 +8,8 @@ import skia;
 import ui;
 
 using namespace skia;
+using namespace ui::layout;
+using namespace ui::widgets;
 
 class FPSCounter {
   int frameCount = 0;
@@ -57,13 +59,13 @@ public:
 
   Window(): glfw::Window(800, 800) {
     setPadding(200);
-    button = new ui::widgets::Button("测试", this);
+    button = new Button("测试", this);
     button->resize(200, 50);
     button->clicked.connect<&Window::onClick>(this);
-    layout_ = new ui::layout::VBoxLayout<Widget>();
+    layout_ = std::make_unique<VBoxLayout<Widget>>(this);
     button->setMaxHeight(50);
-    const auto text = new ui::widgets::Text("哈哈哈哈", this);
-    text->setAlignment(ui::layout::Alignment::Center);
+    const auto text = new Text("哈哈哈哈", this);
+    text->setAlignment(Alignment::Center);
     text->setMaxHeight(50);
   }
 
