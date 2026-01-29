@@ -27,11 +27,44 @@ using ::glfwGetCursorPos;
 using ::glfwSetWindowPos;
 using ::glfwSetWindowIconifyCallback;
 using ::glfwWaitEvents;
+using ::GLFWcursor;
+using ::glfwCreateStandardCursor;
+using ::glfwSetCursor;
 
 constexpr auto left_mouse_button = GLFW_MOUSE_BUTTON_LEFT;
 constexpr auto right_mouse_button = GLFW_MOUSE_BUTTON_RIGHT;
 constexpr auto button_pressed = GLFW_PRESS;
 constexpr auto button_released = GLFW_RELEASE;
+
+enum class CursorType {
+  // 默认箭头光标（常规指针）
+  Arrow = GLFW_ARROW_CURSOR,
+
+  // 文本输入光标（I 形）
+  IBeam = GLFW_IBEAM_CURSOR,
+
+  // 十字准星光标（常用于精准操作）
+  Crosshair = GLFW_CROSSHAIR_CURSOR,
+
+  // 手型光标（常用于可点击元素）
+  Hand = GLFW_HAND_CURSOR,
+
+  // 水平调整大小光标（左右箭头）
+  HResize = GLFW_HRESIZE_CURSOR,
+
+  // 垂直调整大小光标（上下箭头）
+  VResize = GLFW_VRESIZE_CURSOR,
+
+  // 对角线调整大小光标（部分系统支持）
+  ResizeNWSE = GLFW_RESIZE_NWSE_CURSOR,  // 西北-东南方向
+  ResizeNESW = GLFW_RESIZE_NESW_CURSOR,  // 东北-西南方向
+
+  // 移动光标（四向箭头）
+  Move = GLFW_RESIZE_ALL_CURSOR,
+
+  // 禁止光标（圆圈斜杠）
+  NotAllowed = GLFW_NOT_ALLOWED_CURSOR
+};
 
 class Application final {
 public:
@@ -48,6 +81,16 @@ public:
     glfwTerminate();
   }
 };
+
+/**
+ * 设置标准指针
+ * @param window window指针
+ * @param type 鼠标类型
+ */
+void setStandardCursor(GLFWwindow* window, CursorType type) {
+  const auto cursor = glfwCreateStandardCursor(static_cast<int>(type));
+  glfwSetCursor(window, cursor);
+}
 
 /**
  * 获取vulkan所需扩展

@@ -4,6 +4,7 @@
 
 export module ui.widgets:base;
 
+import :window_base;
 import skia.api;
 import yuri_log;
 import ui.layout;
@@ -19,6 +20,7 @@ export namespace ui::widgets {
  * 控件基类
  */
 class Widget {
+  WindowBase* window_ = nullptr;   // 窗口指针
   Widget *mouse_capture = nullptr; // 正在被点击的控件
   friend Layout<Widget>;           // 友元layout组件
 
@@ -216,6 +218,12 @@ public:
   bool visible() const noexcept {
     return visible_;
   }
+
+  /**
+   * 获取当前控件所属指针
+   * @return 窗口指针
+   */
+  WindowBase * window() const;
 
   /**
    * 设置控件几何状态
@@ -419,6 +427,18 @@ Widget::Widget(Widget *parent): parent_(parent) {
   parent_->children_.push_back(this);
 }
 
+WindowBase *Widget::window() const {
+  auto parent = parent_;
+  while (parent != nullptr) {
+    if (dynamic_cast<WindowBase*>(parent)) {
+      return dynamic_cast<WindowBase*>(parent);
+    }
+    parent = parent->parent_;
+  }
+
+  throw std::runtime_error("Can not find a window!");
+}
+
 void Widget::setGeometry(const SkRect &rect) noexcept {
   if (parent_ && parent_->has_layout) {
     return;
@@ -548,7 +568,7 @@ void Widget::MouseLeftPressed(const float x, const float y) {
         child_y - child->self_box.y()
       );
       mouse_capture = child;
-      return;
+      // return;
     }
   }
 
@@ -567,9 +587,9 @@ void Widget::MouseLeftReleased(const float x, const float y) {
       child_y - mouse_capture->self_box.y()
     );
     mouse_capture = nullptr;
-  } else {
-    onMouseLeftReleased(x, y);
   }
+    onMouseLeftReleased(x, y);
+
 }
 
 } // namespace ui::widgets
