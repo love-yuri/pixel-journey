@@ -14,7 +14,7 @@ using namespace ui::widgets;
 
 export namespace glfw {
 
-class Window : public Widget {
+class Window : public LayoutWidget {
 
 protected:
   std::string title_{};          // 窗口标题
@@ -62,8 +62,6 @@ public:
   void showDebugInfo() const;
 
 protected:
-  void layoutChildren() override;
-
   friend void onResizeStatic(GLFWwindow *window, int width, int height);
   friend void onMouseMoveStatic(GLFWwindow *window, double x, double y);
   friend void onMouseEnterStatic(GLFWwindow *window, int is_entered);
@@ -95,7 +93,7 @@ void onResizeStatic(GLFWwindow *window, const int width, const int height) {
  */
 void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (self->visible) {
+  if (self->visible_) {
     self->cursor_x = static_cast<float>(x);
     self->cursor_y = static_cast<float>(y);
     self->MouseMove(self->cursor_x, self->cursor_y);
@@ -107,7 +105,7 @@ void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
  */
 void onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (self->visible && !is_entered) {
+  if (self->visible_ && !is_entered) {
     self->onMouseLeave(self->cursor_x, self->cursor_y);
   }
 }
@@ -117,7 +115,7 @@ void onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
  */
 void onMouseButtonStatic(GLFWwindow *window, const int button, const int action, const int mods) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (self->visible && button == left_mouse_button) {
+  if (self->visible_ && button == left_mouse_button) {
     if (action == button_pressed) {
       self->MouseLeftPressed(self->cursor_x, self->cursor_y);
     } else if (action == button_released) {
@@ -128,11 +126,11 @@ void onMouseButtonStatic(GLFWwindow *window, const int button, const int action,
 
 void onSetWindowIconifyStatic(GLFWwindow *window, const int iconified) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  self->visible = !iconified;
+  self->visible_ = !iconified;
 }
 
 Window::Window(const int width, const int height, const std::string_view title) :
-  Widget(nullptr),
+  LayoutWidget(nullptr),
   title_(title),
   window_(create_window(width, height, title_)),
   context_(window_) {
@@ -162,18 +160,6 @@ Window::~Window() {
   destroy_window(window_);
 }
 
-void Window::layoutChildren() {
-  // 重新布局
-  if (layout_ != nullptr) {
-    layout_->apply();
-  }
-
-  // 更新自控件布局
-  for (const auto child : this->children_) {
-    child->updateLayout();
-  }
-}
-
 bool Window::shouldClose() const {
   return glfwWindowShouldClose(window_);
 }
@@ -189,7 +175,7 @@ render_frame *Window::acquireNextFrame() {
 
 void Window::run() {
   while (!shouldClose()) {
-    if (!visible) {
+    if (!visible_) {
       // 不可见时阻塞等待事件
       glfwWaitEvents();
       continue;

@@ -21,11 +21,11 @@ export namespace ui::widgets {
 class Widget {
   Widget *mouse_capture = nullptr; // 正在被点击的控件
   friend Layout<Widget>;           // 友元layout组件
+
 protected:
-  Widget *parent_ = nullptr;                          // 父控件
-  std::vector<Widget *> children_{};                  // 子控件列表
-  std::unique_ptr<Layout<Widget>> layout_ = nullptr;  // 布局
-  LayoutDirty layout_dirty{};                         // 脏布局类型
+  Widget *parent_ = nullptr;         // 父控件
+  std::vector<Widget *> children_{}; // 子控件列表
+  LayoutDirty layout_dirty{};        // 脏布局类型
 
   /* 控件几何信息 */
   float width_ = 0.f;               // 控件宽度
@@ -38,7 +38,7 @@ protected:
   /**
    * 是否展示 - 手动修改
    */
-  std::uint8_t visible : 1 = 1;
+  std::uint8_t visible_ : 1 = 1;
 
   /**
    * 是否正在被hover - 自动修改
@@ -53,20 +53,9 @@ protected:
   std::uint8_t is_dragging : 1 = 0;
 
   /**
-   * 控件长什么样？
-   */
-  virtual void paint(SkCanvas *canvas) = 0;
-
-  /**
-   * 绘制所有控件
-   */
-  virtual void render(SkCanvas *canvas);
-
-  /**
-   * 添加控件
-   * @param widget 控件指针-可为空
-   */
-  virtual void addWidget(Widget * widget);
+  * 判断控件是否存在layout - 手动修改
+  */
+  std::uint8_t has_layout : 1 = 0;
 
   /**
    * 鼠标移动事件
@@ -136,6 +125,23 @@ protected:
   */
   void updateContentBox();
 
+  /**
+   * 设置控件几何状态-内部或者给布局系统使用
+   * @param widget 待设置的控件
+   * @param rect 控件所占rect，基于父控件
+   */
+  static void setGeometry(Widget* widget, const SkRect &rect) noexcept;
+
+  /**
+   * 设置控件几何状态-内部或者给布局系统使用
+   * @param widget 待设置的控件
+   * @param x 相对于父控件：x
+   * @param y 相对于父控件: y
+   * @param width 控件宽度
+   * @param height 控件高度
+   */
+  static void setGeometry(Widget* widget, float x, float y, float width, float height) noexcept;
+
 public:
   virtual ~Widget();
 
@@ -202,6 +208,13 @@ public:
    */
   [[nodiscard]] const SizeConstraints& sizeConstraints() const noexcept {
     return size_constraints;
+  }
+
+  /**
+   * 是否显示控件
+   */
+  bool visible() const noexcept {
+    return visible_;
   }
 
   /**
@@ -284,6 +297,22 @@ public:
   void move(const SkPoint& point) noexcept;
 
   /**
+   * 控件长什么样？
+   */
+  virtual void paint(SkCanvas *canvas) = 0;
+
+  /**
+   * 绘制所有控件
+   */
+  virtual void render(SkCanvas *canvas);
+
+  /**
+   * 添加控件
+   * @param widget 控件指针-可为空
+   */
+  virtual void addWidget(Widget * widget);
+
+  /**
    * 更新布局
    */
   void updateLayout();
@@ -311,7 +340,7 @@ void Widget::render(SkCanvas *canvas) {
   // 变换后绘制children
   canvas->translate(self_box.x() + padding_.left, self_box.y() + padding_.top);
   for (const auto child : children_) {
-    if (child->visible) {
+    if (child->visible_) {
       child->render(canvas);
     }
   }
@@ -339,6 +368,22 @@ void Widget::updateContentBox() {
     width_ - padding_.left - padding_.right,
     height_ - padding_.top - padding_.bottom
   );
+}
+
+void Widget::setGeometry(Widget *widget, const SkRect &rect) noexcept {
+  widget->self_box = rect;
+  widget->width_ = rect.width();
+  widget->height_ = rect.height();
+  widget->updateContentBox();
+  widget->markLayoutDirty(LayoutDirty::Self);
+}
+
+void Widget::setGeometry(Widget *widget, const float x, const float y, const float width, float const height) noexcept {
+  widget->width_ = width;
+  widget->height_ = height;
+  widget->self_box.setXYWH(x, y, width, height);
+  widget->updateContentBox();
+  widget->markLayoutDirty(LayoutDirty::Self);
 }
 
 void Widget::updateLayout() {
@@ -375,6 +420,10 @@ Widget::Widget(Widget *parent): parent_(parent) {
 }
 
 void Widget::setGeometry(const SkRect &rect) noexcept {
+  if (parent_ && parent_->has_layout) {
+    return;
+  }
+
   this->self_box = rect;
   width_ = rect.width();
   height_ = rect.height();
@@ -383,6 +432,10 @@ void Widget::setGeometry(const SkRect &rect) noexcept {
 }
 
 void Widget::setGeometry(const float x, const float y, const float width, const float height) noexcept {
+  if (parent_ && parent_->has_layout) {
+    return;
+  }
+
   width_ = width;
   height_ = height;
   self_box.setXYWH(x, y, width, height);
@@ -429,6 +482,10 @@ void Widget::setMinHeight(const float h) noexcept {
 }
 
 void Widget::resize(const float width, const float height) noexcept {
+  if (parent_ && parent_->has_layout) {
+    return;
+  }
+
   width_ = width;
   height_ = height;
   self_box.setXYWH(self_box.x(), self_box.y(), width, height);
@@ -437,9 +494,10 @@ void Widget::resize(const float width, const float height) noexcept {
 }
 
 void Widget::move(const float x, const float y) noexcept {
-  if (parent_ != nullptr && parent_->layout_ != nullptr) {
+  if (parent_ && parent_->has_layout) {
     return;
   }
+
   self_box.setXYWH(x, y, width_, height_);
 }
 
@@ -461,7 +519,7 @@ void Widget::MouseMove(const float x, const float y) {
   const auto child_y = y - padding_.top;
 
   for (const auto child : children_) {
-    if (child->visible) {
+    if (child->visible_) {
       if (child->self_box.contains(child_x, child_y) || child->is_dragging) {
         child->MouseMove(
           child_x - child->self_box.x(),
@@ -484,7 +542,7 @@ void Widget::MouseLeftPressed(const float x, const float y) {
   const auto child_y = y - padding_.top;
 
   for (const auto child : children_) {
-    if (child->visible && child->self_box.contains(child_x, child_y)) {
+    if (child->visible_ && child->self_box.contains(child_x, child_y)) {
       child->MouseLeftPressed(
         child_x - child->self_box.x(),
         child_y - child->self_box.y()

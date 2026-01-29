@@ -8,3 +8,5 @@ export import :button;
 export import :base;
 export import :box;
 export import :text;
+export import :layout_widget;
+export import :splitter;
