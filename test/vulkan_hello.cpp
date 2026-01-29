@@ -59,10 +59,16 @@ public:
 
   Window(): glfw::Window(800, 800) {
     setPadding(200);
-    button = new Button("测试", this);
+
+    setLayout<VBoxLayout<Widget>>();
+    const auto splitter = new Splitter(this);
+
+    button = new Button("测试", splitter);
+    button = new Button("测试2", splitter);
+
     button->clicked.connect<&Window::onClick>(this);
-    // layout_ = std::make_unique<VBoxLayout<Widget>>(this);
-    button->setMaxHeight(50);
+
+    // button->setMaxHeight(50);
     button->resize(100, 50);
     // const auto text = new Text("哈哈哈哈", this);
     // text->setAlignment(Alignment::Center);

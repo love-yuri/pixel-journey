@@ -43,6 +43,7 @@ public:
    */
   template <auto ptr, typename T>
   static function_ref from(T *obj) noexcept {
+    static_assert(ptr != nullptr, "ptr cannot be null");
     const auto func = [](void *this_, Args &&...args) -> R {
       return (static_cast<T *>(this_)->*ptr)(std::forward<Args>(args)...);
     };
@@ -71,11 +72,16 @@ public:
   }
 
   R operator()(Args&&... args) const {
-    if (object_ptr != nullptr) {
+    // 成员函数回调频率更高
+    if (object_ptr != nullptr) [[likely]] {
       return member_fn(object_ptr, std::forward<Args>(args)...);
     }
-    return free_fn(std::forward<Args>(args)...);
+
+    [[unlikely]] {
+      return free_fn(std::forward<Args>(args)...);
+    }
   }
+
 
 private:
   void *object_ptr = nullptr;           // 指向对象或闭包（有捕获 lambda 或成员函数）

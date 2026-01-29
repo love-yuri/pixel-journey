@@ -32,7 +32,7 @@ public:
       const auto& sizeConstraints = child->sizeConstraints();
       const auto w = std::clamp(width, sizeConstraints.min_w, sizeConstraints.max_w);
       const auto h = std::clamp(single_h, sizeConstraints.min_h, sizeConstraints.max_h);
-      child->setGeometry(0, y, w, h);
+      Layout<Widget>::setGeometry(child, 0, y, w, h);
       y += h;
     }
   }
