@@ -20,11 +20,6 @@ using namespace ui::animation;
 export namespace ui::widgets {
 
 class Splitter : public Widget {
-  SkRect handle_rect{};    // 中间拖动条
-  float handle_width = 4;  // 拖动条默认宽度
-  float handle_x = 200;    // 拖动条默认x
-  SkPoint last_point{};    // 上次点击点
-  bool is_clicked = false; // 是否被点击
 
 public:
   explicit Splitter(Widget *parent) : Widget(parent) {
@@ -34,7 +29,6 @@ public:
 protected:
   void render(SkCanvas *canvas) override;
   void addWidget(Widget *widget) override;
-  void paint(SkCanvas *canvas) override;
   void layoutChildren() override;
   void onMouseMove(float x, float y) override;
   void onMouseLeftPressed(float x, float y) override;
@@ -47,10 +41,15 @@ private:
     Horizontal
   };
 
-  SplitterOrientation orientation_ = Horizontal;
+  SkRect handle_rect{};                          // 中间拖动条
+  float handle_width = 1;                        // 拖动条默认宽度
+  float handle_x = 200;                          // 拖动条默认x
+  SkPoint last_point{};                          // 上次点击点
+  bool is_clicked = false;                       // 是否被点击
+  SplitterOrientation orientation_ = Horizontal; // 排布方式
   SkPaint sk_paint = PaintDesc {
     .color = skia_colors::pink,
-    .style = SkPaint::kFill_Style
+    .style = SkPaint::kFill_Style,
   };
 };
 
@@ -83,9 +82,6 @@ void Splitter::addWidget(Widget *widget) {
   widget->setGeometry(content_box);
 }
 
-void Splitter::paint(SkCanvas *canvas) {
-}
-
 void Splitter::layoutChildren() {
   handle_rect.setXYWH(handle_x, 0, handle_width, contentHeight());
 
@@ -109,10 +105,12 @@ void Splitter::layoutChildren() {
 }
 
 void Splitter::onMouseMove(const float x, const float y) {
-  if (handle_rect.contains(x, y)) {
-    window()->setCursor(CursorType::HResize);
-  } else {
-    window()->setCursor(CursorType::Arrow);
+  if (!is_clicked) {
+    if (x > handle_x - 5 && x < handle_x + handle_width + 5) {
+      window()->setCursor(CursorType::HResize);
+    } else {
+      window()->setCursor(CursorType::Arrow);
+    }
   }
 
   if (is_clicked) {
@@ -124,15 +122,16 @@ void Splitter::onMouseMove(const float x, const float y) {
 }
 
 void Splitter::onMouseLeftPressed(const float x, const float y) {
-  yuri::info("move: {}", x - last_point.x());
-  if (handle_rect.contains(x, y)) {
+  if (x > handle_x - 5 && x < handle_x + handle_width + 5) {
     last_point.set(x, y);
+    window()->setCursor(CursorType::HResize);
     is_clicked = true;
   }
 }
 
 void Splitter::onMouseLeftReleased(const float x, const float y) {
   is_clicked = false;
+  window()->setCursor(CursorType::Arrow);
 }
 
 } // namespace ui::widgets

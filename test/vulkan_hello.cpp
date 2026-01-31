@@ -58,7 +58,7 @@ public:
   }
 
   Window(): glfw::Window(800, 800) {
-    setPadding(200);
+    setPadding(80);
 
     setLayout<VBoxLayout<Widget>>();
     const auto splitter = new Splitter(this);
@@ -77,7 +77,7 @@ public:
 
   void paint(SkCanvas *canvas) override {
     canvas->drawString(std::format("FPS: {:.1f}", fpsCounter.getFPS()).c_str(), 20, 30, font::default_font, sk_paint_);
-    canvas->drawString(std::format("current: {:.1f} {:.1f}", cursor_x, cursor_y).c_str(), 20, 130, font::default_font, sk_paint_);
+    canvas->drawString(std::format("current: {:.1f} {:.1f}", cursor_x, cursor_y).c_str(), 320, 30, font::default_font, sk_paint_);
   }
 
   void render(SkCanvas *canvas) override {
