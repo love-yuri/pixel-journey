@@ -64,7 +64,7 @@ public:
   /**
    * 设置鼠标指针
    */
-  void setCursor(CursorType type) override;
+  void doSetCursor(CursorType type) override;
 
 protected:
   friend void onResizeStatic(GLFWwindow *window, int width, int height);
@@ -232,7 +232,7 @@ void Window::showDebugInfo() const { // NOLINT(*-convert-member-functions-to-sta
   yuri::info("format: {}, space_khr: {} 支持情况 -> {}", vk::to_string(vk::defaults::default_surface_format), vk::to_string(vk::defaults::default_surface_color_space), res);
 }
 
-void Window::setCursor(const CursorType type) {
+void Window::doSetCursor(const CursorType type) {
   setStandardCursor(window_, type);
 }
 
