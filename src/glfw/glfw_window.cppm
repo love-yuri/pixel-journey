@@ -14,7 +14,7 @@ using namespace ui::widgets;
 
 export namespace glfw {
 
-class Window : public LayoutWidget, public WindowBase {
+class Window : public Widget, public WindowBase {
 
 protected:
   std::string title_{};          // 窗口标题
@@ -135,7 +135,7 @@ void onSetWindowIconifyStatic(GLFWwindow *window, const int iconified) {
 }
 
 Window::Window(const int width, const int height, const std::string_view title) :
-  LayoutWidget(nullptr),
+  Widget(nullptr),
   title_(title),
   window_(create_window(width, height, title_)),
   context_(window_) {

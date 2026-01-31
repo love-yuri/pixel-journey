@@ -95,7 +95,6 @@ void Button::paint(SkCanvas *canvas) {
 }
 
 void Button::layoutChildren() {
-  Box::layoutChildren();
   render_text.update();
 }
 

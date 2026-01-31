@@ -25,9 +25,10 @@ class Widget {
   friend Layout<Widget>;           // 友元layout组件
 
 protected:
-  Widget *parent_ = nullptr;         // 父控件
-  std::vector<Widget *> children_{}; // 子控件列表
-  LayoutDirty layout_dirty{};        // 脏布局类型
+  Widget *parent_ = nullptr;                         // 父控件
+  std::vector<Widget *> children_{};                 // 子控件列表
+  LayoutDirty layout_dirty{};                        // 脏布局类型
+  std::unique_ptr<Layout<Widget>> layout_ = nullptr; // 布局
 
   /* 控件几何信息 */
   float width_ = 0.f;               // 控件宽度
@@ -215,15 +216,23 @@ public:
   /**
    * 是否显示控件
    */
-  bool visible() const noexcept {
+  [[nodiscard]] bool visible() const noexcept {
     return visible_;
+  }
+
+  /**
+   * 获取布局指针-不拥有所有权
+   * @return 布局指针
+   */
+  [[nodiscard]] Layout<Widget> *layout() const {
+    return layout_.get();
   }
 
   /**
    * 获取当前控件所属指针
    * @return 窗口指针
    */
-  WindowBase * window() const;
+  [[nodiscard]] WindowBase * window();
 
   /**
    * 设置控件几何状态
@@ -249,6 +258,17 @@ public:
    * 设置内边距
    */
   void setPadding(const Insets& insets) noexcept;
+
+  /**
+   * 设置布局
+   */
+  template <typename LayoutType>
+  void setLayout();
+
+  /**
+   * 移除布局
+   */
+  void removeLayout();
 
   /**
    * 设置最大尺寸
@@ -307,7 +327,7 @@ public:
   /**
    * 控件长什么样？
    */
-  virtual void paint(SkCanvas *canvas) = 0;
+  virtual void paint(SkCanvas *canvas){}
 
   /**
    * 绘制所有控件
@@ -328,8 +348,7 @@ public:
   /**
    * 更新孩子布局
    */
-  virtual void layoutChildren() {
-  }
+  virtual void layoutChildren();
 };
 
 void Widget::addWidget(Widget * widget) {
@@ -406,13 +425,25 @@ void Widget::updateLayout() {
   layout_dirty = LayoutDirty::None;
 }
 
+void Widget::layoutChildren() {
+  // 重新布局
+  if (layout_) {
+    layout_->apply();
+  }
+
+  // 更新子控件布局
+  for (const auto child : this->children_) {
+    child->updateLayout();
+  }
+}
+
 Widget::~Widget() {
   for (const auto child : children_) {
     // 本控件析构不需要再次处理自身
     child->parent_ = nullptr;
     delete child;
   }
-  if (parent_ != nullptr) {
+  if (parent_) {
     auto &v = parent_->children_;
     if (const auto it = std::ranges::find(v, this); it != v.end()) {
       v.erase(it);
@@ -427,11 +458,14 @@ Widget::Widget(Widget *parent): parent_(parent) {
   parent_->children_.push_back(this);
 }
 
-WindowBase *Widget::window() const {
+WindowBase *Widget::window() {
+  if (window_) {
+    return window_;
+  }
   auto parent = parent_;
-  while (parent != nullptr) {
+  while (parent) {
     if (dynamic_cast<WindowBase*>(parent)) {
-      return dynamic_cast<WindowBase*>(parent);
+      return window_ = dynamic_cast<WindowBase*>(parent);
     }
     parent = parent->parent_;
   }
@@ -473,6 +507,18 @@ void Widget::setPadding(const Insets& insets) noexcept {
   padding_ = insets;
   updateContentBox();
   markLayoutDirty(LayoutDirty::Self);
+}
+
+template <typename LayoutType>
+void Widget::setLayout() {
+  static_assert(std::is_base_of_v<Layout<Widget>, LayoutType>, "LayoutType must inherit from Layout<Widget>");
+  layout_ = std::make_unique<LayoutType>(this);
+  has_layout = true;
+}
+
+void Widget::removeLayout() {
+  layout_ = nullptr;
+  has_layout = false;
 }
 
 void Widget::setMaxSize(const float w, const float h) noexcept {
@@ -568,7 +614,7 @@ void Widget::MouseLeftPressed(const float x, const float y) {
         child_y - child->self_box.y()
       );
       mouse_capture = child;
-      // return;
+      break;
     }
   }
 
@@ -588,8 +634,8 @@ void Widget::MouseLeftReleased(const float x, const float y) {
     );
     mouse_capture = nullptr;
   }
-    onMouseLeftReleased(x, y);
 
+  onMouseLeftReleased(x, y);
 }
 
 } // namespace ui::widgets

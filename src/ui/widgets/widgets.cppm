@@ -9,5 +9,4 @@ export import :base;
 export import :window_base;
 export import :box;
 export import :text;
-export import :layout_widget;
 export import :splitter;
