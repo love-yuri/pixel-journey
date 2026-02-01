@@ -1,35 +1,14 @@
-#include <random>
-
 import std;
 import vulkan;
 import glfw;
 import yuri_log;
 import skia;
 import ui;
+import profiling;
 
 using namespace skia;
 using namespace ui::layout;
 using namespace ui::widgets;
-
-class FPSCounter {
-  int frameCount = 0;
-  double lastTime = 0.0;
-  double fps = 0.0;
-
-public:
-  void update(const double currentTime) {
-    frameCount++;
-
-    // 每秒钟计算一次FPS
-    if (currentTime - lastTime >= 1.0) {
-      fps = frameCount / (currentTime - lastTime);
-      frameCount = 0;
-      lastTime = currentTime;
-    }
-  }
-
-  [[nodiscard]] double getFPS() const { return fps; }
-};
 
 double getCurrentTime() {
   // 获取当前时间（秒，高精度）
@@ -40,7 +19,7 @@ double getCurrentTime() {
 
 class Window: public glfw::Window {
   using glfw::Window::Window;
-  FPSCounter fpsCounter;
+  profiling::FpsCounter fpsCounter;
 
   SkPaint sk_paint_ = [] {
     SkPaint paint;
