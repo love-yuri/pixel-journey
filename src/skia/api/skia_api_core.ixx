@@ -29,6 +29,7 @@ module;
 #include <include/core/SkColor.h>
 #include <include/core/SkRRect.h>
 #include <include/core/SkTextBlob.h>
+#include "include/core/SkShader.h"
 export module skia.api:core;
 
 import std;
@@ -66,6 +67,9 @@ using ::SkFontMgr;
 using ::SkColor;
 using ::SkTextEncoding;
 using ::SkFontMetrics;
+using ::SkShader;
+using ::U8CPU;
+using ::SkBlendMode;
 
 /* 字体相关 */
 #if defined(_WIN32)
