@@ -20,6 +20,9 @@ if (BUILD_TESTING)
   add_subdirectory(test)
 endif ()
 
+# yuri-music项目
+add_subdirectory(test/yuri-music)
+
 # 配置模块支持
 target_sources(yuri_lib
     PUBLIC
