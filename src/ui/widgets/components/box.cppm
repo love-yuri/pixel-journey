@@ -32,6 +32,14 @@ public:
   explicit Box(Widget *parent = nullptr);
 
   /**
+   * 获取box的背景节点
+   * @return 背景节点
+   */
+  inline RenderBackground& background() {
+    return render_bg;
+  }
+
+  /**
    * 返回border对象
    * @return border
    */
@@ -45,4 +53,4 @@ Box::Box(Widget *parent): Widget(parent), render_border(&self_box), render_bg(&s
   render_bg.radius = &radius;
 }
 
-};
+}
