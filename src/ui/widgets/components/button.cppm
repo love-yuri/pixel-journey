@@ -64,8 +64,6 @@ public:
     is_clicked = true;
     is_dragging = true;
     last_point.set(x, y);
-
-
   }
 
   void onMouseLeftReleased(float x, float y) override {

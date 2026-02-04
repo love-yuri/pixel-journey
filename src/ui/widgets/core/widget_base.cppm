@@ -455,7 +455,8 @@ Widget::Widget(Widget *parent): parent_(parent) {
   if (parent == nullptr) {
     return;
   }
-  parent_->children_.push_back(this);
+
+  parent_->addWidget(this);
 }
 
 WindowBase *Widget::window() {

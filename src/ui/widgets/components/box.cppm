@@ -23,6 +23,8 @@ protected:
   RenderBorder render_border; // border节点
   RenderBackground render_bg; // background节点
 
+  void paint(SkCanvas *canvas) override;
+
 public:
   float radius = 0; // 圆角
 
@@ -47,6 +49,11 @@ public:
     return render_border;
   }
 };
+
+void Box::paint(SkCanvas *canvas) {
+  render_bg.render(canvas);
+  render_border.render(canvas);
+}
 
 Box::Box(Widget *parent): Widget(parent), render_border(&self_box), render_bg(&self_box) {
   render_border.radius = &radius;
