@@ -27,7 +27,7 @@ enum class SplitterOrientation {
 
 class SplitterHandle {
 public:
-  static constexpr auto default_handle_width = 5; // 默认handle宽度
+  static constexpr auto default_handle_width = 1; // 默认handle宽度
   static constexpr auto default_handle_x = 200;   // 默认handle起步x
   explicit SplitterHandle(Widget &widget, const SplitterOrientation orientation = SplitterOrientation::Horizontal) noexcept
     : orientation_(orientation),
@@ -160,12 +160,10 @@ void Splitter::layoutChildren() {
     if (i == 0) {
       const auto &handle = handles_[0];
       const auto child = children_[i];
-      const auto x = i * (w + SplitterHandle::default_handle_width);
       setGeometry(child, 0, 0, handle.bounds().x(), contentHeight());
     } else {
-      const auto &handle = handles_[0];
+      const auto &handle = handles_[i - 1];
       const auto child = children_[i];
-      const auto x = i * (w + SplitterHandle::default_handle_width);
       setGeometry(child, handle.bounds().right(), 0, contentWidth() - handle.bounds().right(), contentHeight());
     }
   }
@@ -182,8 +180,11 @@ void Splitter::onMouseMove(const float x, const float y) {
     for (auto &handle : handles_) {
       if (handle.contains(x, y)) {
         has_find = true;
+        handle.setHandleWidth(5);
         break;
       }
+
+      handle.setHandleWidth(SplitterHandle::default_handle_width);
     }
 
     if (has_find) {
@@ -195,6 +196,7 @@ void Splitter::onMouseMove(const float x, const float y) {
 
   if (is_clicked && selected_handle) {
     selected_handle->move(x - last_point.x());
+    selected_handle->setHandleWidth(5);
     last_point.set(x, y);
     markLayoutDirty();
   }
@@ -214,6 +216,7 @@ void Splitter::onMouseLeftPressed(const float x, const float y) {
 
 void Splitter::onMouseLeftReleased(const float x, const float y) {
   is_clicked = false;
+  selected_handle->setHandleWidth(SplitterHandle::default_handle_width);
   selected_handle = nullptr;
   window()->setCursor(CursorType::Arrow);
 }
