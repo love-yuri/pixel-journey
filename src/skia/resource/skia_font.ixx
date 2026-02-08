@@ -10,13 +10,15 @@ import std;
 
 using namespace skia;
 
-#if defined(_WIN32)
-sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_DirectWrite();
-#else
-sk_sp<SkFontMgr> fontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
-#endif
+
 
 export namespace skia::font {
+
+#if defined(_WIN32)
+sk_sp<SkFontMgr> defaultFontMgr = SkFontMgr_New_DirectWrite();
+#else
+sk_sp<SkFontMgr> defaultFontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanner_Make_FreeType());
+#endif
 
 #if defined(_WIN32)
 constexpr auto default_font_path = R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-Medium.ttf)";
@@ -30,7 +32,7 @@ constexpr auto default_font_path = "/usr/share/fonts/maple/MapleMono-NF-CN-Mediu
  * @return sk_sp<SkTypeface>
  */
 sk_sp<SkTypeface> load_from_file(const std::string_view path) {
-  auto typeface = fontMgr->makeFromFile(path.data(), 0);
+  auto typeface = defaultFontMgr->makeFromFile(path.data(), 0);
   if (!typeface) {
     yuri::error("typeface is null! 字体： {} 加载失败!", path);
     return nullptr;
