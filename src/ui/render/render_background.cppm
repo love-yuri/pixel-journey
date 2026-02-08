@@ -31,6 +31,11 @@ public:
     paint.setColor(c);
   }
 
+  // 设置透明度
+  inline void setOpacity(const float opacity) noexcept {
+    paint.setAlphaf(opacity);
+  }
+
 };
 
 void RenderBackground::render(SkCanvas *canvas) {

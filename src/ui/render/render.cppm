@@ -8,3 +8,4 @@ export import :base;
 export import :border;
 export import :text;
 export import :background;
+export import :svg;
