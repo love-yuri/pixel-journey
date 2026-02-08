@@ -29,6 +29,15 @@ elseif(UNIX)
         IMPORTED_LOCATION             "${SKIA_OUT}/libskia.a"      # Linux 静态库
         INTERFACE_INCLUDE_DIRECTORIES "${SKIA_ROOT}"               # 头文件路径
     )
+    # svg所需依赖
+    list(APPEND THIRD_PARTY_LIBS
+        jpeg png z expat webp webpdemux webpmux harfbuzz icuuc icui18n
+        ${SKIA_OUT}/libsvg.a
+        ${SKIA_OUT}/libskresources.a
+        ${SKIA_OUT}/libskshaper.a
+        ${SKIA_OUT}/libskunicode_icu.a
+        ${SKIA_OUT}/libskunicode_core.a
+    )
 endif()
 list(APPEND THIRD_PARTY_LIBS skia)
 
