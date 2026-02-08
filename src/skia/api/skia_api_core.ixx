@@ -5,10 +5,10 @@
 module;
 #include <include/core/SkFontMgr.h>
 #if defined(_WIN32)
-#include "include/ports/SkTypeface_win.h"
+#include <include/ports/SkTypeface_win.h>
 #else
-#include "include/ports/SkFontScanner_FreeType.h"
-#include "include/ports/SkFontMgr_fontconfig.h"
+#include <include/ports/SkFontScanner_FreeType.h>
+#include <include/ports/SkFontMgr_fontconfig.h>
 #include <include/core/SkTypeface.h>
 #endif
 #include <include/core/SkCanvas.h>
@@ -29,7 +29,11 @@ module;
 #include <include/core/SkColor.h>
 #include <include/core/SkRRect.h>
 #include <include/core/SkTextBlob.h>
-#include "include/core/SkShader.h"
+#include <include/core/SkShader.h>
+#include <modules/skresources/include/SkResources.h>
+#include <modules/svg/include/SkSVGDOM.h>
+#include <modules/skshaper/utils/FactoryHelpers.h>
+#include <include/core/SkStream.h>
 export module skia.api:core;
 
 import std;
@@ -70,6 +74,10 @@ using ::SkFontMetrics;
 using ::SkShader;
 using ::U8CPU;
 using ::SkBlendMode;
+using ::SkString;
+using ::SkSVGDOM;
+using ::SkSize;
+using ::SkFILEStream;
 
 /* 字体相关 */
 #if defined(_WIN32)
@@ -122,5 +130,19 @@ using ::GrBackendRenderTargets::MakeVk;
 export namespace SkSurfaces {
 
 using SkSurfaces::WrapBackendRenderTarget;
+
+}
+
+export namespace skia::resources {
+
+using skresources::ImageDecodeStrategy;
+using skresources::FileResourceProvider;
+using skresources::DataURIResourceProviderProxy;
+
+}
+
+export namespace skia::shapers {
+
+using SkShapers::BestAvailable;
 
 }
