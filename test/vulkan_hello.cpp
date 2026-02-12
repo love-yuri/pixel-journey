@@ -60,7 +60,7 @@ public:
   }
 
   void render(SkCanvas *canvas) override {
-    fpsCounter.update(getCurrentTime());
+    fpsCounter.update();
 
     canvas->clear(skia_colors::white);
 

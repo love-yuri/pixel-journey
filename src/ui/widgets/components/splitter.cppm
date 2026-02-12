@@ -1,7 +1,11 @@
 //
 // Created by love-yuri on 2026/1/29.
 //
-
+module;
+#if defined(_WIN32)
+// ReSharper disable once CppUnusedIncludeDirective
+#include "include/private/base/SkFloatingPoint.h"
+#endif
 export module ui.widgets:splitter;
 
 import std;

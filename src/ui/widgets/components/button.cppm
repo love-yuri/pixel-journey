@@ -77,7 +77,7 @@ public:
 
 Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&self_box) {
   render_text.setTextAndAlignment(text, Alignment::Center);
-  render_bg.setColor(SkColorSetARGB(0xff, 145, 209, 123));
+  render_bg.setColor(ColorFromARGB(0xff, 145, 209, 123));
 
   radius = 4;
 
