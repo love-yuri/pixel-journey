@@ -20,11 +20,11 @@ NINJA_EXE = "ninja.exe" if os.name == "nt" else "ninja"
 args = [
     "is_official_build=true",  # Release
     "is_debug=false",          # 非debug
+    "is_component_build=false",# 编译静态库
     "skia_use_vulkan=true",    # 使用vulkan
     "skia_use_gl=false",       # 不使用opengl
     "skia_enable_svg=true",    # 使用SVG
     # "skia_enable_tools=true",  # 启用 tools"
-    "skia_use_freetype=true",  # 使用ttf
     r'cc="clang"',             # 使用clang
     r'cxx="clang++"',          # 使用clang++
 ]
@@ -34,7 +34,6 @@ if os.name == "nt":
     # Windows 特定
     args += [
         "skia_pdf_subset_harfbuzz=true",
-        "is_component_build=true", # 编译动态库
         # 使用 skia 自带库
         "skia_use_system_expat=false",
         "skia_use_system_harfbuzz=false",
@@ -49,6 +48,7 @@ else:
     # Linux 特定
     args += [
         "skia_use_fontconfig=true",
+        "skia_use_freetype=true",  # 使用ttf
     ]
 
 # -----------------------------
