@@ -15,11 +15,17 @@ message(STATUS "GLFW version: ${glfw3_VERSION}")
 if(WIN32)
     set(SKIA_ROOT "D:/skia")
     set(SKIA_OUT "${SKIA_ROOT}/out/Shared")
-    add_library(skia SHARED IMPORTED GLOBAL)
+    add_library(skia STATIC IMPORTED)
     set_target_properties(skia PROPERTIES
-        IMPORTED_LOCATION             "${SKIA_OUT}/skia.dll"       # Windows 动态库
-        IMPORTED_IMPLIB               "${SKIA_OUT}/skia.dll.lib"   # Windows 导入库
-        INTERFACE_INCLUDE_DIRECTORIES "${SKIA_ROOT}"               # 头文件路径
+        IMPORTED_LOCATION "${SKIA_OUT}/skia.lib"
+        INTERFACE_INCLUDE_DIRECTORIES "${SKIA_ROOT}"
+    )
+    list(APPEND THIRD_PARTY_LIBS
+        ${SKIA_OUT}/svg.lib
+        ${SKIA_OUT}/skresources.lib
+        ${SKIA_OUT}/skshaper.lib
+        ${SKIA_OUT}/skunicode_icu.lib
+        ${SKIA_OUT}/skunicode_core.lib
     )
 elseif(UNIX)
     set(SKIA_ROOT "/home/yuri/github/skia")
