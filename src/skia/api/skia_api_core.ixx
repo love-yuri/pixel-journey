@@ -90,8 +90,8 @@ using ::SkFontScanner_Make_FreeType;
 /**
  * 导出内联函数
  */
-consteval SkColor SkColorSetARGB(const U8CPU a,const  U8CPU r, const U8CPU g, const U8CPU b) noexcept {
-  return ::SkColorSetARGB(a, r, g, b); // 调用原始函数
+consteval SkColor ColorFromARGB(const U8CPU a,const U8CPU r, const U8CPU g, const U8CPU b) noexcept {
+  return SkColorSetARGB(a, r, g, b);
 }
 
 } // namespace skia
