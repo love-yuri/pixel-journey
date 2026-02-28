@@ -44,9 +44,9 @@ void RenderBackground::render(SkCanvas *canvas) {
   }
 
   if (radius == nullptr || *radius <= 0) {
-    canvas->drawRect(*self_box, paint);
+    canvas->drawRect(self_box, paint);
   } else {
-    canvas->drawRoundRect(*self_box, *radius, *radius, paint);
+    canvas->drawRoundRect(self_box, *radius, *radius, paint);
   }
 }
 

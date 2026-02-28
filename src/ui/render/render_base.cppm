@@ -38,12 +38,14 @@ struct PaintDesc {
  * render node基类
  */
 class RenderNode {
-public:
+protected:
   /**
    * node 几何边界指针
    * 严格跟随调用widget
    */
-  const SkRect *self_box{};
+  SkRect self_box{};
+
+public:
 
   /**
   * 是否显示
@@ -52,10 +54,8 @@ public:
   bool visible = true;
 
   RenderNode() noexcept = default;
-  explicit RenderNode(const SkRect* rect): self_box(rect) {
-    if (rect == nullptr) {
-      throw std::runtime_error("node的边界不能为空!");
-    }
+  explicit RenderNode(const SkRect& rect): self_box(rect) {
+
   }
 
   virtual ~RenderNode() = default;
@@ -65,6 +65,16 @@ public:
    * @param canvas canvas
    */
   virtual void render(SkCanvas* canvas) = 0;
+
+  // 调用self box进行更新
+  virtual void update() {
+  }
+
+  // 更新rect 并调用update
+  void update(const SkRect &rect) {
+    self_box = rect;
+    update();
+  }
 };
 
 } // namespace ui::render
