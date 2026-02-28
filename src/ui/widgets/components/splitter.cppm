@@ -120,11 +120,15 @@ private:
 
 void Splitter::render(SkCanvas *canvas) {
   canvas->save();
+
+  // 变换到self_box
+  canvas->translate(x_, y_);
+
   // 绘制自身
   paint(canvas);
 
   // 变换后绘制children
-  canvas->translate(self_box.x() + padding_.left, self_box.y() + padding_.top);
+  canvas->translate(padding_.left, padding_.top);
 
   // 绘制child
   for (const auto child : children_) {

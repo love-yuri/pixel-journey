@@ -48,8 +48,7 @@ public:
       return;
     }
 
-    move(self_box.x() + x - last_point.x(), self_box.y() + y - last_point.y());
-    render_text.update();
+    move(x_ + x - last_point.x(), y_ + y - last_point.y());
   }
 
   void onMouseEnter(float x, float y) override {
@@ -75,7 +74,7 @@ public:
   void layoutChildren() override;
 };
 
-Button::Button(const std::string_view text, Widget *parent) : Box(parent), render_text(&self_box) {
+Button::Button(const std::string_view text, Widget *parent) : Box(parent) {
   render_text.setTextAndAlignment(text, Alignment::Center);
   render_bg.setColor(ColorFromARGB(0xff, 145, 209, 123));
 
@@ -93,7 +92,9 @@ void Button::paint(SkCanvas *canvas) {
 }
 
 void Button::layoutChildren() {
-  render_text.update();
+  render_text.update({padding_.left, padding_.top, contentWidth(), contentHeight()});
+  render_bg.update({0, 0, width_, height_});
+  render_border.update({0, 0, width_, height_});
 }
 
 } // namespace ui::widgets

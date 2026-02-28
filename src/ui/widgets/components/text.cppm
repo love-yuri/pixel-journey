@@ -14,7 +14,7 @@ export namespace ui::widgets {
 class Text: public Widget {
   RenderText renderText; // 字体节点
 public:
-  explicit Text(const std::string_view text, Widget* parent): Widget(parent), renderText(text, &self_box) {
+  explicit Text(const std::string_view text, Widget* parent): Widget(parent), renderText(text) {
 
   }
 
@@ -23,7 +23,7 @@ public:
   }
 
   void layoutChildren() override {
-    renderText.update();
+    renderText.update({padding_.left, padding_.top, contentWidth(), contentHeight()});
   }
 
   /**
