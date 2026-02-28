@@ -34,6 +34,7 @@ public:
    * @param rect 所占空间
    */
   RenderText(std::string_view text, const SkRect& rect);
+  RenderText(std::string_view text);
   RenderText() = default;
 
   /**
@@ -81,6 +82,9 @@ public:
 
 RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
   RenderText::update();
+}
+
+RenderText::RenderText(const std::string_view text): text(text) {
 }
 
 const SkRect& RenderText::textBound() const {

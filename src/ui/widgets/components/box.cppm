@@ -55,7 +55,7 @@ void Box::paint(SkCanvas *canvas) {
   render_border.render(canvas);
 }
 
-Box::Box(Widget *parent): Widget(parent), render_border(&self_box), render_bg(&self_box) {
+Box::Box(Widget *parent): Widget(parent) {
   render_border.radius = &radius;
   render_bg.radius = &radius;
 }
