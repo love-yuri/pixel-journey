@@ -23,7 +23,7 @@ public:
   }
 
   void layoutChildren() override {
-    renderText.update({padding_.left, padding_.top, contentWidth(), contentHeight()});
+    renderText.update(contentRect());
   }
 
   /**

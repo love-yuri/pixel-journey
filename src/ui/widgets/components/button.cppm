@@ -92,9 +92,9 @@ void Button::paint(SkCanvas *canvas) {
 }
 
 void Button::layoutChildren() {
-  render_text.update({padding_.left, padding_.top, contentWidth(), contentHeight()});
-  render_bg.update({0, 0, width_, height_});
-  render_border.update({0, 0, width_, height_});
+  render_text.update(contentRect());
+  render_bg.update(borderRect());
+  render_border.update(borderRect());
 }
 
 } // namespace ui::widgets

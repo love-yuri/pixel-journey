@@ -184,6 +184,16 @@ public:
     return height_;
   }
 
+  /** 获取border rect */
+  [[nodiscard]] SkRect borderRect() const noexcept {
+    return SkRect::MakeWH(width_, height_);
+  }
+
+  /** 获取内容rect */
+  [[nodiscard]] SkRect contentRect() const noexcept {
+    return SkRect::MakeLTRB(padding_.left, padding_.top, width_ - padding_.right, height_ - padding_.bottom);
+  }
+
   /**
    * 获取控件内容宽度-去除padding区域
    */
