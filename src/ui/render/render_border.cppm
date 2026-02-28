@@ -47,10 +47,10 @@ void RenderBorder::render(SkCanvas *canvas) {
 
   const auto insert = paint.getStrokeWidth() / 2;
   const SkRect rect = {
-    self_box->fLeft + insert,
-    self_box->fTop + insert,
-    self_box->fRight - insert,
-    self_box->fBottom - insert,
+    self_box.fLeft + insert,
+    self_box.fTop + insert,
+    self_box.fRight - insert,
+    self_box.fBottom - insert,
   };
   if (radius == nullptr || *radius <= 0) {
     canvas->drawRect(rect, paint);

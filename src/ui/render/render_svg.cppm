@@ -27,6 +27,12 @@ public:
   explicit RenderSvg(std::string_view path);
   void render(SkCanvas *canvas) override;
 
+  // svg宽度
+  [[nodiscard]] float width() const;
+
+  // svg高度
+  [[nodiscard]] float height() const;
+
 private:
   std::string file_path;             // svg 路径
   sk_sp<SkSVGDOM> svg_dom = nullptr; // svg dom
@@ -54,6 +60,14 @@ void RenderSvg::render(SkCanvas *canvas) {
   canvas->translate(290, 80);
   svg_dom->render(canvas);
   canvas->restore();
+}
+
+float RenderSvg::width() const {
+  return svg_dom->containerSize().width();
+}
+
+float RenderSvg::height() const {
+  return svg_dom->containerSize().height();
 }
 
 } // namespace ui::render

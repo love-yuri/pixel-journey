@@ -26,13 +26,14 @@ class RenderText : public RenderNode {
   Alignment alignment = Alignment::TopLeft; // 对齐方式
 
 public:
+  using RenderNode::update;
 
   /**
    * 构造一个文本节点
    * @param text 显示的文本
    * @param rect 所占空间
    */
-  RenderText(std::string_view text, const SkRect* rect);
+  RenderText(std::string_view text, const SkRect& rect);
   RenderText() = default;
 
   /**
@@ -75,11 +76,11 @@ public:
   /**
    * 重新计算文本、位置等信息
    */
-  void update();
+  void update() override;
 };
 
-RenderText::RenderText(const std::string_view text, const SkRect* rect): RenderNode(rect), text(text) {
-  update();
+RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
+  RenderText::update();
 }
 
 const SkRect& RenderText::textBound() const {
@@ -123,20 +124,20 @@ void RenderText::update() {
 
   // 计算起点x
   if (alignment & Alignment::Left) {
-    x = self_box->left() - font_rect.left();
+    x = self_box.left() - font_rect.left();
   } else if (alignment & Alignment::Right) {
-    x = self_box->right() - font_rect.right();
+    x = self_box.right() - font_rect.right();
   } else if (alignment & Alignment::HCenter) {
-    x = self_box->centerX() - font_rect.centerX();
+    x = self_box.centerX() - font_rect.centerX();
   }
 
   // 计算起点y
   if (alignment & Alignment::Top) {
-    y = self_box->top() - font_rect.top();
+    y = self_box.top() - font_rect.top();
   } else if (alignment & Alignment::Bottom) {
-    y = self_box->bottom() - font_rect.bottom();
+    y = self_box.bottom() - font_rect.bottom();
   } else if (alignment & Alignment::VCenter) {
-    y = self_box->centerY() - font_rect.centerY();
+    y = self_box.centerY() - font_rect.centerY();
   }
 
   // 计算blob
