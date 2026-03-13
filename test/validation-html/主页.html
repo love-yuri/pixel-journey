@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serene Music Player</title>
+    <title>Pixel Journey · Yuri Music</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -13,47 +13,69 @@
         }
 
         :root {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f1f5f9;
-            --sidebar-bg: #1e293b;
-            --sidebar-hover: #334155;
-            --sidebar-active: #3b82f6;
-            --accent: #3b82f6;
-            --accent-light: #60a5fa;
-            --accent-soft: rgba(59, 130, 246, 0.1);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --text-on-dark: #e2e8f0;
-            --text-on-dark-muted: #94a3b8;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+            /* Desktop-first tokens (Skia-friendly: solid fills, 1px outlines, simple shadows) */
+            --bg-primary: #070a14;
+            --bg-secondary: rgba(255,255,255,0.08);
+            --bg-tertiary: rgba(255,255,255,0.12);
+            --sidebar-bg: rgba(12, 16, 32, 0.78);
+            --sidebar-hover: rgba(255,255,255,0.06);
+            --sidebar-active: rgba(34, 211, 238, 0.18);
+            --accent: #22d3ee;
+            --accent-light: #7c3aed;
+            --accent-soft: rgba(34, 211, 238, 0.18);
+            --text-primary: rgba(255,255,255,0.92);
+            --text-secondary: rgba(214, 227, 255, 0.68);
+            --text-muted: rgba(214, 227, 255, 0.46);
+            --text-on-dark: rgba(255,255,255,0.92);
+            --text-on-dark-muted: rgba(214, 227, 255, 0.62);
+            --border: rgba(255,255,255,0.12);
+            --shadow-sm: 0 1px 0 rgba(255,255,255,0.04);
+            --shadow-md: 0 16px 50px rgba(0,0,0,0.55);
+            --shadow-lg: 0 30px 80px rgba(0,0,0,0.65);
+
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: var(--bg-primary);
-            min-height: 100vh;
+            background-color: var(--bg-primary);
+            background-image:
+                radial-gradient(1000px 600px at 20% -10%, rgba(34,211,238,0.22), transparent 60%),
+                radial-gradient(900px 500px at 110% 10%, rgba(124,58,237,0.18), transparent 55%),
+                linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: auto, auto, 28px 28px, 28px 28px;
+            background-position: 0 0, 0 0, 0 0, 0 0;
+            height: 100vh;
+            padding: 18px;
             overflow: hidden;
             color: var(--text-primary);
         }
 
         .app-container {
+            height: 100%;
+        }
+
+        .app-shell {
+            height: 100%;
             display: flex;
-            height: 100vh;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: var(--shadow-lg);
+            background: rgba(8, 10, 20, 0.55);
         }
 
         /* 侧边导航 */
         .sidebar {
-            width: 240px;
+            width: 264px;
             background: var(--sidebar-bg);
             display: flex;
             flex-direction: column;
             padding: 24px 16px;
-            transition: width 0.3s ease;
+            border-right: 1px solid rgba(255,255,255,0.10);
         }
 
         .logo {
@@ -61,7 +83,7 @@
             align-items: center;
             gap: 12px;
             padding: 0 8px;
-            margin-bottom: 32px;
+            margin-bottom: 14px;
         }
 
         .logo-icon {
@@ -106,7 +128,7 @@
             align-items: center;
             gap: 12px;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             transition: all 0.2s ease;
             margin-bottom: 4px;
@@ -138,6 +160,7 @@
 
         .nav-item.active {
             background: var(--sidebar-active);
+            box-shadow: inset 0 0 0 1px rgba(34,211,238,0.35);
         }
 
         .nav-item.active i,
@@ -145,59 +168,32 @@
             color: white;
         }
 
-        .user-section {
+        .sidebar-footer {
             margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid var(--sidebar-hover);
-        }
-
-        .user-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .user-card:hover {
-            background: var(--sidebar-hover);
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .user-avatar i {
-            color: white;
-            font-size: 14px;
-        }
-
-        .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .user-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-on-dark);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-role {
-            font-size: 12px;
+            padding: 14px 8px 6px;
+            border-top: 1px solid rgba(255,255,255,0.08);
             color: var(--text-on-dark-muted);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .sidebar-footer .chip {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.04);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .sidebar-footer .chip i {
+            font-size: 12px;
+            color: var(--accent);
         }
 
         /* 主内容区 */
@@ -206,13 +202,14 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background: rgba(6, 8, 16, 0.62);
         }
 
         .main-content {
             flex: 1;
             position: relative;
             overflow: hidden;
-            padding-bottom: 90px;
+            background: rgba(6, 8, 16, 0.38);
         }
 
         .page {
@@ -221,7 +218,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 32px 40px;
+            padding: 26px 30px;
             overflow-y: auto;
             opacity: 0;
             visibility: hidden;
@@ -254,7 +251,7 @@
         }
 
         .page-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 6px;
@@ -262,7 +259,7 @@
         }
 
         .page-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
         }
 
@@ -274,7 +271,7 @@
         .search-bar {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             padding: 14px 18px;
             display: flex;
             align-items: center;
@@ -316,7 +313,7 @@
         .quick-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: var(--radius-md);
             padding: 20px;
             display: flex;
             align-items: center;
@@ -334,7 +331,7 @@
         .quick-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -398,7 +395,7 @@
         .playlist-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: var(--radius-md);
             padding: 14px;
             cursor: pointer;
             transition: all 0.25s ease;
@@ -412,7 +409,7 @@
         .playlist-cover {
             width: 100%;
             aspect-ratio: 1;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             margin-bottom: 12px;
             display: flex;
             align-items: center;
@@ -469,7 +466,7 @@
             padding: 12px 16px;
             background: var(--bg-secondary);
             border: 1px solid transparent;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -489,7 +486,7 @@
         .song-cover {
             width: 48px;
             height: 48px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             display: flex;
             align-items: center;
@@ -597,7 +594,7 @@
         .settings-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: var(--radius-md);
             margin-bottom: 20px;
             overflow: hidden;
         }
@@ -661,224 +658,6 @@
             transform: translateX(20px);
         }
 
-        /* 底部播放器 */
-        .player-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 90px;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 32px;
-            z-index: 100;
-        }
-
-        .player-track {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            width: 240px;
-        }
-
-        .player-cover {
-            width: 56px;
-            height: 56px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .player-cover i {
-            font-size: 22px;
-            color: white;
-        }
-
-        .player-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .player-title {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .player-artist {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .player-controls {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .control-buttons {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .ctrl-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: transparent;
-            border: none;
-        }
-
-        .ctrl-btn i {
-            font-size: 16px;
-            color: var(--text-secondary);
-            transition: color 0.2s ease;
-        }
-
-        .ctrl-btn:hover i {
-            color: var(--text-primary);
-        }
-
-        .ctrl-btn.play-btn {
-            width: 44px;
-            height: 44px;
-            background: var(--accent);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .ctrl-btn.play-btn i {
-            color: white;
-            font-size: 18px;
-        }
-
-        .ctrl-btn.play-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .progress-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .progress-time {
-            font-size: 11px;
-            color: var(--text-muted);
-            width: 36px;
-        }
-
-        .progress-track {
-            flex: 1;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .progress-fill {
-            width: 32%;
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            right: -5px;
-            top: -3px;
-            width: 10px;
-            height: 10px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .progress-track:hover .progress-fill::after {
-            opacity: 1;
-        }
-
-        .player-options {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            width: 240px;
-            justify-content: flex-end;
-        }
-
-        .volume-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .volume-wrap i {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .volume-track {
-            width: 80px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            cursor: pointer;
-        }
-
-        .volume-fill {
-            width: 65%;
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-        }
-
-        .opt-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .opt-btn i {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .opt-btn:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .opt-btn:hover i {
-            color: var(--text-primary);
-        }
-
         /* 响应式 */
         @media (max-width: 900px) {
             .stats-row {
@@ -894,97 +673,79 @@
             .logo-text,
             .nav-section-title,
             .nav-item span,
-            .user-info {
+            .sidebar-footer {
                 display: none;
             }
             .nav-item {
                 justify-content: center;
                 padding: 12px 8px;
             }
-            .user-card {
-                justify-content: center;
-            }
-            .player-track,
-            .player-options {
-                width: auto;
-            }
-            .player-info,
-            .volume-wrap,
-            .opt-btn {
-                display: none;
-            }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- 侧边导航 -->
-        <nav class="sidebar">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-wave-square"></i>
-                </div>
-                <span class="logo-text">Serene</span>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">菜单</div>
-                <div class="nav-item active" data-page="home">
-                    <i class="fas fa-home"></i>
-                    <span>首页</span>
-                </div>
-                <div class="nav-item" data-page="browse">
-                    <i class="fas fa-compass"></i>
-                    <span>浏览</span>
-                </div>
-                <div class="nav-item" data-page="search">
-                    <i class="fas fa-search"></i>
-                    <span>搜索</span>
-                </div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">媒体库</div>
-                <div class="nav-item" data-page="library">
-                    <i class="fas fa-folder-open"></i>
-                    <span>音乐库</span>
-                </div>
-                <div class="nav-item" data-page="favorites">
-                    <i class="fas fa-heart"></i>
-                    <span>我喜欢</span>
-                </div>
-                <div class="nav-item" data-page="recent">
-                    <i class="fas fa-clock"></i>
-                    <span>最近播放</span>
-                </div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-section-title">其他</div>
-                <div class="nav-item" data-page="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>设置</span>
-                </div>
-            </div>
-
-            <div class="user-section">
-                <div class="user-card">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+        <div class="app-shell">
+            <!-- 侧边导航 -->
+            <nav class="sidebar">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-wave-square"></i>
                     </div>
-                    <div class="user-info">
-                        <div class="user-name">音乐爱好者</div>
-                        <div class="user-role">免费会员</div>
+                    <span class="logo-text">Pixel Journey</span>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">菜单</div>
+                    <div class="nav-item active" data-page="home">
+                        <i class="fas fa-home"></i>
+                        <span>首页</span>
+                    </div>
+                    <div class="nav-item" data-page="browse">
+                        <i class="fas fa-compass"></i>
+                        <span>浏览</span>
+                    </div>
+                    <div class="nav-item" data-page="search">
+                        <i class="fas fa-search"></i>
+                        <span>搜索</span>
                     </div>
                 </div>
-            </div>
-        </nav>
 
-        <!-- 主内容区 -->
-        <div class="main-wrapper">
-            <main class="main-content">
-                <!-- 首页 -->
-                <div class="page active" id="page-home">
+                <div class="nav-section">
+                    <div class="nav-section-title">媒体库</div>
+                    <div class="nav-item" data-page="library">
+                        <i class="fas fa-folder-open"></i>
+                        <span>音乐库</span>
+                    </div>
+                    <div class="nav-item" data-page="favorites">
+                        <i class="fas fa-heart"></i>
+                        <span>我喜欢</span>
+                    </div>
+                    <div class="nav-item" data-page="recent">
+                        <i class="fas fa-clock"></i>
+                        <span>最近播放</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">其他</div>
+                    <div class="nav-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>设置</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <span class="chip"><i class="fas fa-lock"></i> 本地模式</span>
+                    <span class="chip"><i class="fas fa-cloud"></i> 未同步</span>
+                </div>
+            </nav>
+
+            <!-- 主内容区 -->
+            <div class="main-wrapper">
+                <main class="main-content">
+                    <!-- 首页 -->
+                    <div class="page active" id="page-home">
                     <div class="page-header">
                         <h1 class="page-title">下午好</h1>
                         <p class="page-subtitle">发现适合现在聆听的音乐</p>
@@ -1361,48 +1122,8 @@
                             <div class="toggle" onclick="this.classList.toggle('active')"></div>
                         </div>
                     </div>
-                </div>
-            </main>
-
-            <!-- 底部播放器 -->
-            <div class="player-bar">
-                <div class="player-track">
-                    <div class="player-cover">
-                        <i class="fas fa-music"></i>
                     </div>
-                    <div class="player-info">
-                        <div class="player-title">夜曲</div>
-                        <div class="player-artist">周杰伦</div>
-                    </div>
-                </div>
-
-                <div class="player-controls">
-                    <div class="control-buttons">
-                        <button class="ctrl-btn"><i class="fas fa-random"></i></button>
-                        <button class="ctrl-btn"><i class="fas fa-step-backward"></i></button>
-                        <button class="ctrl-btn play-btn"><i class="fas fa-play"></i></button>
-                        <button class="ctrl-btn"><i class="fas fa-step-forward"></i></button>
-                        <button class="ctrl-btn"><i class="fas fa-redo"></i></button>
-                    </div>
-                    <div class="progress-wrap">
-                        <span class="progress-time">1:28</span>
-                        <div class="progress-track">
-                            <div class="progress-fill"></div>
-                        </div>
-                        <span class="progress-time">4:25</span>
-                    </div>
-                </div>
-
-                <div class="player-options">
-                    <div class="volume-wrap">
-                        <i class="fas fa-volume-up"></i>
-                        <div class="volume-track">
-                            <div class="volume-fill"></div>
-                        </div>
-                    </div>
-                    <div class="opt-btn"><i class="fas fa-list"></i></div>
-                    <div class="opt-btn"><i class="fas fa-expand"></i></div>
-                </div>
+                </main>
             </div>
         </div>
     </div>
@@ -1431,17 +1152,6 @@
             });
         });
 
-        // 播放按钮
-        const playBtn = document.querySelector('.play-btn');
-        let isPlaying = false;
-
-        playBtn.addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            playBtn.innerHTML = isPlaying 
-                ? '<i class="fas fa-pause"></i>' 
-                : '<i class="fas fa-play"></i>';
-        });
-
         // 喜欢按钮
         document.querySelectorAll('.action-btn').forEach(btn => {
             if (btn.querySelector('.fa-heart')) {
@@ -1460,9 +1170,5 @@
             }
         });
     </script>
-
-    <div style="position: fixed; bottom: 100px; right: 20px; font-size: 11px; color: var(--text-muted); opacity: 0.5;">
-        Generated with <a href="https://github.com/ThinkInAIXYZ/deepchat" style="color: var(--accent);">DeepChat</a>
-    </div>
 </body>
 </html>
