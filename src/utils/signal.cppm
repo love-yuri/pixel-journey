@@ -82,7 +82,6 @@ public:
     }
   }
 
-
 private:
   void *object_ptr = nullptr;           // 指向对象或闭包（有捕获 lambda 或成员函数）
   member_invoke_fn member_fn = nullptr; // 对象/成员函数调用
@@ -124,4 +123,3 @@ public:
     }
   }
 };
-
