@@ -35,13 +35,7 @@ struct Insets {
   constexpr Insets(const float lr, const float tb) : left(lr), right(lr), top(tb), bottom(tb) {
   }
 
-  inline Insets & operator=(const Insets &o) {
-    left = o.left;
-    right = o.right;
-    top = o.top;
-    bottom = o.bottom;
-    return *this;
-  }
+  inline Insets & operator=(const Insets &o) = default;
 
   /**
    * 设置所有值
@@ -51,6 +45,34 @@ struct Insets {
     right = all;
     top = all;
     bottom = all;
+  }
+
+  /**
+   * 仅padding left
+   */
+  inline static Insets fromLeft(const float l) noexcept {
+    return {l, 0, 0, 0};
+  }
+
+  /**
+   * 仅 padding top
+   */
+  inline static Insets fromTop(const float t) noexcept {
+    return {0, t, 0, 0};
+  }
+
+  /**
+   * 仅 padding right
+   */
+  inline static Insets fromRight(const float r) noexcept {
+    return {0, 0, r, 0};
+  }
+
+  /**
+   * 仅 padding bottom
+   */
+  inline static Insets fromBottom(const float b) noexcept {
+    return {0, 0, 0, b};
   }
 };
 
