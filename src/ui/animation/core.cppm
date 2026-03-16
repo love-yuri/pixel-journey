@@ -4,6 +4,7 @@
 export module ui.animation:core;
 
 import std;
+import signal;
 import yuri_log;
 
 using namespace std::chrono;
@@ -16,54 +17,16 @@ template <typename T>
 concept CanAnimation = requires(T a, T b, float t) { a + b; a - b; a * t; };
 
 template <CanAnimation T>
-struct AnimationTarget {
-  enum class Kind : std::uint8_t {
-    RawPtr,  // 普通变量
-    MemberFn // 成员函数
-  };
-
-  Kind kind = Kind::RawPtr;
-
-  union {
-    T *raw;
-    struct {
-      void *obj;
-      void (*fn)(void *, const T &) noexcept;
-    } cb;
-  };
-
-  inline void apply(const T &v) noexcept {
-    if (kind == Kind::RawPtr) {
-      *raw = v;
-    } else {
-      cb.fn(cb.obj, v);
-    }
-  }
-};
-
-/**
- * 成员函数转普通函数
- * @tparam Obj 类 类型
- * @tparam T 参数类型
- * @tparam Method 成员函数
- */
-template <typename Obj, typename T, void (Obj::*Method)(T)>
-void memberThunk(void* obj, const T& v) noexcept {
-  (static_cast<Obj*>(obj)->*Method)(v);
-}
-
-template <CanAnimation T>
 class IAnimation {
 public:
-  using memberFunc = void (*)(void *, const T&) noexcept; // 成员函数类型
+  using Setter = function_ref<void(const T&)>;
+
 protected:
-  std::vector<T> from{};                                   // 初始值容器
-  std::vector<T> to{};                                     // 目标值容器
-  std::vector<AnimationTarget<T>> values{};                // value容器
-  std::vector<memberFunc> func_values{};                   // func_values容器
-  std::vector<float> inv_duration{};                       // 持续时间 inv容器 1/ 500 ...
-  std::vector<std::uint64_t> start_time{};                 // 开始时间容器
-  std::mutex mutex{};                                      // 锁-单线程暂未考虑
+  std::vector<T> from_{};              // 起始值
+  std::vector<T> to_{};                // 目标值
+  std::vector<float> inv_dur{};        // 间隔比例 1 / duration * 1000.0
+  std::vector<std::uint64_t> start_{}; // 起始时间
+  std::vector<Setter> setters_{};      // setter
 
   /**
    * 交换移除元素
@@ -96,49 +59,40 @@ public:
   * @param from_val 起始值
   * @param to_val 目标值
   * @param dur 持续时间
-  * @param obj this 指针
-  * @param func 回调函数
+  * @param setter 回调函数
   */
-  void start(std::uint64_t now, const T& from_val, const T& to_val, float dur, void* obj, memberFunc func);
+  void start(std::uint64_t now, const T& from_val, const T& to_val, float dur, const Setter& setter);
 };
 
 template <CanAnimation T>
 void IAnimation<T>::start(const std::uint64_t now, const T& from_val, const T& to_val, const float dur, T *val_ptr) {
-  from.emplace_back(from_val);
-  to.emplace_back(to_val);
-  inv_duration.emplace_back(1.f / dur / 1000.f);
-  start_time.emplace_back(now);
+  const auto func = [](void *p, const T &v) noexcept {
+    *static_cast<T *>(p) = v;
+  };
 
-  AnimationTarget<T> target { AnimationTarget<T>::Kind::RawPtr };
-  target.cb.obj = val_ptr;
-  values.emplace_back(target);
+  start(now, from_val, to_val, dur, Setter { val_ptr, func });
 }
 
 template <CanAnimation T>
-void IAnimation<T>::start(std::uint64_t now, const T &from_val, const T &to_val, const float dur, void* obj, memberFunc func) {
-  from.emplace_back(from_val);
-  to.emplace_back(to_val);
-  inv_duration.emplace_back(1.f / dur / 1000.f);
-  start_time.emplace_back(now);
-
-  AnimationTarget<T> target { AnimationTarget<T>::Kind::MemberFn };
-  target.cb.fn = func;
-  target.cb.obj = obj;
-  values.emplace_back(target);
+void IAnimation<T>::start(std::uint64_t now, const T &from_val, const T &to_val, const float dur, const Setter& setter) {
+  from_.emplace_back(from_val);
+  to_.emplace_back(to_val);
+  inv_dur.emplace_back(1.f / dur / 1000.f);
+  start_.emplace_back(now);
+  setters_.emplace_back(setter);
 }
 
 template <CanAnimation T>
 void IAnimation<T>::swapRemove(std::size_t i) {
-  values[i] = values.back();
-  values.pop_back();
-  from[i] = from.back();
-  from.pop_back();
-  to[i] = to.back();
-  to.pop_back();
-  inv_duration[i] = inv_duration.back();
-  inv_duration.pop_back();
-  start_time[i] = start_time.back();
-  start_time.pop_back();
+  const auto swap_pop = [](auto &v, std::size_t idx) {
+    v[idx] = std::move(v.back());
+    v.pop_back();
+  };
+  swap_pop(from_, i);
+  swap_pop(to_, i);
+  swap_pop(inv_dur, i);
+  swap_pop(start_, i);
+  swap_pop(setters_, i);
 }
 
 struct FrameClock {

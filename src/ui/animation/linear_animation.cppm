@@ -10,6 +10,13 @@ import std;
 
 export namespace ui::animation {
 
+// 线性插值
+template <CanAnimation T>
+[[nodiscard]] T lerp(const T &from, const T &to, float t) noexcept {
+  return from + (to - from) * t;
+}
+
+
 template <CanAnimation T>
 class LinearAnimation : public IAnimation<T> {
 public:
@@ -21,14 +28,14 @@ public:
 
 template <CanAnimation T>
 void LinearAnimation<T>::update(const std::uint64_t now) {
-  for (std::size_t i = 0; i < this->values.size(); ++i) {
-    if (const float t = (now - this->start_time[i]) * this->inv_duration[i]; t < 1.f) {
-      const auto value = this->from[i] + (this->to[i] - this->from[i]) * t;
-      this->values[i].apply(value);
+  std::size_t i = 0;
+  while (i < this->setters_.size()) {
+    if (float t = static_cast<float>(now - this->start_[i]) * this->inv_dur[i]; t >= 1.f) {
+      this->setters_[i](this->to_[i]);
+      this->swapRemove(i);
     } else {
-      this->values[i].apply(this->to[i]); // 更新为末尾值
-      this->swapRemove(i);                // 弹出最后值
-      --i;                                // 重置i
+      this->setters_[i](lerp(this->from_[i], this->to_[i], t));
+      ++i;
     }
   }
 }

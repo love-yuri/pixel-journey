@@ -21,6 +21,8 @@ class AnimationManager {
   LinearAnimation<float> animations {};
 
 public:
+  using Setter = LinearAnimation<float>::Setter;
+
   /**
    * 更新渲染帧周期
    */
@@ -42,18 +44,33 @@ public:
    * @param from 起始参数
    * @param to 目标参数
    * @param duration 持续时间-ms
-   * @param obj this 指针
-   * @param func 回调函数指针
+   * @param setter 设置回调
    */
-  void start(float from, float to, float duration, void* obj, LinearAnimation<float>::memberFunc func);
+  void start(float from, float to, float duration, const LinearAnimation<float>::Setter& setter);
+
+  /**
+   * 开启动画
+   * @param from 起始参数
+   * @param to 目标参数
+   * @param duration 持续时间-ms
+   * @param obj this 对象
+   */
+  template<auto ptr, typename TObject>
+  void start(float from, float to, float duration, TObject* obj);
+
 };
 
-void AnimationManager::start(const float from, const float to, const float duration, float *value) { // NOLINT(*-non-const-parameter)
+template <auto ptr, typename TObject>
+void AnimationManager::start(const float from, const float to, const float duration, TObject *obj) {
+  start(from, to, duration, LinearAnimation<float>::Setter::from<ptr, TObject>(obj));
+}
+
+void AnimationManager::start(const float from, const float to, const float duration, float *value) {
   animations.start(clock.now, from, to, duration, value);
 }
 
-void AnimationManager::start(const float from, const float to, const float duration, void* obj, LinearAnimation<float>::memberFunc func) {
-  animations.start(clock.now, from, to, duration, obj, func);
+void AnimationManager::start(const float from, const float to, const float duration, const LinearAnimation<float>::Setter& setter) {
+  animations.start(clock.now, from, to, duration, setter);
 }
 
 } // namespace ui::animation
