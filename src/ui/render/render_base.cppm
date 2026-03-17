@@ -75,6 +75,16 @@ public:
     self_box = rect;
     update();
   }
+
+  /**
+   * 获取控件左侧边界
+   */
+  [[nodiscard]] float left() const { return self_box.fLeft; }
+
+  /**
+   * 获取控件左侧边界
+   */
+  [[nodiscard]] float right() const { return self_box.fRight; }
 };
 
 } // namespace ui::render

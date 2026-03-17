@@ -34,14 +34,14 @@ public:
    * @param rect 所占空间
    */
   RenderText(std::string_view text, const SkRect& rect);
-  RenderText(std::string_view text);
+  explicit RenderText(std::string_view text);
   RenderText() = default;
 
   /**
    * 获取字体显示所需bound
    * @return 字体bound
    */
-  const SkRect& textBound() const;
+  [[nodiscard]] const SkRect& textBound() const;
 
   /**
    * 设置对齐方式
@@ -110,7 +110,7 @@ void RenderText::setText(const std::string_view text) {
   update();
 }
 
-void RenderText::setTextAndAlignment(std::string_view text, Alignment alignment) {
+void RenderText::setTextAndAlignment(const std::string_view text, const Alignment alignment) {
   this->text = text;
   this->alignment = alignment;
   update();
