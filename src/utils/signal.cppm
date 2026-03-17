@@ -68,7 +68,7 @@ private:
 };
 
 export template <typename ...Args>
-class Signal { // NOLINT(*-pro-type-member-init)
+class Signal {
   using SignalType = function_ref<void(Args...)>;
   std::vector<SignalType> slots{};
 
