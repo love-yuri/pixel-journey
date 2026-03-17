@@ -28,6 +28,8 @@ module;
 #include <include/core/SkFontMetrics.h>
 #include <include/core/SkColor.h>
 #include <include/core/SkRRect.h>
+#include <include/core/SkImage.h>
+#include <include/core/SkSamplingOptions.h>
 #include <include/core/SkTextBlob.h>
 #include <include/core/SkShader.h>
 #include <modules/skresources/include/SkResources.h>
@@ -43,6 +45,9 @@ import std;
  */
 export namespace skia {
 
+using ::SkSamplingOptions;
+using ::SkImageInfo;
+using ::SkImage;
 using ::SkPathFillType;
 using ::SkTextBlob;
 using ::SkPoint;
@@ -103,6 +108,7 @@ export namespace skia::gpu {
 
 using skgpu::VulkanBackendContext;
 using skgpu::MutableTextureState;
+using skgpu::Budgeted;
 
 } // namespace skia::skgpu
 
@@ -130,6 +136,8 @@ using ::GrBackendRenderTargets::MakeVk;
 export namespace SkSurfaces {
 
 using SkSurfaces::WrapBackendRenderTarget;
+using SkSurfaces::Raster;
+using SkSurfaces::RenderTarget;
 
 }
 
