@@ -12,26 +12,17 @@ class function_ref;
 
 export template <typename R, typename... Args>
 class function_ref<R(Args...)> {
-  function_ref() = default;
+
 public:
-  // 对象 + 成员函数或闭包对象调用
-  using member_invoke_fn = R (*)(void *, Args&&...);
-
-  // 普通函数或无捕获 lambda 调用
-  using free_invoke_fn = R (*)(Args&&...);
-
-  /**
-   * 通过函数指针初始化
-   * @param func 函数指针
-   */
-  explicit function_ref(const free_invoke_fn func) noexcept : free_fn(func) {
-  }
+  // 函数类型
+  using InvokeFunType = R (*)(void *, Args&&...);
+  function_ref() = delete;
 
   /**
    * 默认构造函数
    * 自行处理指针
    */
-  function_ref(void *obj, const member_invoke_fn method) noexcept : object_ptr(obj), member_fn(method) {
+  function_ref(void *obj, const InvokeFunType func) noexcept : object_ptr(obj), invoke_fun(func) {
   }
 
   /**
@@ -59,33 +50,21 @@ public:
   template <typename F>
   requires std::invocable<F &, Args...>
   static function_ref from(F &f) {
-    if constexpr (std::is_function_v<std::remove_reference_t<F>>) {
-      return function_ref(f);
-    } else {
-      return function_ref(
-        std::addressof(f),
-        [](void *p, Args&& ...args) -> R {
-          return (*static_cast<F *>(p))(std::forward<Args>(args)...);
-        }
-      );
-    }
+    return function_ref(
+      std::addressof(f),
+      [](void *p, Args&& ...args) -> R {
+        return (*static_cast<F *>(p))(std::forward<Args>(args)...);
+      }
+    );
   }
 
   R operator()(Args&&... args) const {
-    // 成员函数回调频率更高
-    if (object_ptr != nullptr) [[likely]] {
-      return member_fn(object_ptr, std::forward<Args>(args)...);
-    }
-
-    [[unlikely]] {
-      return free_fn(std::forward<Args>(args)...);
-    }
+    return invoke_fun(object_ptr, std::forward<Args>(args)...);
   }
 
 private:
-  void *object_ptr = nullptr;           // 指向对象或闭包（有捕获 lambda 或成员函数）
-  member_invoke_fn member_fn = nullptr; // 对象/成员函数调用
-  free_invoke_fn free_fn = nullptr;     // 普通函数或无捕获 lambda 调用
+  void *object_ptr = nullptr;         // 指向对象或闭包
+  InvokeFunType invoke_fun = nullptr; // 对象/成员函数调用
 };
 
 export template <typename ...Args>
