@@ -46,7 +46,7 @@ public:
    * @param duration 持续时间-ms
    * @param setter 设置回调
    */
-  void start(float from, float to, float duration, const LinearAnimation<float>::Setter& setter);
+  void start(float from, float to, float duration, LinearAnimation<float>::Setter setter);
 
   /**
    * 开启动画
@@ -69,8 +69,8 @@ void AnimationManager::start(const float from, const float to, const float durat
   animations.start(clock.now, from, to, duration, value);
 }
 
-void AnimationManager::start(const float from, const float to, const float duration, const LinearAnimation<float>::Setter& setter) {
-  animations.start(clock.now, from, to, duration, setter);
+void AnimationManager::start(const float from, const float to, const float duration, const LinearAnimation<float>::Setter setter) {
+  animations.start(clock.now, from, to, duration, std::move(setter));
 }
 
 } // namespace ui::animation

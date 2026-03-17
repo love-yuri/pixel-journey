@@ -29,12 +29,14 @@ public:
 template <CanAnimation T>
 void LinearAnimation<T>::update(const std::uint64_t now) {
   std::size_t i = 0;
-  while (i < this->setters_.size()) {
-    if (float t = static_cast<float>(now - this->start_[i]) * this->inv_dur[i]; t >= 1.f) {
-      this->setters_[i](this->to_[i]);
+
+  while (i < this->values_.size()) {
+    const auto &v = this->values_[i];
+    if (float t = static_cast<float>(now - v.start) * v.inv_dur; t >= 1.f) {
+      v.setter(v.to);
       this->swapRemove(i);
     } else {
-      this->setters_[i](lerp(this->from_[i], this->to_[i], t));
+      v.setter(lerp(v.from, v.to, t));
       ++i;
     }
   }

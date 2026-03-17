@@ -17,16 +17,23 @@ template <typename T>
 concept CanAnimation = requires(T a, T b, float t) { a + b; a - b; a * t; };
 
 template <CanAnimation T>
+struct Tween {
+  using Setter = function_ref<void(const T&)>;
+
+  float from;          // 起始值
+  float to;            // 目标值
+  float inv_dur;       // 间隔比例 1 / duration * 1000.0
+  std::uint64_t start; // 起始时间
+  Setter setter;       // setter
+};
+
+template <CanAnimation T>
 class IAnimation {
 public:
   using Setter = function_ref<void(const T&)>;
 
 protected:
-  std::vector<T> from_{};              // 起始值
-  std::vector<T> to_{};                // 目标值
-  std::vector<float> inv_dur{};        // 间隔比例 1 / duration * 1000.0
-  std::vector<std::uint64_t> start_{}; // 起始时间
-  std::vector<Setter> setters_{};      // setter
+  std::vector<Tween<T>> values_{};      // setter
 
   /**
    * 交换移除元素
@@ -61,7 +68,7 @@ public:
   * @param dur 持续时间
   * @param setter 回调函数
   */
-  void start(std::uint64_t now, const T& from_val, const T& to_val, float dur, const Setter& setter);
+  void start(std::uint64_t now, const T& from_val, const T& to_val, float dur, Setter setter);
 };
 
 template <CanAnimation T>
@@ -74,12 +81,8 @@ void IAnimation<T>::start(const std::uint64_t now, const T& from_val, const T& t
 }
 
 template <CanAnimation T>
-void IAnimation<T>::start(std::uint64_t now, const T &from_val, const T &to_val, const float dur, const Setter& setter) {
-  from_.emplace_back(from_val);
-  to_.emplace_back(to_val);
-  inv_dur.emplace_back(1.f / dur / 1000.f);
-  start_.emplace_back(now);
-  setters_.emplace_back(setter);
+void IAnimation<T>::start(std::uint64_t now, const T &from_val, const T &to_val, const float dur, const Setter setter) {
+  values_.emplace_back(from_val, to_val, 1.f / dur / 1000.f, now, std::move(setter));
 }
 
 template <CanAnimation T>
@@ -88,11 +91,7 @@ void IAnimation<T>::swapRemove(std::size_t i) {
     v[idx] = std::move(v.back());
     v.pop_back();
   };
-  swap_pop(from_, i);
-  swap_pop(to_, i);
-  swap_pop(inv_dur, i);
-  swap_pop(start_, i);
-  swap_pop(setters_, i);
+  swap_pop(values_, i);
 }
 
 struct FrameClock {
