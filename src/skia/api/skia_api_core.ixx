@@ -31,6 +31,7 @@ module;
 #include <include/core/SkImage.h>
 #include <include/core/SkSamplingOptions.h>
 #include <include/core/SkTextBlob.h>
+#include <include/core/SkColorFilter.h>
 #include <include/core/SkShader.h>
 #include <modules/skresources/include/SkResources.h>
 #include <modules/svg/include/SkSVGDOM.h>
@@ -45,6 +46,8 @@ import std;
  */
 export namespace skia {
 
+using ::SkColorFilters;
+using ::SkColorFilter;
 using ::SkSamplingOptions;
 using ::SkImageInfo;
 using ::SkImage;
@@ -95,8 +98,8 @@ using ::SkFontScanner_Make_FreeType;
 /**
  * 导出内联函数
  */
-consteval SkColor ColorFromARGB(const U8CPU a,const U8CPU r, const U8CPU g, const U8CPU b) noexcept {
-  return SkColorSetARGB(a, r, g, b);
+constexpr SkColor ColorFromARGB(const U8CPU a,const U8CPU r, const U8CPU g, const U8CPU b) noexcept {
+  return SkASSERT(a <= 255 && r <= 255 && g <= 255 && b <= 255), (a << 24 | r << 16 | g << 8 | b << 0);
 }
 
 } // namespace skia
