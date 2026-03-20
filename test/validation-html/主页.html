@@ -13,43 +13,46 @@
         }
 
         :root {
-            /* Desktop-first tokens (Skia-friendly: solid fills, 1px outlines, simple shadows) */
-            --bg-primary: #070a14;
-            --bg-secondary: rgba(255,255,255,0.08);
-            --bg-tertiary: rgba(255,255,255,0.12);
-            --sidebar-bg: rgba(12, 16, 32, 0.78);
-            --sidebar-hover: rgba(255,255,255,0.06);
-            --sidebar-active: rgba(34, 211, 238, 0.18);
-            --accent: #22d3ee;
-            --accent-light: #7c3aed;
-            --accent-soft: rgba(34, 211, 238, 0.18);
-            --text-primary: rgba(255,255,255,0.92);
-            --text-secondary: rgba(214, 227, 255, 0.68);
-            --text-muted: rgba(214, 227, 255, 0.46);
-            --text-on-dark: rgba(255,255,255,0.92);
-            --text-on-dark-muted: rgba(214, 227, 255, 0.62);
-            --border: rgba(255,255,255,0.12);
-            --shadow-sm: 0 1px 0 rgba(255,255,255,0.04);
-            --shadow-md: 0 16px 50px rgba(0,0,0,0.55);
-            --shadow-lg: 0 30px 80px rgba(0,0,0,0.65);
+            --bg-primary: #050810;
+            --bg-secondary: rgba(255,255,255,0.04);
+            --bg-tertiary: rgba(255,255,255,0.07);
+            --bg-glass: rgba(255,255,255,0.03);
+            --sidebar-bg: rgba(8, 12, 24, 0.85);
+            --sidebar-hover: rgba(255,255,255,0.05);
+            --sidebar-active: rgba(139, 92, 246, 0.15);
+            --accent: #a78bfa;
+            --accent-light: #c4b5fd;
+            --accent-hot: #f472b6;
+            --accent-soft: rgba(167, 139, 250, 0.12);
+            --gradient-primary: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+            --gradient-warm: linear-gradient(135deg, #fb923c 0%, #f472b6 100%);
+            --gradient-cool: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
+            --text-primary: rgba(255,255,255,0.95);
+            --text-secondary: rgba(255, 255, 255, 0.55);
+            --text-muted: rgba(255, 255, 255, 0.30);
+            --text-on-dark: rgba(255,255,255,0.95);
+            --text-on-dark-muted: rgba(255,255,255,0.45);
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
+            --shadow-lg: 0 24px 64px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(167, 139, 250, 0.15);
 
-            --radius-sm: 10px;
-            --radius-md: 14px;
-            --radius-lg: 18px;
+            --radius-sm: 8px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-primary);
             background-image:
-                radial-gradient(1000px 600px at 20% -10%, rgba(34,211,238,0.22), transparent 60%),
-                radial-gradient(900px 500px at 110% 10%, rgba(124,58,237,0.18), transparent 55%),
-                linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
-            background-size: auto, auto, 28px 28px, 28px 28px;
-            background-position: 0 0, 0 0, 0 0, 0 0;
+                radial-gradient(800px 500px at 15% 0%, rgba(167,139,250,0.15), transparent 60%),
+                radial-gradient(600px 400px at 85% 5%, rgba(244,114,182,0.10), transparent 50%),
+                radial-gradient(400px 300px at 50% 100%, rgba(167,139,250,0.05), transparent 50%);
             height: 100vh;
-            padding: 18px;
+            padding: 12px;
             overflow: hidden;
             color: var(--text-primary);
         }
@@ -63,38 +66,40 @@
             display: flex;
             border-radius: var(--radius-lg);
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.12);
-            box-shadow: var(--shadow-lg);
-            background: rgba(8, 10, 20, 0.55);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            background: rgba(10, 12, 22, 0.70);
+            backdrop-filter: blur(40px);
         }
 
         /* 侧边导航 */
         .sidebar {
-            width: 264px;
+            width: 260px;
             background: var(--sidebar-bg);
             display: flex;
             flex-direction: column;
-            padding: 24px 16px;
-            border-right: 1px solid rgba(255,255,255,0.10);
+            padding: 28px 14px;
+            border-right: 1px solid var(--border);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0 8px;
-            margin-bottom: 14px;
+            gap: 14px;
+            padding: 0 10px;
+            margin-bottom: 32px;
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            width: 42px;
+            height: 42px;
+            background: var(--gradient-primary);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.3);
         }
 
         .logo-icon i {
@@ -110,40 +115,40 @@
         }
 
         .nav-section {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .nav-section-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--text-on-dark-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0 12px;
-            margin-bottom: 8px;
+            letter-spacing: 1px;
+            padding: 0 14px;
+            margin-bottom: 10px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
+            gap: 14px;
+            padding: 11px 14px;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2px;
         }
 
         .nav-item i {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-on-dark-muted);
-            width: 24px;
+            width: 22px;
             text-align: center;
             transition: color 0.2s ease;
         }
 
         .nav-item span {
-            font-size: 14px;
+            font-size: 13.5px;
             color: var(--text-on-dark-muted);
             font-weight: 500;
             transition: color 0.2s ease;
@@ -160,39 +165,40 @@
 
         .nav-item.active {
             background: var(--sidebar-active);
-            box-shadow: inset 0 0 0 1px rgba(34,211,238,0.35);
+            box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.25);
         }
 
         .nav-item.active i,
         .nav-item.active span {
-            color: white;
+            color: var(--accent-light);
         }
 
         .sidebar-footer {
             margin-top: auto;
-            padding: 14px 8px 6px;
-            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 16px 10px 8px;
+            border-top: 1px solid var(--border);
             color: var(--text-on-dark-muted);
-            font-size: 12px;
+            font-size: 11px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 8px;
         }
 
         .sidebar-footer .chip {
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.10);
-            background: rgba(255,255,255,0.04);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-glass);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             white-space: nowrap;
+            font-size: 11px;
         }
 
         .sidebar-footer .chip i {
-            font-size: 12px;
+            font-size: 10px;
             color: var(--accent);
         }
 
@@ -202,14 +208,14 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: rgba(6, 8, 16, 0.62);
+            background: rgba(5, 8, 16, 0.40);
         }
 
         .main-content {
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: rgba(6, 8, 16, 0.38);
+            background: transparent;
         }
 
         .page {
@@ -218,12 +224,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            padding: 26px 30px;
+            padding: 28px 32px;
             overflow-y: auto;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(12px);
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+            transform: translateY(8px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
         }
 
         .page.active {
@@ -247,11 +253,11 @@
 
         /* 页面头部 */
         .page-header {
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
 
         .page-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 6px;
@@ -261,32 +267,33 @@
         .page-subtitle {
             font-size: 13px;
             color: var(--text-secondary);
+            font-weight: 400;
         }
 
-        /* 搜索栏 */
         .search-container {
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
 
         .search-bar {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 14px 18px;
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             gap: 14px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .search-bar:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-soft);
+            box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-md);
+            background: var(--bg-tertiary);
         }
 
         .search-bar i {
             color: var(--text-muted);
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .search-bar input {
@@ -296,41 +303,42 @@
             font-size: 14px;
             color: var(--text-primary);
             background: transparent;
+            font-weight: 400;
         }
 
         .search-bar input::placeholder {
             color: var(--text-muted);
         }
 
-        /* 快捷卡片 */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 36px;
         }
 
         .quick-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 20px;
+            padding: 18px;
             display: flex;
             align-items: center;
             gap: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .quick-card:hover {
-            border-color: var(--accent);
+            border-color: var(--border-hover);
             box-shadow: var(--shadow-md);
             transform: translateY(-2px);
+            background: var(--bg-tertiary);
         }
 
         .quick-icon {
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
@@ -339,71 +347,72 @@
         }
 
         .quick-icon i {
-            font-size: 20px;
+            font-size: 18px;
             color: white;
         }
 
-        .quick-icon.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+        .quick-icon.blue { background: linear-gradient(135deg, #3b82f6, #6366f1); }
         .quick-icon.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-        .quick-icon.teal { background: linear-gradient(135deg, #14b8a6, #5eead4); }
+        .quick-icon.teal { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
         .quick-icon.orange { background: linear-gradient(135deg, #f97316, #fb923c); }
 
         .quick-info h4 {
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .quick-info p {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-secondary);
         }
 
-        /* 区块标题 */
         .section-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-primary);
+            letter-spacing: -0.2px;
         }
 
         .section-link {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--accent);
             cursor: pointer;
             transition: color 0.2s ease;
+            font-weight: 500;
         }
 
         .section-link:hover {
             color: var(--accent-light);
         }
 
-        /* 歌单网格 */
         .playlist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+            gap: 18px;
         }
 
         .playlist-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 14px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .playlist-card:hover {
             box-shadow: var(--shadow-lg);
             transform: translateY(-4px);
+            border-color: var(--border-hover);
         }
 
         .playlist-cover {
@@ -422,13 +431,13 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
         }
 
         .playlist-cover i {
-            font-size: 32px;
+            font-size: 28px;
             color: white;
-            opacity: 0.95;
+            opacity: 0.9;
         }
 
         .playlist-cover.gradient-1 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
@@ -438,7 +447,7 @@
         .playlist-cover.gradient-5 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
 
         .playlist-title {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 3px;
@@ -448,45 +457,45 @@
         }
 
         .playlist-meta {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
         }
 
-        /* 歌曲列表 */
         .song-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
         }
 
         .song-item {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 12px 16px;
-            background: var(--bg-secondary);
+            gap: 14px;
+            padding: 10px 14px;
+            background: transparent;
             border: 1px solid transparent;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .song-item:hover {
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
             border-color: var(--border);
         }
 
         .song-index {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             width: 20px;
             text-align: center;
+            font-variant-numeric: tabular-nums;
         }
 
         .song-cover {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-sm);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             display: flex;
             align-items: center;
@@ -496,7 +505,7 @@
 
         .song-cover i {
             color: white;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .song-info {
@@ -505,7 +514,7 @@
         }
 
         .song-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text-primary);
             margin-bottom: 2px;
@@ -515,24 +524,31 @@
         }
 
         .song-artist {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-secondary);
         }
 
         .song-duration {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
         }
 
         .song-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .song-item:hover .song-actions {
+            opacity: 1;
         }
 
         .action-btn {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -544,7 +560,7 @@
         }
 
         .action-btn i {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted);
             transition: color 0.2s ease;
         }
@@ -558,54 +574,58 @@
         }
 
         .action-btn.liked i {
-            color: #ec4899;
+            color: var(--accent-hot);
         }
 
-        /* 统计卡片 */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 28px;
+            gap: 14px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: var(--radius-md);
             padding: 20px;
             text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-tertiary);
         }
 
         .stat-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 4px;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
         }
 
         .stat-label {
-            font-size: 13px;
+            font-size: 11.5px;
             color: var(--text-secondary);
         }
 
-        /* 设置 */
         .settings-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             overflow: hidden;
         }
 
         .settings-header {
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-bottom: 1px solid var(--border);
         }
 
         .settings-header h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -614,7 +634,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 20px;
+            padding: 12px 18px;
             border-bottom: 1px solid var(--border);
         }
 
@@ -623,15 +643,15 @@
         }
 
         .setting-label {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-primary);
         }
 
         .toggle {
-            width: 44px;
-            height: 24px;
+            width: 40px;
+            height: 22px;
             background: var(--border);
-            border-radius: 12px;
+            border-radius: 6px;
             position: relative;
             cursor: pointer;
             transition: background 0.25s ease;
@@ -644,24 +664,310 @@
         .toggle::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             background: white;
-            border-radius: 50%;
+            border-radius: 4px;
             top: 2px;
             left: 2px;
-            transition: transform 0.25s ease;
-            box-shadow: var(--shadow-sm);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
         .toggle.active::after {
-            transform: translateX(20px);
+            transform: translateX(18px);
+        }
+
+        .player-bar {
+            height: 68px;
+            background: rgba(8, 10, 20, 0.90);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+        }
+
+        .player-song {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 220px;
+            flex-shrink: 0;
+        }
+
+        .player-cover {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+        }
+
+        .player-cover i {
+            color: white;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .player-cover.playing {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.3); }
+            50% { box-shadow: 0 0 16px 4px rgba(167, 139, 250, 0.2); }
+        }
+
+        .player-info {
+            min-width: 0;
+        }
+
+        .player-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-artist {
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-like {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .player-like i {
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        .player-like:hover i {
+            color: var(--accent-hot);
+        }
+
+        .player-like.liked i {
+            color: var(--accent-hot);
+        }
+
+        .player-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ctrl-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .ctrl-btn i {
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+
+        .ctrl-btn:hover i {
+            color: var(--text-primary);
+        }
+
+        .ctrl-btn.play {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .ctrl-btn.play i {
+            color: var(--bg-primary);
+            font-size: 16px;
+            margin-left: 2px;
+        }
+
+        .ctrl-btn.play:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.4);
+        }
+
+        .ctrl-btn.active i {
+            color: var(--accent);
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            width: 36px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 1px;
+            position: relative;
+            cursor: pointer;
+            transition: height 0.15s ease;
+        }
+
+        .progress-bar:hover {
+            height: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 1px;
+            width: 35%;
+            position: relative;
+            transition: width 0.1s linear;
+            cursor: pointer;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            transition: transform 0.15s ease;
+        }
+
+        .progress-bar:hover .progress-fill::after {
+            transform: translateY(-50%) scale(1);
+        }
+
+        .player-extra {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 180px;
+            justify-content: flex-end;
+        }
+
+        .extra-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .extra-btn i {
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        .extra-btn:hover {
+            background: var(--bg-secondary);
+        }
+
+        .extra-btn:hover i {
+            color: var(--text-primary);
+        }
+
+        .extra-btn.active i {
+            color: var(--accent);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-bar {
+            width: 70px;
+            height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 1px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .volume-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 1px;
+            width: 70%;
         }
 
         /* 响应式 */
         @media (max-width: 900px) {
             .stats-row {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .player-extra {
+                display: none;
+            }
+            .player-song {
+                width: 180px;
             }
         }
 
@@ -680,6 +986,90 @@
                 justify-content: center;
                 padding: 12px 8px;
             }
+            .player-song {
+                width: auto;
+                flex: 1;
+            }
+            .progress-container {
+                display: none;
+            }
+            .player-bar {
+                padding: 0 12px;
+                gap: 12px;
+            }
+        }
+
+        .sound-wave {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+        }
+
+        .sound-wave span {
+            width: 2.5px;
+            background: var(--accent);
+            border-radius: 1px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+
+        .sound-wave span:nth-child(1) { animation-delay: 0s; height: 40%; }
+        .sound-wave span:nth-child(2) { animation-delay: 0.2s; height: 70%; }
+        .sound-wave span:nth-child(3) { animation-delay: 0.4s; height: 50%; }
+        .sound-wave span:nth-child(4) { animation-delay: 0.1s; height: 80%; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1); }
+        }
+
+        .playlist-play {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            width: 34px;
+            height: 34px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 16px rgba(167, 139, 250, 0.4);
+            cursor: pointer;
+            border: none;
+            z-index: 2;
+        }
+
+        .playlist-play i {
+            color: var(--bg-primary);
+            font-size: 13px;
+            margin-left: 2px;
+        }
+
+        .playlist-card:hover .playlist-play {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .playlist-play:hover {
+            transform: scale(1.08) !important;
+            box-shadow: 0 4px 24px rgba(167, 139, 250, 0.5);
+        }
+
+        .song-item.playing {
+            background: var(--accent-soft);
+            border-color: rgba(167, 139, 250, 0.2);
+        }
+
+        .song-item.playing .song-index {
+            color: var(--accent);
+        }
+
+        .song-item.playing .song-title {
+            color: var(--accent-light);
         }
     </style>
 </head>
@@ -746,10 +1136,10 @@
                 <main class="main-content">
                     <!-- 首页 -->
                     <div class="page active" id="page-home">
-                    <div class="page-header">
-                        <h1 class="page-title">下午好</h1>
-                        <p class="page-subtitle">发现适合现在聆听的音乐</p>
-                    </div>
+                        <div class="page-header">
+                            <h1 class="page-title">下午好</h1>
+                            <p class="page-subtitle">发现适合现在聆听的音乐</p>
+                        </div>
 
                     <div class="quick-actions">
                         <div class="quick-card">
@@ -841,27 +1231,42 @@
                     </div>
                     <div class="playlist-grid">
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-1"><i class="fas fa-headphones-alt"></i></div>
+                            <div class="playlist-cover gradient-1">
+                                <i class="fas fa-headphones-alt"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">深夜独处时光</div>
                             <div class="playlist-meta">42 首歌曲</div>
                         </div>
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-2"><i class="fas fa-sun"></i></div>
+                            <div class="playlist-cover gradient-2">
+                                <i class="fas fa-sun"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">清晨唤醒</div>
                             <div class="playlist-meta">28 首歌曲</div>
                         </div>
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-3"><i class="fas fa-coffee"></i></div>
+                            <div class="playlist-cover gradient-3">
+                                <i class="fas fa-coffee"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">咖啡时光</div>
                             <div class="playlist-meta">35 首歌曲</div>
                         </div>
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-4"><i class="fas fa-running"></i></div>
+                            <div class="playlist-cover gradient-4">
+                                <i class="fas fa-running"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">运动燃脂</div>
                             <div class="playlist-meta">50 首歌曲</div>
                         </div>
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-5"><i class="fas fa-heart"></i></div>
+                            <div class="playlist-cover gradient-5">
+                                <i class="fas fa-heart"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">甜蜜情歌</div>
                             <div class="playlist-meta">38 首歌曲</div>
                         </div>
@@ -946,17 +1351,26 @@
                     </div>
                     <div class="playlist-grid">
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-1"><i class="fas fa-star"></i></div>
+                            <div class="playlist-cover gradient-1">
+                                <i class="fas fa-star"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">我的收藏</div>
                             <div class="playlist-meta">128 首歌曲</div>
                         </div>
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-2"><i class="fas fa-car"></i></div>
+                            <div class="playlist-cover gradient-2">
+                                <i class="fas fa-car"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">驾车必备</div>
                             <div class="playlist-meta">45 首歌曲</div>
                         </div>
                         <div class="playlist-card">
-                            <div class="playlist-cover gradient-3"><i class="fas fa-laptop-code"></i></div>
+                            <div class="playlist-cover gradient-3">
+                                <i class="fas fa-laptop-code"></i>
+                                <button class="playlist-play"><i class="fas fa-play"></i></button>
+                            </div>
                             <div class="playlist-title">工作专注</div>
                             <div class="playlist-meta">62 首歌曲</div>
                         </div>
@@ -1124,6 +1538,69 @@
                     </div>
                     </div>
                 </main>
+
+                <!-- 底部播放器 -->
+                <div class="player-bar">
+                    <div class="player-song">
+                        <div class="player-cover playing">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="player-info">
+                            <div class="player-title">夜曲</div>
+                            <div class="player-artist">周杰伦</div>
+                        </div>
+                        <button class="player-like liked">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+
+                    <div class="player-controls">
+                        <div class="control-buttons">
+                            <button class="ctrl-btn" title="随机播放">
+                                <i class="fas fa-random"></i>
+                            </button>
+                            <button class="ctrl-btn" title="上一首">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button class="ctrl-btn play" id="playBtn" title="播放/暂停">
+                                <i class="fas fa-pause"></i>
+                            </button>
+                            <button class="ctrl-btn" title="下一首">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                            <button class="ctrl-btn active" title="单曲循环">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                        <div class="progress-container">
+                            <span class="progress-time">1:32</span>
+                            <div class="progress-bar" id="progressBar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <span class="progress-time">4:25</span>
+                        </div>
+                    </div>
+
+                    <div class="player-extra">
+                        <div class="sound-wave" id="soundWave">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="volume-control">
+                            <button class="extra-btn active" title="音量">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <div class="volume-bar">
+                                <div class="volume-fill"></div>
+                            </div>
+                        </div>
+                        <button class="extra-btn" title="播放列表">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1168,6 +1645,116 @@
                     }
                 });
             }
+        });
+
+        // 播放器控制
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = playBtn.querySelector('i');
+        const soundWave = document.getElementById('soundWave');
+        const playerCover = document.querySelector('.player-cover');
+        let isPlaying = true;
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
+                soundWave.style.display = 'flex';
+                playerCover.classList.add('playing');
+            } else {
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+                soundWave.style.display = 'none';
+                playerCover.classList.remove('playing');
+            }
+        });
+
+        // 播放进度条
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = ((e.clientX - rect.left) / rect.width) * 100;
+            progressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+        });
+
+        // 歌曲点击播放
+        document.querySelectorAll('.song-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.closest('.action-btn')) return;
+                
+                document.querySelectorAll('.song-item').forEach(i => i.classList.remove('playing'));
+                item.classList.add('playing');
+                
+                const title = item.querySelector('.song-title').textContent;
+                const artist = item.querySelector('.song-artist').textContent.split('·')[0].trim();
+                
+                document.querySelector('.player-title').textContent = title;
+                document.querySelector('.player-artist').textContent = artist;
+                
+                if (!isPlaying) {
+                    playBtn.click();
+                }
+            });
+        });
+
+        // 歌单播放按钮
+        document.querySelectorAll('.playlist-play').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const card = btn.closest('.playlist-card');
+                const title = card.querySelector('.playlist-title').textContent;
+                
+                document.querySelector('.player-title').textContent = title;
+                document.querySelector('.player-artist').textContent = '歌单播放';
+                
+                if (!isPlaying) {
+                    playBtn.click();
+                }
+            });
+        });
+
+        // 播放器喜欢按钮
+        document.querySelector('.player-like').addEventListener('click', function() {
+            this.classList.toggle('liked');
+            const icon = this.querySelector('i');
+            if (this.classList.contains('liked')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+        });
+
+        // 控制按钮高亮
+        document.querySelectorAll('.ctrl-btn:not(.play)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.querySelector('.fa-random') || this.querySelector('.fa-redo')) {
+                    this.classList.toggle('active');
+                }
+            });
+        });
+
+        // 音量控制
+        document.querySelector('.volume-bar').addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const percent = ((e.clientX - rect.left) / rect.width) * 100;
+            this.querySelector('.volume-fill').style.width = `${Math.max(0, Math.min(100, percent))}%`;
+        });
+
+        // 快捷卡片点击
+        document.querySelectorAll('.quick-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('h4').textContent;
+                document.querySelector('.player-title').textContent = title;
+                document.querySelector('.player-artist').textContent = '正在播放...';
+                
+                if (!isPlaying) {
+                    playBtn.click();
+                }
+            });
         });
     </script>
 </body>
