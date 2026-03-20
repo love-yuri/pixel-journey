@@ -85,7 +85,7 @@ void RenderSvg::rasterize() {
     return;
   }
 
-  auto surface = SkSurfaces::RenderTarget(
+  const auto surface = SkSurfaces::RenderTarget(
     vulkan_context->skia_direct_context.get(),
     gpu::Budgeted::kNo,
     SkImageInfo::MakeN32Premul(w, h)

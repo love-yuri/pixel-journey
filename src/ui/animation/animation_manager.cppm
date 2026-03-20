@@ -21,7 +21,7 @@ class AnimationManager {
   LinearAnimation<float> animations {};
 
 public:
-  using Setter = LinearAnimation<float>::Setter;
+  using Setter = function_ref<void(const float&)>;
 
   /**
    * 更新渲染帧周期
@@ -46,7 +46,7 @@ public:
    * @param duration 持续时间-ms
    * @param setter 设置回调
    */
-  void start(float from, float to, float duration, LinearAnimation<float>::Setter setter);
+  void start(float from, float to, float duration, Setter setter);
 
   /**
    * 开启动画
@@ -62,14 +62,14 @@ public:
 
 template <auto ptr, typename TObject>
 void AnimationManager::start(const float from, const float to, const float duration, TObject *obj) {
-  start(from, to, duration, LinearAnimation<float>::Setter::from<ptr, TObject>(obj));
+  start(from, to, duration, std::move(Setter::from<ptr, TObject>(obj)));
 }
 
 void AnimationManager::start(const float from, const float to, const float duration, float *value) {
   animations.start(clock.now, from, to, duration, value);
 }
 
-void AnimationManager::start(const float from, const float to, const float duration, const LinearAnimation<float>::Setter setter) {
+void AnimationManager::start(const float from, const float to, const float duration, const Setter setter) {
   animations.start(clock.now, from, to, duration, std::move(setter));
 }
 
