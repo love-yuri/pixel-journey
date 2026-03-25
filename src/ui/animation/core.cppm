@@ -24,7 +24,4 @@ public:
   virtual bool update(std::uint64_t now) = 0;
 };
 
-template <typename T>
-concept CanAnimation = requires(T a, T b, float t) { a + b; a - b; a * t; };
-
 } // namespace ui::animation

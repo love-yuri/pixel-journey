@@ -5,21 +5,19 @@
 export module ui.animation:linear_animation;
 
 import :core;
+import skia;
 import yuri_log;
 import profiling;
+import ui.algorithm;
 import std;
 
 using namespace profiling;
+using namespace ui::algorithm;
+using namespace skia;
 
 export namespace ui::animation {
 
-// 线性插值
-template <CanAnimation T>
-[[nodiscard]] T lerp(const T &from, const T &to, float t) noexcept {
-  return from + (to - from) * t;
-}
-
-template <CanAnimation T>
+template <CanLerp T>
 class LinearAnimation : public IAnimation {
 public:
   using Setter = function_ref<void(const T&)>;
@@ -39,12 +37,12 @@ private:
   Setter setter;       // setter
 };
 
-template <CanAnimation T>
+template <CanLerp T>
 LinearAnimation<T>::LinearAnimation(const T &from, const T &to, const float duration, Setter setter) noexcept :
   from(from), to(to), inv_dur(1.f / (duration * 1000.f)), start(frame_clock.now), setter(std::move(setter)) {
 }
 
-template <CanAnimation T>
+template <CanLerp T>
 bool LinearAnimation<T>::update(const std::uint64_t now) {
   if (float t = static_cast<float>(now - start) * inv_dur; t >= 1.f) {
     setter(to);
