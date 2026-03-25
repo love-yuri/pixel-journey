@@ -86,6 +86,9 @@ using ::SkString;
 using ::SkSVGDOM;
 using ::SkSize;
 using ::SkFILEStream;
+using ::SkColorToHSV;
+using ::SkHSVToColor;
+using ::SkScalar;
 
 /* 字体相关 */
 #if defined(_WIN32)
