@@ -8,6 +8,8 @@ import :window_base;
 import skia.api;
 import yuri_log;
 import ui.layout;
+import ui.animation;
+import utils.type_traits;
 import std;
 import signal;
 
@@ -373,6 +375,17 @@ public:
    * 更新孩子布局
    */
   virtual void layoutChildren();
+
+  /**
+   * 开启一段线动画
+   * @tparam ptr 成员函数指针
+   * @tparam T 参数类型
+   * @param from 起始值
+   * @param to 目标值
+   * @param duration 持续时间
+   */
+  template <auto ptr, typename T>
+  void startAnimation(const T& from, const T& to, float duration) noexcept;
 };
 
 void Widget::addWidget(Widget * widget) {
@@ -537,6 +550,12 @@ void Widget::setLayout() {
   static_assert(std::is_base_of_v<Layout<Widget>, LayoutType>, "LayoutType must inherit from Layout<Widget>");
   layout_ = std::make_unique<LayoutType>(this);
   has_layout = true;
+}
+
+template <auto ptr, typename T>
+void Widget::startAnimation(const T &from, const T &to, float duration) noexcept {
+  using ClassType = utils::meta::member_class_t<decltype(ptr)>;
+  animation_manager->start<ptr>(from, to, duration, static_cast<ClassType*>(this));
 }
 
 void Widget::removeLayout() {
