@@ -5,3 +5,4 @@
 export module profiling;
 
 export import :fps_counter;
+export import :frame_clock;

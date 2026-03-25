@@ -5,6 +5,7 @@ import glfw.api;
 import glfw.context;
 import vulkan;
 import configuration;
+import profiling;
 import skia;
 import yuri_log;
 import std;
@@ -189,6 +190,9 @@ void Window::run() {
     // 获取下一帧图像
     const auto frame = acquireNextFrame();
     frame->begin_frame();
+
+    // 更新clock
+    profiling::frame_clock.update();
 
     // 更新动画
     animation_manager->update();
