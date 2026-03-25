@@ -37,6 +37,9 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/types/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/core/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/layout/layouts/*.cppm
+
+    # ui - algorithm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/algorithm/*.cppm
 )
 
 # 收集源文件
