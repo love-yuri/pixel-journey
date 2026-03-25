@@ -10,6 +10,12 @@ import std;
 
 using namespace ui::animation;
 
+// setter 函数
+template<typename T>
+void setter_fn(void* p, const T& v) noexcept {
+  *static_cast<T*>(p) = v;
+}
+
 export namespace ui::animation {
 
 /**
@@ -17,12 +23,7 @@ export namespace ui::animation {
  * 使用方法: 1: animation_manager->start(0.f, 30.f, 100, this, &memberThunk<Box, float, &Box::setPadding>);
  */
 class AnimationManager {
-  FrameClock clock; // 动画计时clock
-  LinearAnimation<float> animations {};
-
 public:
-  using Setter = function_ref<void(const float&)>;
-
   /**
    * 更新渲染帧周期
    */
@@ -36,17 +37,8 @@ public:
    * @param duration 持续时间-ms
    * @param value value指针
    */
-  void start(float from, float to, float duration, float* value);
-
-  /**
-   * 开启动画
-   * @tparam T 参数类型
-   * @param from 起始参数
-   * @param to 目标参数
-   * @param duration 持续时间-ms
-   * @param setter 设置回调
-   */
-  void start(float from, float to, float duration, Setter setter);
+  template <typename T>
+  void start(const T &from, const T & to, float duration, T* value);
 
   /**
    * 开启动画
@@ -55,29 +47,48 @@ public:
    * @param duration 持续时间-ms
    * @param obj this 对象
    */
-  template<auto ptr, typename TObject>
-  void start(float from, float to, float duration, TObject* obj);
+  template<auto ptr, typename TObject, typename T>
+  void start(const T& from, const T& to, float duration, TObject* obj);
 
+private:
+  std::vector<std::unique_ptr<IAnimation>> animations_; // 动画合集
 };
 
-template <auto ptr, typename TObject>
-void AnimationManager::start(const float from, const float to, const float duration, TObject *obj) {
-  start(from, to, duration, std::move(Setter::from<ptr, TObject>(obj)));
+template <typename T>
+void AnimationManager::start(const T &from, const T &to, float duration, T *value) {
+  animations_.emplace_back(
+    std::make_unique<LinearAnimation<T>>(
+      from, to, duration,
+      typename LinearAnimation<T>::Setter {
+        value, &setter_fn<T>
+      }
+    )
+  );
 }
 
-void AnimationManager::start(const float from, const float to, const float duration, float *value) {
-  animations.start(clock.now, from, to, duration, value);
-}
-
-void AnimationManager::start(const float from, const float to, const float duration, const Setter setter) {
-  animations.start(clock.now, from, to, duration, std::move(setter));
+template <auto ptr, typename TObject, typename T>
+void AnimationManager::start(const T &from, const T &to, float duration, TObject *obj) {
+  animations_.emplace_back(
+    std::make_unique<LinearAnimation<T>>(
+      from, to, duration,
+      LinearAnimation<T>::Setter::template from<ptr>(obj)
+    )
+  );
 }
 
 } // namespace ui::animation
 
 void AnimationManager::update() {
-  clock.update();
-  animations.update(clock.now);
+  std::size_t i = 0;
+
+  while (i < this->animations_.size()) {
+    if (const auto &animation = animations_[i]; animation->update(frame_clock.now)) {
+      animations_[i] = std::move(animations_.back());
+      animations_.pop_back();
+    } else {
+      i++;
+    }
+  }
 }
 
 auto animation_manager_ = std::make_shared<AnimationManager>();
