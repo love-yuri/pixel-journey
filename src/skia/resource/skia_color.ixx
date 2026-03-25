@@ -52,38 +52,28 @@ constexpr SkColor accent_blue = ColorFromARGB(0xFF, 0x00, 0x78, 0xD7);
 constexpr SkColor accent_green = ColorFromARGB(0xFF, 0x00, 0xC8, 0x53);
 constexpr SkColor accent_red = ColorFromARGB(0xFF, 0xE8, 0x11, 0x23);
 
-SkColor LerpHSV(const SkColor c1, const SkColor c2, float t) {
-  t = std::clamp(t, 0.0f, 1.0f);
-
+SkColor LerpHSV(const SkColor c1, const SkColor c2, const float t) noexcept {
   // 1. 转 HSV
   SkScalar hsv1[3], hsv2[3];
   SkColorToHSV(c1, hsv1);
   SkColorToHSV(c2, hsv2);
 
-  // 2. 处理 Hue
-  const float h1 = hsv1[0];
-  const float h2 = hsv2[0];
+  // 2. Hue 最短路径插值
+  const float dh = std::fmod(hsv2[0] - hsv1[0] + 540.0f, 360.0f) - 180.0f;
+  const float h  = std::fmod(hsv1[0] + dh * t + 360.0f, 360.0f);
 
-  float dh = h2 - h1;
-  if (dh > 180.0f) dh -= 360.0f;
-  if (dh < -180.0f) dh += 360.0f;
-
-  float h = h1 + dh * t;
-
-  // 保证在 [0, 360)
-  if (h < 0) h += 360.0f;
-  if (h >= 360) h -= 360.0f;
-
-  // 3. 插值 S / V
+  // 3. S / V 插值
   const float s = hsv1[1] + (hsv2[1] - hsv1[1]) * t;
   const float v = hsv1[2] + (hsv2[2] - hsv1[2]) * t;
 
-  // 4. 插值透明度
-  const float a = SkColorGetA(c1) + static_cast<float>(SkColorGetA(c2) - SkColorGetA(c1)) * t;
+  // 4. Alpha 插值
+  const float a1 = static_cast<float>(SkColorGetA(c1));
+  const float a2 = static_cast<float>(SkColorGetA(c2));
+  const auto  a  = static_cast<uint8_t>(a1 + (a2 - a1) * t);
 
   // 5. 转回 RGB
   const SkScalar hsv[3] = {h, s, v};
-  return SkHSVToColor(static_cast<std::uint8_t>(a), hsv);
+  return SkHSVToColor(a, hsv);
 }
 
 } // namespace skia_colors
