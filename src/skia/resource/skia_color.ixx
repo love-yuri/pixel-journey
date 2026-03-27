@@ -33,13 +33,13 @@ constexpr SkColor magenta = ColorFromARGB(0xFF, 0xFF, 0x00, 0xFF);
 constexpr SkColor orange = ColorFromARGB(0xFF, 0xFF, 0xA5, 0x00);
 
 // 柔和粉色系
-constexpr SkColor pink = ColorFromARGB(0xFF, 0xFF, 0xC0, 0xCB);          // 经典粉
-constexpr SkColor light_pink = ColorFromARGB(0xFF, 0xFF, 0xB6, 0xC1);    // 浅粉
-constexpr SkColor misty_rose = ColorFromARGB(0xFF, 0xFF, 0xE4, 0xE1);    // 雾玫瑰
-constexpr SkColor peach = ColorFromARGB(0xFF, 0xFF, 0xDA, 0xB9);         // 桃粉
-constexpr SkColor lavender_blush = ColorFromARGB(0xFF, 0xFF, 0xF0, 0xF5);// 淡紫粉
-constexpr SkColor rose = ColorFromARGB(0xFF, 0xF4, 0xC2, 0xC2);          // 玫瑰粉
-constexpr SkColor coral_pink = ColorFromARGB(0xFF, 0xFF, 0xB3, 0xBA);    // 珊瑚粉
+constexpr SkColor pink = ColorFromARGB(0xFF, 0xFF, 0xC0, 0xCB);           // 经典粉
+constexpr SkColor light_pink = ColorFromARGB(0xFF, 0xFF, 0xB6, 0xC1);     // 浅粉
+constexpr SkColor misty_rose = ColorFromARGB(0xFF, 0xFF, 0xE4, 0xE1);     // 雾玫瑰
+constexpr SkColor peach = ColorFromARGB(0xFF, 0xFF, 0xDA, 0xB9);          // 桃粉
+constexpr SkColor lavender_blush = ColorFromARGB(0xFF, 0xFF, 0xF0, 0xF5); // 淡紫粉
+constexpr SkColor rose = ColorFromARGB(0xFF, 0xF4, 0xC2, 0xC2);           // 玫瑰粉
+constexpr SkColor coral_pink = ColorFromARGB(0xFF, 0xFF, 0xB3, 0xBA);     // 珊瑚粉
 
 // 状态 / 功能色
 constexpr SkColor transparent = ColorFromARGB(0x00, 0x00, 0x00, 0x00);
@@ -59,7 +59,7 @@ SkColor LerpHSV(const SkColor c1, const SkColor c2, const float t) noexcept {
 
   // 2. Hue 最短路径插值
   const float dh = std::fmod(hsv2[0] - hsv1[0] + 540.0f, 360.0f) - 180.0f;
-  const float h  = std::fmod(hsv1[0] + dh * t + 360.0f, 360.0f);
+  const float h = std::fmod(hsv1[0] + dh * t + 360.0f, 360.0f);
 
   // 3. S / V 插值
   const float s = hsv1[1] + (hsv2[1] - hsv1[1]) * t;
@@ -68,11 +68,11 @@ SkColor LerpHSV(const SkColor c1, const SkColor c2, const float t) noexcept {
   // 4. Alpha 插值
   const float a1 = static_cast<float>(SkColorGetA(c1));
   const float a2 = static_cast<float>(SkColorGetA(c2));
-  const auto  a  = static_cast<std::uint8_t>(a1 + (a2 - a1) * t);
+  const auto a = static_cast<std::uint8_t>(a1 + (a2 - a1) * t);
 
   // 5. 转回 RGB
   const SkScalar hsv[3] = {h, s, v};
   return HSVToColor(a, hsv);
 }
 
-} // namespace skia_colors
+} // namespace skia::skia_colors
