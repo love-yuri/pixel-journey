@@ -15,10 +15,7 @@ export namespace ui::render {
 
 class RenderBackground : public RenderNode {
   using RenderNode::RenderNode;
-  SkPaint paint = PaintDesc {
-    .color = skia_colors::transparent,
-    .style = SkPaint::kFill_Style
-  };
+  SkPaint paint = PaintDesc{.color = skia_colors::transparent, .style = SkPaint::kFill_Style};
 
 public:
   float *radius = nullptr; // 圆角大小
@@ -35,7 +32,6 @@ public:
   inline void setOpacity(const float opacity) noexcept {
     paint.setAlphaf(opacity);
   }
-
 };
 
 void RenderBackground::render(SkCanvas *canvas) {
