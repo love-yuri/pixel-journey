@@ -96,7 +96,7 @@ public:
    * 发送信号
    * @param args 参数
    */
-  inline void emit(Args&&... args) {
+  inline void emit(Args... args) {
     for (auto & slot: slots) {
       slot(std::forward<Args>(args)...);
     }
