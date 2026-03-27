@@ -86,8 +86,6 @@ using ::SkString;
 using ::SkSVGDOM;
 using ::SkSize;
 using ::SkFILEStream;
-using ::SkColorToHSV;
-using ::SkHSVToColor;
 using ::SkScalar;
 
 /* 字体相关 */
@@ -104,6 +102,18 @@ using ::SkFontScanner_Make_FreeType;
 constexpr SkColor ColorFromARGB(const U8CPU a,const U8CPU r, const U8CPU g, const U8CPU b) noexcept {
   return SkASSERT(a <= 255 && r <= 255 && g <= 255 && b <= 255), (a << 24 | r << 16 | g << 8 | b << 0);
 }
+
+/**
+ * 将color转hsv
+ * @param color  原颜色
+ * @param hsv hsv数组
+ */
+void ColorToHSV(const SkColor color, SkScalar hsv[3]) { return SkColorToHSV(color, hsv); }
+
+/**
+ * hsv转color
+ */
+SkColor HSVToColor(const U8CPU alpha, const SkScalar hsv[3]) { return SkHSVToColor(alpha, hsv); }
 
 } // namespace skia
 

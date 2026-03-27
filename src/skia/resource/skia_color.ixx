@@ -1,14 +1,13 @@
 //
 // Created by love-yuri on 2026/1/13.
 //
-module;
-#include "include/core/SkColor.h"
+
 export module skia.resource:color;
+
+#define SkColorGetA(color) (((color) >> 24) & 0xFF)
 
 import skia.api;
 import std;
-
-#define SkColorGetA(color)      (((color) >> 24) & 0xFF)
 
 /**
  * 常用颜色
@@ -55,8 +54,8 @@ constexpr SkColor accent_red = ColorFromARGB(0xFF, 0xE8, 0x11, 0x23);
 SkColor LerpHSV(const SkColor c1, const SkColor c2, const float t) noexcept {
   // 1. 转 HSV
   SkScalar hsv1[3], hsv2[3];
-  SkColorToHSV(c1, hsv1);
-  SkColorToHSV(c2, hsv2);
+  ColorToHSV(c1, hsv1);
+  ColorToHSV(c2, hsv2);
 
   // 2. Hue 最短路径插值
   const float dh = std::fmod(hsv2[0] - hsv1[0] + 540.0f, 360.0f) - 180.0f;
@@ -69,11 +68,11 @@ SkColor LerpHSV(const SkColor c1, const SkColor c2, const float t) noexcept {
   // 4. Alpha 插值
   const float a1 = static_cast<float>(SkColorGetA(c1));
   const float a2 = static_cast<float>(SkColorGetA(c2));
-  const auto  a  = static_cast<uint8_t>(a1 + (a2 - a1) * t);
+  const auto  a  = static_cast<std::uint8_t>(a1 + (a2 - a1) * t);
 
   // 5. 转回 RGB
   const SkScalar hsv[3] = {h, s, v};
-  return SkHSVToColor(a, hsv);
+  return HSVToColor(a, hsv);
 }
 
 } // namespace skia_colors
