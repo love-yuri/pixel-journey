@@ -21,9 +21,10 @@ using namespace ui::layout;
 using namespace skia;
 using namespace ui::animation;
 
+class SplitterLayout;
+
 export namespace ui::widgets {
 
-// 布局方式
 enum class SplitterOrientation {
   Horizontal,
   Vertical,
@@ -31,16 +32,16 @@ enum class SplitterOrientation {
 
 class SplitterHandle {
 public:
-  static constexpr auto default_handle_width = 1; // 默认handle宽度
-  static constexpr auto default_handle_x = 200;   // 默认handle起步x
-  explicit SplitterHandle(Widget &widget, const SplitterOrientation orientation = SplitterOrientation::Horizontal) noexcept
-    : orientation_(orientation),
-      widget_(widget) {
+  static constexpr auto default_handle_width = 1;
+  static constexpr auto default_handle_x = 200;
 
+  explicit SplitterHandle(
+    Widget &widget,
+    const SplitterOrientation orientation = SplitterOrientation::Horizontal) noexcept :
+    orientation_(orientation), widget_(widget) {
     update();
   }
 
-  // 更新布局
   void update() {
     if (orientation_ == SplitterOrientation::Horizontal) {
       handle_rect.setXYWH(default_handle_x, 0, default_handle_width, widget_.contentHeight());
@@ -49,22 +50,18 @@ public:
     }
   }
 
-  // 更新位置
   void move(const float x, const float y) {
     handle_rect.setXYWH(x, y, default_handle_width, widget_.contentHeight());
   }
 
-  // 更新位置
   void move(const float x) {
     handle_rect.setXYWH(handle_rect.x() + x, 0, default_handle_width, widget_.contentHeight());
   }
 
-  // 绘制
   void draw(SkCanvas *canvas) const {
     canvas->drawRect(handle_rect, sk_paint);
   }
 
-  // 设置handle的宽度
   void setHandleWidth(const float width) {
     if (orientation_ == SplitterOrientation::Horizontal) {
       const float center_x = handle_rect.centerX();
@@ -75,68 +72,110 @@ public:
     }
   }
 
-  // 判断鼠标是否在矩形内
   [[nodiscard]] bool contains(const float x, const float y) const {
     return x > handle_rect.x() - 5 && x < handle_rect.right() + 5;
   }
 
-  // 获取矩形边界
   [[nodiscard]] const SkRect &bounds() const {
     return handle_rect;
   }
 
 protected:
-  SkRect handle_rect{};             // 中间拖动条
-  SplitterOrientation orientation_; // 排布方式
-  Widget &widget_;                  // 父控件
-  SkPaint sk_paint = SkPaintBuilder()
-    .setColor(skia_colors::gray)
-    .build();
+  SkRect handle_rect{};
+  SplitterOrientation orientation_;
+  Widget &widget_;
+  SkPaint sk_paint = SkPaintBuilder().setColor(skia_colors::gray).build();
 };
 
 class Splitter : public Widget {
+  friend class SplitterLayout;
 
 public:
-  explicit Splitter(Widget *parent) : Widget(parent) {
-    has_layout = true;
+  explicit Splitter(Widget *parent);
+
+  [[nodiscard]] const std::vector<SplitterHandle> &handles() const noexcept {
+    return handles_;
   }
 
-protected:
   void render(SkCanvas *canvas) override;
   void addWidget(Widget *widget) override;
   void layoutChildren() override;
+
+protected:
   void onMouseMove(float x, float y) override;
   void onMouseLeftPressed(float x, float y) override;
   void onMouseLeftReleased(float x, float y) override;
 
 private:
-  std::vector<SplitterHandle> handles_; // 间隔条
-  SkPoint last_point{};                 // 上次点击点
-  bool is_clicked = false;              // 是否被点击
-  SplitterOrientation orientation_{};   // 排布方式
-  std::size_t last_layout_handle_size = 0;
-  SplitterHandle* selected_handle = nullptr;
+  std::vector<SplitterHandle> handles_;
+  SkPoint last_point{};
+  bool is_clicked = false;
+  SplitterOrientation orientation_{};
+  SplitterHandle *selected_handle = nullptr;
 };
+
+/**
+ * Splitter布局策略 - 根据handle位置划分子控件空间
+ * 仅在Splitter内部使用
+ */
+class SplitterLayout : public Layout<Widget> {
+public:
+  explicit SplitterLayout(Widget *widget) : Layout(widget) {
+  }
+
+  void apply() const override {
+    const auto &children = widget_->children();
+    const auto child_count = children.size();
+    if (child_count == 0) return;
+
+    const auto *splitter = static_cast<const Splitter *>(widget_);
+    const auto &handles = splitter->handles();
+    const auto h = handles.size();
+    const auto content_w = widget_->contentWidth();
+    const auto content_h = widget_->contentHeight();
+
+    if (h == 0) {
+      const float w = content_w / static_cast<float>(child_count);
+      float x = 0;
+      for (const auto &child : children) {
+        setGeometry(child, x, 0, w, content_h);
+        x += w;
+      }
+      return;
+    }
+
+    setGeometry(children[0], 0, 0, handles[0].bounds().x(), content_h);
+
+    for (std::size_t i = 1; i < h; ++i) {
+      const float left = handles[i - 1].bounds().right();
+      const float right = handles[i].bounds().x();
+      setGeometry(children[i], left, 0, right - left, content_h);
+    }
+
+    setGeometry(children[h], handles[h - 1].bounds().right(), 0,
+                content_w - handles[h - 1].bounds().right(), content_h);
+  }
+};
+
+Splitter::Splitter(Widget *parent) : Widget(parent) {
+  setLayout<SplitterLayout>();
+}
 
 void Splitter::render(SkCanvas *canvas) {
   canvas->save();
 
-  // 变换到self_box
   canvas->translate(x_, y_);
-
-  // 绘制自身
   paint(canvas);
 
-  // 变换后绘制children
   canvas->translate(padding_.left, padding_.top);
 
-  // 绘制child
-  for (const auto child : children_) {
-    child->render(canvas);
+  for (const auto &child : children_) {
+    if (child->visible()) {
+      child->render(canvas);
+    }
   }
 
-  // 绘制间隔条
-  for (auto& handle : handles_) {
+  for (auto &handle : handles_) {
     handle.draw(canvas);
   }
 
@@ -145,39 +184,18 @@ void Splitter::render(SkCanvas *canvas) {
 
 void Splitter::addWidget(Widget *widget) {
   Widget::addWidget(widget);
-  yuri::info("add widget");
-  if (children_.size() < 2) {
-    return;
+  if (children_.size() >= 2) {
+    handles_.emplace_back(*this, orientation_);
   }
-  handles_.emplace_back(*this, orientation_);
   markLayoutDirty();
 }
 
 void Splitter::layoutChildren() {
-  const auto handle_size = handles_.size();
-  const auto w = (contentWidth() - handle_size * SplitterHandle::default_handle_width) / (handle_size + 1);
-  if (last_layout_handle_size != handle_size) {
-    for (auto i = 0u; i < handles_.size(); ++i) {
-      auto &handle = handles_[i];
-      handle.move((i + 1) * w + i * SplitterHandle::default_handle_width, 0);
-    }
-    last_layout_handle_size = handle_size;
+  if (layout_) {
+    layout_->apply();
   }
 
-  for (auto i = 0u; i < children_.size(); ++i) {
-    if (i == 0) {
-      const auto &handle = handles_[0];
-      const auto child = children_[i];
-      setGeometry(child, 0, 0, handle.bounds().x(), contentHeight());
-    } else {
-      const auto &handle = handles_[i - 1];
-      const auto child = children_[i];
-      setGeometry(child, handle.bounds().right(), 0, contentWidth() - handle.bounds().right(), contentHeight());
-    }
-  }
-
-  // 更新子控件布局
-  for (const auto child : this->children_) {
+  for (const auto &child : children_) {
     child->updateLayout();
   }
 }
@@ -191,7 +209,6 @@ void Splitter::onMouseMove(const float x, const float y) {
         handle.setHandleWidth(5);
         break;
       }
-
       handle.setHandleWidth(SplitterHandle::default_handle_width);
     }
 
@@ -224,8 +241,10 @@ void Splitter::onMouseLeftPressed(const float x, const float y) {
 
 void Splitter::onMouseLeftReleased(const float x, const float y) {
   is_clicked = false;
-  selected_handle->setHandleWidth(SplitterHandle::default_handle_width);
-  selected_handle = nullptr;
+  if (selected_handle) {
+    selected_handle->setHandleWidth(SplitterHandle::default_handle_width);
+    selected_handle = nullptr;
+  }
   window()->setCursor(CursorType::Arrow);
 }
 

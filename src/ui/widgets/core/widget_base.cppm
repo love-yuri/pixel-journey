@@ -123,23 +123,6 @@ protected:
    */
   void markLayoutDirty(LayoutDirty reason = LayoutDirty::Self);
 
-  /**
-   * 设置控件几何状态-内部或者给布局系统使用
-   * @param widget 待设置的控件
-   * @param rect 控件所占rect，基于父控件
-   */
-  static void setGeometry(Widget* widget, const SkRect &rect) noexcept;
-
-  /**
-   * 设置控件几何状态-内部或者给布局系统使用
-   * @param widget 待设置的控件
-   * @param x 相对于父控件：x
-   * @param y 相对于父控件: y
-   * @param width 控件宽度
-   * @param height 控件高度
-   */
-  static void setGeometry(Widget* widget, float x, float y, float width, float height) noexcept;
-
 public:
   virtual ~Widget();
 
@@ -427,23 +410,6 @@ void Widget::markLayoutDirty(const LayoutDirty reason) {
   }
 }
 
-
-void Widget::setGeometry(Widget *widget, const SkRect &rect) noexcept {
-  widget->x_ = rect.x();
-  widget->y_ = rect.y();
-  widget->width_ = rect.width();
-  widget->height_ = rect.height();
-  widget->markLayoutDirty(LayoutDirty::Self);
-}
-
-void Widget::setGeometry(Widget *widget, const float x, const float y, const float width, float const height) noexcept {
-  widget->x_ = x;
-  widget->y_ = y;
-  widget->width_ = width;
-  widget->height_ = height;
-  widget->markLayoutDirty(LayoutDirty::Self);
-}
-
 void Widget::updateLayout() {
   // 无需更新
   if (layout_dirty == LayoutDirty::None) {
@@ -483,11 +449,9 @@ Widget::~Widget() {
 }
 
 Widget::Widget(Widget *parent): parent_(parent) {
-  if (parent == nullptr) {
-    return;
+  if (parent != nullptr) {
+    parent_->addWidget(this);
   }
-
-  parent_->addWidget(this);
 }
 
 WindowBase *Widget::window() {
