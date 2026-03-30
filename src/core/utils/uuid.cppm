@@ -14,12 +14,12 @@ namespace utils::uuid {
  */
 export [[nodiscard]] std::string generate() {
   // clang-format off
-  thread_local std::mt19937_64 rng {
-    std::random_device{}() ^
-    static_cast<std::uint64_t>(
-      std::chrono::high_resolution_clock::now().time_since_epoch().count()
-    )
-  };
+  thread_local std::mt19937_64 rng([] {
+      std::random_device rd;
+      std::array seed_data{rd(), rd(), rd(), rd()};
+      std::seed_seq seq(seed_data.begin(), seed_data.end());
+      return std::mt19937_64(seq);
+  }());
   // clang-format on
   std::uniform_int_distribution<std::uint32_t> dist(0, 15);
   std::uniform_int_distribution<std::uint32_t> dist2(8, 11);
