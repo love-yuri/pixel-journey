@@ -17,34 +17,36 @@ class RenderText : public RenderNode {
   float x = 0.0;
   float y = 0.0;
   SkFont font = font::default_font;
-  std::string text{};
+  std::string text_{};
   SkPaint paint = PaintDesc{};
   sk_sp<SkTextBlob> blob;
 
 public:
   using RenderNode::update;
 
-  RenderText(std::string_view text, const SkRect& rect);
+  RenderText(std::string_view text, const SkRect &rect);
   explicit RenderText(std::string_view text);
   RenderText() = default;
 
-  [[nodiscard]] const SkRect& textBound() const;
+  [[nodiscard]] const SkRect &textBound() const;
   void setFontSize(float size);
   void setColor(SkColor color);
   void setText(std::string_view text);
   void setTextAndAlignment(std::string_view text, Alignment alignment);
+  const std::string &text() const;
   void render(SkCanvas *canvas) override;
   void update() override;
 };
 
-RenderText::RenderText(const std::string_view text, const SkRect& rect): RenderNode(rect), text(text) {
+RenderText::RenderText(const std::string_view text, const SkRect &rect) :
+  RenderNode(rect), text_(text) {
   RenderText::update();
 }
 
-RenderText::RenderText(const std::string_view text): text(text) {
+RenderText::RenderText(const std::string_view text) : text_(text) {
 }
 
-const SkRect& RenderText::textBound() const {
+const SkRect &RenderText::textBound() const {
   return font_rect;
 }
 
@@ -58,14 +60,18 @@ void RenderText::setColor(const SkColor color) {
 }
 
 void RenderText::setText(const std::string_view text) {
-  this->text = text;
+  this->text_ = text;
   update();
 }
 
 void RenderText::setTextAndAlignment(const std::string_view text, const Alignment alignment) {
-  this->text = text;
+  this->text_ = text;
   alignment_ = alignment;
   update();
+}
+
+const std::string &RenderText::text() const {
+  return text_;
 }
 
 void RenderText::render(SkCanvas *canvas) {
@@ -75,12 +81,12 @@ void RenderText::render(SkCanvas *canvas) {
 }
 
 void RenderText::update() {
-  font.measureText(text.data(), text.size(), SkTextEncoding::kUTF8, &font_rect);
+  font.measureText(text_.data(), text_.size(), SkTextEncoding::kUTF8, &font_rect);
   const auto pos = calcAlignedPosition(font_rect);
   x = pos.x();
   y = pos.y();
 
-  blob = SkTextBlob::MakeFromText(text.data(), text.size(), font, SkTextEncoding::kUTF8);
+  blob = SkTextBlob::MakeFromText(text_.data(), text_.size(), font, SkTextEncoding::kUTF8);
 }
 
 } // namespace ui::render
