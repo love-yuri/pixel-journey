@@ -20,7 +20,7 @@ export namespace ui::widgets {
  * 控件基类
  */
 class Widget {
-  WindowBase* window_ = nullptr;   // 窗口指针
+  WindowBase *window_ = nullptr;   // 窗口指针
   Widget *mouse_capture = nullptr; // 正在被点击的控件
   friend Layout<Widget>;           // 友元layout组件
 
@@ -56,8 +56,8 @@ protected:
   std::uint8_t is_dragging : 1 = 0;
 
   /**
-  * 判断控件是否存在layout - 手动修改
-  */
+   * 判断控件是否存在layout - 手动修改
+   */
   std::uint8_t has_layout : 1 = 0;
 
   /**
@@ -130,7 +130,7 @@ public:
    * 不传递任何layout信息
    * 需要子类自行指定
    */
-  explicit Widget(Widget* parent = nullptr);
+  explicit Widget(Widget *parent = nullptr);
 
   /**
    * 命中检测边界
@@ -174,7 +174,9 @@ public:
 
   /** 获取内容rect */
   [[nodiscard]] SkRect contentRect() const noexcept {
+    // clang-format off
     return SkRect::MakeLTRB(padding_.left, padding_.top, width_ - padding_.right, height_ - padding_.bottom);
+    // clang-format on
   }
 
   /**
@@ -195,7 +197,7 @@ public:
    * 获取该控件所有子控件
    * @return child 合集
    */
-  [[nodiscard]] std::vector<Widget*>& children() noexcept {
+  [[nodiscard]] std::vector<Widget *> &children() noexcept {
     return children_;
   }
 
@@ -211,7 +213,7 @@ public:
    * 获取控件尺寸约束
    * @return 约束合集
    */
-  [[nodiscard]] const SizeConstraints& sizeConstraints() const noexcept {
+  [[nodiscard]] const SizeConstraints &sizeConstraints() const noexcept {
     return size_constraints;
   }
 
@@ -234,7 +236,7 @@ public:
    * 获取当前控件所属指针
    * @return 窗口指针
    */
-  [[nodiscard]] WindowBase * window();
+  [[nodiscard]] WindowBase *window();
 
   /**
    * 坐标是否被控件包含
@@ -269,7 +271,7 @@ public:
   /**
    * 设置内边距
    */
-  void setPadding(const Insets& insets) noexcept;
+  void setPadding(const Insets &insets) noexcept;
 
   /**
    * 设置布局
@@ -329,12 +331,13 @@ public:
    * 移动控件位置
    * @param point 目标点
    */
-  void move(const SkPoint& point) noexcept;
+  void move(const SkPoint &point) noexcept;
 
   /**
    * 控件长什么样？
    */
-  virtual void paint(SkCanvas *canvas){}
+  virtual void paint(SkCanvas *canvas) {
+  }
 
   /**
    * 绘制所有控件
@@ -345,7 +348,7 @@ public:
    * 添加控件
    * @param widget 控件指针-可为空
    */
-  virtual void addWidget(Widget * widget);
+  virtual void addWidget(Widget *widget);
 
   /**
    * 更新布局
@@ -366,10 +369,10 @@ public:
    * @param duration 持续时间
    */
   template <auto ptr, typename T>
-  void startAnimation(const T& from, const T& to, float duration) noexcept;
+  void startAnimation(const T &from, const T &to, float duration) noexcept;
 };
 
-void Widget::addWidget(Widget * widget) {
+void Widget::addWidget(Widget *widget) {
   if (widget == nullptr) {
     return;
   }
@@ -448,7 +451,7 @@ Widget::~Widget() {
   }
 }
 
-Widget::Widget(Widget *parent): parent_(parent) {
+Widget::Widget(Widget *parent) : parent_(parent) {
   if (parent != nullptr) {
     parent_->addWidget(this);
   }
@@ -460,8 +463,8 @@ WindowBase *Widget::window() {
   }
   auto parent = parent_;
   while (parent) {
-    if (dynamic_cast<WindowBase*>(parent)) {
-      return window_ = dynamic_cast<WindowBase*>(parent);
+    if (dynamic_cast<WindowBase *>(parent)) {
+      return window_ = dynamic_cast<WindowBase *>(parent);
     }
     parent = parent->parent_;
   }
@@ -485,6 +488,7 @@ void Widget::setGeometry(const SkRect &rect) noexcept {
   markLayoutDirty(LayoutDirty::Self);
 }
 
+// clang-format off
 void Widget::setGeometry(const float x, const float y, const float width, const float height) noexcept {
   if (parent_ && parent_->has_layout) {
     return;
@@ -496,20 +500,22 @@ void Widget::setGeometry(const float x, const float y, const float width, const 
   height_ = height;
   markLayoutDirty(LayoutDirty::Self);
 }
+// clang-format on
 
 void Widget::setPadding(const float padding) noexcept {
   padding_.setAll(padding);
   markLayoutDirty(LayoutDirty::Self);
 }
 
-void Widget::setPadding(const Insets& insets) noexcept {
+void Widget::setPadding(const Insets &insets) noexcept {
   padding_ = insets;
   markLayoutDirty(LayoutDirty::Self);
 }
 
 template <typename LayoutType>
 void Widget::setLayout() {
-  static_assert(std::is_base_of_v<Layout<Widget>, LayoutType>, "LayoutType must inherit from Layout<Widget>");
+  static_assert(std::is_base_of_v<Layout<Widget>, LayoutType>,
+                "LayoutType must inherit from Layout<Widget>");
   layout_ = std::make_unique<LayoutType>(this);
   has_layout = true;
 }
@@ -517,7 +523,7 @@ void Widget::setLayout() {
 template <auto ptr, typename T>
 void Widget::startAnimation(const T &from, const T &to, float duration) noexcept {
   using ClassType = meta::member_class_t<decltype(ptr)>;
-  animation_manager->start<ptr>(from, to, duration, static_cast<ClassType*>(this));
+  animation_manager->start<ptr>(from, to, duration, static_cast<ClassType *>(this));
 }
 
 void Widget::removeLayout() {
@@ -591,16 +597,10 @@ void Widget::MouseMove(const float x, const float y) {
   for (const auto child : children_) {
     if (child->visible_) {
       if (child->contains(child_x, child_y) || child->is_dragging) {
-        child->MouseMove(
-          child_x - child->x_,
-          child_y - child->y_
-        );
+        child->MouseMove(child_x - child->x_, child_y - child->y_);
       } else if (child->hovered_) {
         child->hovered_ = false;
-        child->onMouseLeave(
-          child_x - child->x_,
-          child_y - child->y_
-        );
+        child->onMouseLeave(child_x - child->x_, child_y - child->y_);
       }
     }
   }
@@ -613,10 +613,7 @@ void Widget::MouseLeftPressed(const float x, const float y) {
 
   for (const auto child : children_) {
     if (child->visible_ && child->contains(child_x, child_y)) {
-      child->MouseLeftPressed(
-        child_x - child->x_,
-        child_y - child->y_
-      );
+      child->MouseLeftPressed(child_x - child->x_, child_y - child->y_);
       mouse_capture = child;
       break;
     }
@@ -632,10 +629,7 @@ void Widget::MouseLeftReleased(const float x, const float y) {
   const auto child_y = y - padding_.top;
 
   if (mouse_capture) {
-    mouse_capture->MouseLeftReleased(
-      child_x - mouse_capture->x_,
-      child_y - mouse_capture->y_
-    );
+    mouse_capture->MouseLeftReleased(child_x - mouse_capture->x_, child_y - mouse_capture->y_);
     mouse_capture = nullptr;
   }
 
