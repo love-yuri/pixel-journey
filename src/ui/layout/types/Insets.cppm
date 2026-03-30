@@ -24,7 +24,8 @@ struct Insets {
    * @param r 右侧
    * @param b 底部
    */
-  constexpr Insets(const float l, const float t, const float r, const float b) : left(l), right(r), top(t), bottom(b) {
+  constexpr Insets(const float l, const float t, const float r, const float b) :
+    left(l), right(r), top(t), bottom(b) {
   }
 
   /**
@@ -35,12 +36,10 @@ struct Insets {
   constexpr Insets(const float lr, const float tb) : left(lr), right(lr), top(tb), bottom(tb) {
   }
 
-  inline Insets & operator=(const Insets &o) = default;
-
   /**
    * 设置所有值
    */
-  inline void setAll(const float all) noexcept {
+  void setAll(const float all) noexcept {
     left = all;
     right = all;
     top = all;
@@ -50,28 +49,28 @@ struct Insets {
   /**
    * 仅padding left
    */
-  inline static Insets fromLeft(const float l) noexcept {
+  constexpr static Insets fromLeft(const float l) noexcept {
     return {l, 0, 0, 0};
   }
 
   /**
    * 仅 padding top
    */
-  inline static Insets fromTop(const float t) noexcept {
+  constexpr static Insets fromTop(const float t) noexcept {
     return {0, t, 0, 0};
   }
 
   /**
    * 仅 padding right
    */
-  inline static Insets fromRight(const float r) noexcept {
+  constexpr static Insets fromRight(const float r) noexcept {
     return {0, 0, r, 0};
   }
 
   /**
    * 仅 padding bottom
    */
-  inline static Insets fromBottom(const float b) noexcept {
+  constexpr static Insets fromBottom(const float b) noexcept {
     return {0, 0, 0, b};
   }
 };
