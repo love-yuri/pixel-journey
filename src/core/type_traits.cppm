@@ -3,9 +3,9 @@
 //
 
 // utils/type_traits.cppm
-export module utils.type_traits;
+export module core:type_traits;
 
-export namespace utils::meta {
+export namespace meta {
 
 // 成员函数指针萃取器
 template<typename T>

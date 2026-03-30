@@ -5,9 +5,8 @@ import glfw.api;
 import glfw.context;
 import vulkan;
 import configuration;
-import profiling;
+import core;
 import skia;
-import yuri_log;
 import std;
 import ui;
 

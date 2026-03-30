@@ -1,9 +1,9 @@
 # 收集模块文件
 file(GLOB IXX_MODULES
-    # 工具配置相关
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.cppm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/utils/profiling/*.cppm
+    # 核心基础设施
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/profiling/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/utils/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
 
     # glfw

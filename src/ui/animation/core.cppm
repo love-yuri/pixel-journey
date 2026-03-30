@@ -4,8 +4,7 @@
 export module ui.animation:core;
 
 import std;
-import signal;
-import yuri_log;
+import core;
 
 using namespace std::chrono;
 using namespace std::chrono_literals;

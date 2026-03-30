@@ -22,10 +22,10 @@ public:
     return cursor_;
   }
 
-protected:
   // 子类重写设置鼠标指针
   virtual void doSetCursor(CursorType type) = 0;
 
+protected:
   CursorType cursor_ = CursorType::Arrow; // 当前cursor
 };
 

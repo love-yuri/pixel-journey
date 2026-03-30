@@ -11,7 +11,7 @@ import ui.render;
 import skia.resource;
 import :base;
 import :box;
-import signal;
+import core;
 import ui.animation;
 
 using namespace ui::render;
@@ -36,6 +36,8 @@ public:
    */
   void paint(SkCanvas *canvas) override;
 
+  void layoutChildren() override;
+
   /**
    * 返回字体节点
    */
@@ -43,6 +45,7 @@ public:
     return render_text;
   }
 
+protected:
   void onMouseMove(const float x, const float y) override {
     if (!is_clicked) {
       return;
@@ -71,7 +74,6 @@ public:
     clicked.emit();
   }
 
-  void layoutChildren() override;
 };
 
 Button::Button(const std::string_view text, Widget *parent) : Box(parent) {

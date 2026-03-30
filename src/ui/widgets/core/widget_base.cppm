@@ -6,12 +6,10 @@ export module ui.widgets:base;
 
 import :window_base;
 import skia.api;
-import yuri_log;
 import ui.layout;
 import ui.animation;
-import utils.type_traits;
+import core;
 import std;
-import signal;
 
 using namespace skia;
 using namespace ui::layout;
@@ -554,7 +552,7 @@ void Widget::setLayout() {
 
 template <auto ptr, typename T>
 void Widget::startAnimation(const T &from, const T &to, float duration) noexcept {
-  using ClassType = utils::meta::member_class_t<decltype(ptr)>;
+  using ClassType = meta::member_class_t<decltype(ptr)>;
   animation_manager->start<ptr>(from, to, duration, static_cast<ClassType*>(this));
 }
 

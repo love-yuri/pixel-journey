@@ -2,7 +2,7 @@
 // Created by yuri on 2026/1/31.
 //
 
-export module profiling:fps_counter;
+export module core.profiling:fps_counter;
 
 import std;
 

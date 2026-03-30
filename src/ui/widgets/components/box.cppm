@@ -23,10 +23,10 @@ protected:
   RenderBorder render_border; // border节点
   RenderBackground render_bg; // background节点
 
-  void paint(SkCanvas *canvas) override;
-
 public:
   float radius = 0; // 圆角
+
+  void paint(SkCanvas *canvas) override;
 
   /**
    * 默认构造函数

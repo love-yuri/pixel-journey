@@ -6,8 +6,7 @@ export module ui.animation:linear_animation;
 
 import :core;
 import skia;
-import yuri_log;
-import profiling;
+import core;
 import ui.algorithm;
 import std;
 

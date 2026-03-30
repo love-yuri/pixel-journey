@@ -2,13 +2,12 @@
 // Created by love-yuri on 2026/3/25.
 //
 
-export module profiling:frame_clock;
+export module core.profiling:frame_clock;
 
 import std;
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
-using duration = steady_clock::duration;
 
 namespace profiling {
 

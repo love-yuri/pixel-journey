@@ -2,7 +2,7 @@
 // Created by yuri on 2026/1/23.
 //
 
-export module signal;
+export module core:signal;
 
 import std;
 import yuri_log;
