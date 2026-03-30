@@ -16,6 +16,17 @@ struct SizeConstraints {
   float min_h = 0.f;                                    // 最小高度
   float max_w = std::numeric_limits<float>::infinity(); // 最大宽度
   float max_h = std::numeric_limits<float>::infinity(); // 最大高度
+
+  /**
+   * 将尺寸约束到合法范围 [min, max]
+   */
+  [[nodiscard]] float clampW(const float w) const noexcept {
+    return std::clamp(w, min_w, max_w);
+  }
+
+  [[nodiscard]] float clampH(const float h) const noexcept {
+    return std::clamp(h, min_h, max_h);
+  }
 };
 
 } // namespace ui::layout

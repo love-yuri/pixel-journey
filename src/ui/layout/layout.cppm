@@ -9,4 +9,5 @@ export import :insets;
 export import :base;
 export import :layout_dirty;
 export import :vbox_layout;
+export import :hbox_layout;
 export import :size_constraints;
