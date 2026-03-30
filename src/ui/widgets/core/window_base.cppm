@@ -18,7 +18,7 @@ public:
   /**
    * 获取当前鼠标类型
    */
-  CursorType cursor() const noexcept {
+  [[nodiscard]] CursorType cursor() const noexcept {
     return cursor_;
   }
 

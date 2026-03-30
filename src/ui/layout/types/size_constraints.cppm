@@ -24,6 +24,9 @@ struct SizeConstraints {
     return std::clamp(w, min_w, max_w);
   }
 
+  /**
+   * 将尺寸约束到合法范围 [min, max]
+   */
   [[nodiscard]] float clampH(const float h) const noexcept {
     return std::clamp(h, min_h, max_h);
   }
