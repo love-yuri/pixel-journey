@@ -225,6 +225,13 @@ public:
   }
 
   /**
+   * 设置控件可见性
+   */
+  void setVisible(const bool v) noexcept {
+    visible_ = v;
+  }
+
+  /**
    * 获取布局指针-不拥有所有权
    * @return 布局指针
    */
