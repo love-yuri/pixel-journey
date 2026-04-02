@@ -341,6 +341,16 @@ public:
   void move(const SkPoint &point) noexcept;
 
   /**
+   * 设置控件x坐标
+   */
+  void setX(float x) noexcept;
+
+  /**
+   * 设置控件y坐标
+   */
+  void setY(float y) noexcept;
+
+  /**
    * 控件长什么样？
    */
   virtual void paint(SkCanvas *canvas) {
@@ -586,6 +596,14 @@ void Widget::move(const float x, const float y) noexcept {
 
 void Widget::move(const SkPoint &point) noexcept {
   move(point.x(), point.y());
+}
+
+void Widget::setX(const float x) noexcept {
+  x_ = x;
+}
+
+void Widget::setY(const float y) noexcept {
+  y_ = y;
 }
 
 void Widget::MouseMove(const float x, const float y) {
