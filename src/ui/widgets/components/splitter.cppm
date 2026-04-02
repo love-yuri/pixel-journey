@@ -66,6 +66,7 @@ protected:
       markLayoutDirty();
     } else {
       const bool near = std::abs(x - split_pos_) <= handle_w_ / 2.f + hit_zone_;
+      handle_w_ = near ? active_handle_w_ : default_handle_w_;
       window()->setCursor(near ? CursorType::HResize : CursorType::Arrow);
     }
   }
@@ -74,6 +75,7 @@ protected:
     if (std::abs(x - split_pos_) <= handle_w_ / 2.f + hit_zone_) {
       dragging_ = true;
       is_dragging = true;
+      handle_w_ = active_handle_w_;
       window()->setCursor(CursorType::HResize);
     }
   }
@@ -81,6 +83,7 @@ protected:
   void onMouseLeftReleased(float, float) override {
     dragging_ = false;
     is_dragging = false;
+    handle_w_ = default_handle_w_;
     window()->setCursor(CursorType::Arrow);
   }
 
@@ -92,8 +95,10 @@ public:
 
 private:
   float split_pos_ = 200.f;
-  float handle_w_ = 1.f;
+  static constexpr float default_handle_w_ = 1.f;
+  static constexpr float active_handle_w_ = 5.f;
   static constexpr float hit_zone_ = 3.f;
+  float handle_w_ = default_handle_w_;
   bool dragging_ = false;
   SkPaint paint_;
 };
