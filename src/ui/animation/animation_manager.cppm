@@ -6,6 +6,7 @@ export module ui.animation:animation_manager;
 
 import :core;
 import :linear_animation;
+import :bezier_animation;
 import std;
 
 using namespace ui::animation;
@@ -42,6 +43,12 @@ public:
   void start(const T &from, const T &to, float duration, T *value);
 
   /**
+   * 开启动画 (贝塞尔曲线)
+   */
+  template <typename T>
+  void start(const T &from, const T &to, float duration, CubicBezier curve, T *value);
+
+  /**
    * 开启动画
    * @param from 起始参数
    * @param to 目标参数
@@ -50,6 +57,12 @@ public:
    */
   template <auto ptr, typename TObject, typename T>
   void start(const T &from, const T &to, float duration, TObject *obj);
+
+  /**
+   * 开启动画 (贝塞尔曲线)
+   */
+  template <auto ptr, typename TObject, typename T>
+  void start(const T &from, const T &to, float duration, CubicBezier curve, TObject *obj);
 
 private:
   std::vector<std::unique_ptr<IAnimation>> animations_; // 动画合集
@@ -75,6 +88,24 @@ void AnimationManager::start(const T &from, const T &to, float duration, TObject
     )
   );
   // clang-format off
+}
+
+template <typename T>
+void AnimationManager::start(const T &from, const T &to, float duration, CubicBezier curve, T *value) {
+  animations_.emplace_back(
+    std::make_unique<BezierAnimation<T>>(
+      from, to, duration, curve, typename BezierAnimation<T>::Setter{value, &setter_fn<T>}
+    )
+  );
+}
+
+template <auto ptr, typename TObject, typename T>
+void AnimationManager::start(const T &from, const T &to, float duration, CubicBezier curve, TObject *obj) {
+  animations_.emplace_back(
+    std::make_unique<BezierAnimation<T>>(
+      from, to, duration, curve, BezierAnimation<T>::Setter::template from<ptr>(obj)
+    )
+  );
 }
 
 void AnimationManager::update() {
