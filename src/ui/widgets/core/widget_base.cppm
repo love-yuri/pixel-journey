@@ -13,6 +13,7 @@ import std;
 
 using namespace skia;
 using namespace ui::layout;
+using namespace ui::animation;
 
 export namespace ui::widgets {
 
@@ -378,15 +379,33 @@ public:
   virtual void layoutChildren();
 
   /**
-   * 开启一段线动画
+   * 开启一段动画
    * @tparam ptr 成员函数指针
    * @tparam T 参数类型
    * @param from 起始值
    * @param to 目标值
    * @param duration 持续时间
+   * @param bezier 可选贝塞尔曲线
    */
-  template <auto ptr, typename T>
-  void startAnimation(const T &from, const T &to, float duration) noexcept;
+  template <auto ptr, typename T, typename... Bezier>
+  void startAnimation(const T &from, const T &to, float duration, Bezier&&... bezier) noexcept {
+    using ClassType = meta::member_class_t<decltype(ptr)>;
+    animation_manager->start<ptr>(from, to, duration, std::forward<Bezier>(bezier)..., static_cast<ClassType*>(this));
+  }
+
+  /**
+   * 开启一段动画
+   * @tparam T 参数类型
+   * @param from 起始值
+   * @param to 目标值
+   * @param duration 持续时间
+   * @param value 待更新的值
+   * @param bezier 可选贝塞尔曲线
+   */
+  template <typename T, typename... Bezier>
+  void startAnimation(const T &from, const T &to, float duration, T *value, Bezier&&... bezier) noexcept {
+    animation_manager->start(from, to, duration, value, std::forward<Bezier>(bezier)...);
+  }
 };
 
 void Widget::addWidget(Widget *widget) {
@@ -535,12 +554,6 @@ void Widget::setLayout() {
                 "LayoutType must inherit from Layout<Widget>");
   layout_ = std::make_unique<LayoutType>(this);
   has_layout = true;
-}
-
-template <auto ptr, typename T>
-void Widget::startAnimation(const T &from, const T &to, float duration) noexcept {
-  using ClassType = meta::member_class_t<decltype(ptr)>;
-  animation_manager->start<ptr>(from, to, duration, static_cast<ClassType *>(this));
 }
 
 void Widget::removeLayout() {

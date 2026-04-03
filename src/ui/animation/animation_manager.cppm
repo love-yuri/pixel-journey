@@ -46,7 +46,7 @@ public:
    * 开启动画 (贝塞尔曲线)
    */
   template <typename T>
-  void start(const T &from, const T &to, float duration, CubicBezier curve, T *value);
+  void start(const T &from, const T &to, float duration, T *value, CubicBezier curve);
 
   /**
    * 开启动画
@@ -62,7 +62,7 @@ public:
    * 开启动画 (贝塞尔曲线)
    */
   template <auto ptr, typename TObject, typename T>
-  void start(const T &from, const T &to, float duration, CubicBezier curve, TObject *obj);
+  void start(const T &from, const T &to, float duration, TObject *obj, CubicBezier curve);
 
 private:
   std::vector<std::unique_ptr<IAnimation>> animations_; // 动画合集
@@ -91,7 +91,7 @@ void AnimationManager::start(const T &from, const T &to, float duration, TObject
 }
 
 template <typename T>
-void AnimationManager::start(const T &from, const T &to, float duration, CubicBezier curve, T *value) {
+void AnimationManager::start(const T &from, const T &to, float duration, T *value, CubicBezier curve) {
   animations_.emplace_back(
     std::make_unique<BezierAnimation<T>>(
       from, to, duration, curve, typename BezierAnimation<T>::Setter{value, &setter_fn<T>}
@@ -100,7 +100,7 @@ void AnimationManager::start(const T &from, const T &to, float duration, CubicBe
 }
 
 template <auto ptr, typename TObject, typename T>
-void AnimationManager::start(const T &from, const T &to, float duration, CubicBezier curve, TObject *obj) {
+void AnimationManager::start(const T &from, const T &to, float duration, TObject *obj, CubicBezier curve) {
   animations_.emplace_back(
     std::make_unique<BezierAnimation<T>>(
       from, to, duration, curve, BezierAnimation<T>::Setter::template from<ptr>(obj)
