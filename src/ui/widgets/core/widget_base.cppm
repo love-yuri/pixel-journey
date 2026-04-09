@@ -124,6 +124,11 @@ protected:
    */
   void markLayoutDirty(LayoutDirty reason = LayoutDirty::Self);
 
+  /**
+   * 递归清除所有子控件的悬浮状态
+   */
+  void clearHoverState();
+
 public:
   virtual ~Widget();
 
@@ -188,7 +193,7 @@ public:
   }
 
   /**
-   * 获取控件内容宽度-去除padding区域
+   * 获取控件内容高度-去除padding区域
    */
   [[nodiscard]] float contentHeight() const noexcept {
     return height_ - padding_.top - padding_.bottom;
@@ -633,13 +638,23 @@ void Widget::MouseMove(const float x, const float y) {
   const auto child_y = y - padding_.top;
 
   for (const auto child : children_) {
-    if (child->visible_) {
-      if (child->contains(child_x, child_y) || child->is_dragging) {
-        child->MouseMove(child_x - child->x_, child_y - child->y_);
-      } else if (child->hovered_) {
-        child->hovered_ = false;
-        child->onMouseLeave(child_x - child->x_, child_y - child->y_);
+    if (!child->visible_) continue;
+    if (child->contains(child_x, child_y) || child->is_dragging) {
+      // 鼠标在此子控件内，清除其他兄弟的悬浮状态
+      for (const auto sibling : children_) {
+        if (sibling != child && sibling->visible_ && sibling->hovered_) {
+          sibling->clearHoverState();
+        }
       }
+      child->MouseMove(child_x - child->x_, child_y - child->y_);
+      return;
+    }
+  }
+
+  // 鼠标不在任何子控件内，清除所有子控件的悬浮状态
+  for (const auto child : children_) {
+    if (child->visible_ && child->hovered_) {
+      child->clearHoverState();
     }
   }
 }
@@ -672,6 +687,18 @@ void Widget::MouseLeftReleased(const float x, const float y) {
   }
 
   onMouseLeftReleased(x, y);
+}
+
+void Widget::clearHoverState() {
+  if (hovered_) {
+    hovered_ = false;
+    onMouseLeave(0, 0);
+  }
+  for (const auto child : children_) {
+    if (child->visible_) {
+      child->clearHoverState();
+    }
+  }
 }
 
 } // namespace ui::widgets
