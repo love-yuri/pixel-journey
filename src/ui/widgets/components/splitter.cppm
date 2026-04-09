@@ -94,7 +94,7 @@ public:
   }
 
 private:
-  float split_pos_ = 200.f;
+  float split_pos_ = 250.f;
   static constexpr float default_handle_w_ = 1.f;
   static constexpr float active_handle_w_ = 5.f;
   static constexpr float hit_zone_ = 3.f;
