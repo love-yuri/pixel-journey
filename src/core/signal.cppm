@@ -49,7 +49,7 @@ public:
    */
   template <typename F>
   requires std::invocable<F &, Args...>
-  static function_ref from(F &f) {
+  static function_ref from(F &f) noexcept {
     return function_ref(
       std::addressof(f),
       [](void *p, Args&& ...args) -> R {
@@ -88,7 +88,17 @@ public:
    */
   template <typename F>
   requires std::invocable<F &, Args...>
-  inline void connect(F& f) {
+  inline void connect(F& f) noexcept {
+    slots.emplace_back(SignalType::from(f));
+  }
+
+  /**
+   * 创建信号连接
+   * 可以传临时lambda 但是仅限测试
+   */
+  template <typename F>
+  requires std::invocable<F &, Args...>
+  inline void connect(F&& f) noexcept {
     slots.emplace_back(SignalType::from(f));
   }
 
