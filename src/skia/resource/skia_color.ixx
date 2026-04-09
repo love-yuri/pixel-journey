@@ -5,6 +5,9 @@
 export module skia.resource:color;
 
 #define SkColorGetA(color) (((color) >> 24) & 0xFF)
+#define SkColorGetR(color)      (((color) >> 16) & 0xFF)
+#define SkColorGetG(color)      (((color) >>  8) & 0xFF)
+#define SkColorGetB(color)      (((color) >>  0) & 0xFF)
 
 import skia.api;
 import std;
@@ -51,28 +54,24 @@ constexpr SkColor accent_blue = ColorFromARGB(0xFF, 0x00, 0x78, 0xD7);
 constexpr SkColor accent_green = ColorFromARGB(0xFF, 0x00, 0xC8, 0x53);
 constexpr SkColor accent_red = ColorFromARGB(0xFF, 0xE8, 0x11, 0x23);
 
-SkColor LerpHSV(const SkColor c1, const SkColor c2, const float t) noexcept {
-  // 1. 转 HSV
-  SkScalar hsv1[3], hsv2[3];
-  ColorToHSV(c1, hsv1);
-  ColorToHSV(c2, hsv2);
+SkColor LerpPremul(const SkColor c1, const SkColor c2, const float t) noexcept {
+  const float a1 = SkColorGetA(c1) / 255.0f;
+  const float a2 = SkColorGetA(c2) / 255.0f;
+  const float a  = a1 + (a2 - a1) * t;
 
-  // 2. Hue 最短路径插值
-  const float dh = std::fmod(hsv2[0] - hsv1[0] + 540.0f, 360.0f) - 180.0f;
-  const float h = std::fmod(hsv1[0] + dh * t + 360.0f, 360.0f);
+  // 预乘
+  const float r1 = SkColorGetR(c1) * a1, r2 = SkColorGetR(c2) * a2;
+  const float g1 = SkColorGetG(c1) * a1, g2 = SkColorGetG(c2) * a2;
+  const float b1 = SkColorGetB(c1) * a1, b2 = SkColorGetB(c2) * a2;
 
-  // 3. S / V 插值
-  const float s = hsv1[1] + (hsv2[1] - hsv1[1]) * t;
-  const float v = hsv1[2] + (hsv2[2] - hsv1[2]) * t;
+  // 插值后反预乘
+  if (a < 1e-4f) return transparent;
+  const auto r = static_cast<std::uint8_t>((r1 + (r2 - r1) * t) / a);
+  const auto g = static_cast<std::uint8_t>((g1 + (g2 - g1) * t) / a);
+  const auto b = static_cast<std::uint8_t>((b1 + (b2 - b1) * t) / a);
+  const auto ia = static_cast<std::uint8_t>(a * 255.0f);
 
-  // 4. Alpha 插值
-  const float a1 = static_cast<float>(SkColorGetA(c1));
-  const float a2 = static_cast<float>(SkColorGetA(c2));
-  const auto a = static_cast<std::uint8_t>(a1 + (a2 - a1) * t);
-
-  // 5. 转回 RGB
-  const SkScalar hsv[3] = {h, s, v};
-  return HSVToColor(a, hsv);
+  return ColorFromARGB(ia, r, g, b);
 }
 
 } // namespace skia::skia_colors

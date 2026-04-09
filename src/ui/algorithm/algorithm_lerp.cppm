@@ -20,7 +20,7 @@ template <CanLerp T>
 
 template <>
 [[nodiscard]] SkColor lerp<SkColor>(const SkColor& from, const SkColor& to, float t) noexcept {
-  return skia_colors::LerpHSV(from, to, t);
+  return skia_colors::LerpPremul(from, to, t);
 }
 
 }
