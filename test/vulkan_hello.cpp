@@ -4,7 +4,7 @@ import glfw;
 import yuri_log;
 import skia;
 import ui;
-import profiling;
+import core;
 
 using namespace skia;
 using namespace ui::layout;
