@@ -20,15 +20,17 @@ public:
     if (children.empty()) return;
 
     const auto height = this->widget_->contentHeight();
-    const float single_w = this->widget_->contentWidth() / static_cast<float>(children.size());
+    const auto total_spacing = this->spacing_ * static_cast<float>(children.size() - 1);
+    const float single_w = (this->widget_->contentWidth() - total_spacing) / static_cast<float>(children.size());
 
     float x = 0;
-    for (const auto& child : children) {
+    for (std::size_t i = 0; i < children.size(); ++i) {
+      const auto& child = children[i];
       const auto& sc = child->sizeConstraints();
       const auto w = sc.clampW(single_w);
       const auto h = sc.clampH(height);
       Layout<Widget>::setGeometry(child, x, 0, w, h);
-      x += w;
+      x += w + (i < children.size() - 1 ? this->spacing_ : 0);
     }
   }
 };

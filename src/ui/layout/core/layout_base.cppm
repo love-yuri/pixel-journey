@@ -14,6 +14,7 @@ template <typename Widget>
 class Layout {
 protected:
   Widget *widget_; // 控件指针
+  float spacing_ = 0; // 子控件间距
 
   /**
    * 直接设置控件几何状态 - 仅布局系统可用 (通过 friend)
@@ -37,6 +38,16 @@ public:
 
   virtual ~Layout() = default;
   virtual void apply() const = 0;
+
+  // 设置子控件间距
+  void setSpacing(const float spacing) noexcept {
+    spacing_ = spacing;
+  }
+
+  // 获取子控件间距
+  float spacing() const noexcept {
+    return spacing_;
+  }
 };
 
 } // namespace ui::layout
