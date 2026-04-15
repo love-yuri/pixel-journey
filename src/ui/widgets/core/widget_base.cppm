@@ -290,6 +290,7 @@ public:
    * 设置布局
    */
   template <typename LayoutType>
+  requires std::derived_from<LayoutType, LayoutType>
   void setLayout();
 
   /**
@@ -554,9 +555,8 @@ void Widget::setPadding(const Insets &insets) noexcept {
 }
 
 template <typename LayoutType>
+requires std::derived_from<LayoutType, LayoutType>
 void Widget::setLayout() {
-  static_assert(std::is_base_of_v<Layout<Widget>, LayoutType>,
-                "LayoutType must inherit from Layout<Widget>");
   layout_ = std::make_unique<LayoutType>(this);
   has_layout = true;
 }
