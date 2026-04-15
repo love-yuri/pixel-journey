@@ -67,7 +67,9 @@ protected:
     } else {
       const bool near = std::abs(x - split_pos_) <= handle_w_ / 2.f + hit_zone_;
       handle_w_ = near ? active_handle_w_ : default_handle_w_;
-      window()->setCursor(near ? CursorType::HResize : CursorType::Arrow);
+      if (near) {
+        window()->setCursor(CursorType::HResize);
+      }
     }
   }
 
@@ -81,10 +83,12 @@ protected:
   }
 
   void onMouseLeftReleased(float, float) override {
-    dragging_ = false;
-    is_dragging = false;
+    if (dragging_) {
+      window()->setCursor(CursorType::Arrow);
+      dragging_ = false;
+      is_dragging = false;
+    }
     handle_w_ = default_handle_w_;
-    window()->setCursor(CursorType::Arrow);
   }
 
 public:
