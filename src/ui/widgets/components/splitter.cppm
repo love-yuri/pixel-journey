@@ -92,6 +92,10 @@ protected:
       handle_w = near ? active_handle_w : default_handle_w;
       if (near) {
         window()->setCursor(CursorType::HResize);
+        has_near_set = true;
+      } else if (has_near_set) {
+        window()->setCursor(CursorType::Arrow);
+        has_near_set = false;
       }
     }
   }
@@ -138,7 +142,8 @@ private:
   static constexpr float active_handle_w = 5.f;
   static constexpr float hit_zone = 3.f;
   float handle_w = default_handle_w;
-  bool dragging_ = false;
+  bool dragging_ = false;    // 是否正在拖动
+  bool has_near_set = false; // 是否因为靠近过被set鼠标
   SkPaint paint_;
 };
 
