@@ -6,3 +6,4 @@ export module skia.resource;
 
 export import :font;
 export import :color;
+export import :path;

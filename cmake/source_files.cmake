@@ -19,6 +19,7 @@ file(GLOB IXX_MODULES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/api/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/resource/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/resource/*.cppm
 
     # ui - core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cppm
