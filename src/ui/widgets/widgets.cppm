@@ -10,3 +10,4 @@ export import :window_base;
 export import :box;
 export import :text;
 export import :splitter;
+export import :scroll_area;

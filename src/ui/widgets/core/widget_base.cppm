@@ -62,21 +62,34 @@ protected:
   std::uint8_t has_layout : 1 = 0;
 
   /**
-   * 鼠标移动事件
-   * @param x x: 相对于左上角
-   * @param y y: 相对于左上角
+   * 鼠标移动事件分发
+   * @param x x: 相对于控件左上角
+   * @param y y: 相对于控件左上角
    */
-  void MouseMove(float x, float y);
+  virtual void MouseMove(float x, float y);
 
   /**
-   * 鼠标左侧点击事件
+   * 鼠标左侧点击事件分发
+   * @param x 鼠标位置x: 相对于控件左上角
+   * @param y 鼠标位置y: 相对于控件左上角
    */
-  void MouseLeftPressed(float x, float y);
+  virtual void MouseLeftPressed(float x, float y);
 
   /**
-   * 鼠标左侧松开事件
+   * 鼠标左侧松开事件分发
+   * @param x 鼠标位置x: 相对于控件左上角
+   * @param y 鼠标位置y: 相对于控件左上角
    */
-  void MouseLeftReleased(float x, float y);
+  virtual void MouseLeftReleased(float x, float y);
+
+  /**
+   * 鼠标滚轮事件分发
+   * @param x 鼠标位置x（相对于控件左上角）
+   * @param y 鼠标位置y（相对于控件左上角）
+   * @param delta_x 水平滚动量
+   * @param delta_y 垂直滚动量
+   */
+  virtual void MouseWheel(float x, float y, float delta_x, float delta_y);
 
   /**
    * 鼠标移动事件
@@ -116,6 +129,14 @@ protected:
    * @param y 鼠标当前位置 y
    */
   virtual void onMouseLeftReleased(float x, float y) {
+  }
+
+  /**
+   * 鼠标滚轮事件
+   * @param delta_x 水平滚动量
+   * @param delta_y 垂直滚动量（正值向上，负值向下）
+   */
+  virtual void onMouseWheel(float delta_x, float delta_y) {
   }
 
   /**
@@ -687,6 +708,22 @@ void Widget::MouseLeftReleased(const float x, const float y) {
   }
 
   onMouseLeftReleased(x, y);
+}
+
+void Widget::MouseWheel(const float x, const float y, const float delta_x, const float delta_y) {
+  // 先让自身处理
+  onMouseWheel(delta_x, delta_y);
+
+  // 再分发给子控件
+  const auto child_x = x - padding_.left;
+  const auto child_y = y - padding_.top;
+
+  for (const auto child : children_) {
+    if (child->visible_ && child->contains(child_x, child_y)) {
+      child->MouseWheel(child_x - child->x_, child_y - child->y_, delta_x, delta_y);
+      return;
+    }
+  }
 }
 
 void Widget::clearHoverState() {

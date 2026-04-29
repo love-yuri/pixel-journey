@@ -71,6 +71,7 @@ protected:
   friend void onMouseMoveStatic(GLFWwindow *window, double x, double y);
   friend void onMouseEnterStatic(GLFWwindow *window, int is_entered);
   friend void onMouseButtonStatic(GLFWwindow *window, int button, int action, int mods);
+  friend void onScrollStatic(GLFWwindow *window, double xoffset, double yoffset);
   friend void onSetWindowIconifyStatic(GLFWwindow *window, int iconified);
 };
 
@@ -129,6 +130,16 @@ void onMouseButtonStatic(GLFWwindow *window, const int button, const int action,
   }
 }
 
+/**
+ * 静态 鼠标滚轮回调
+ */
+void onScrollStatic(GLFWwindow *window, const double xoffset, const double yoffset) {
+  const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  if (self->visible_) {
+    self->MouseWheel(self->cursor_x, self->cursor_y, static_cast<float>(xoffset), static_cast<float>(yoffset));
+  }
+}
+
 void onSetWindowIconifyStatic(GLFWwindow *window, const int iconified) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
   self->visible_ = !iconified;
@@ -153,6 +164,7 @@ Window::Window(const int width, const int height, const std::string_view title) 
   glfwSetCursorPosCallback(window_, onMouseMoveStatic);
   glfwSetMouseButtonCallback(window_, onMouseButtonStatic);
   glfwSetCursorEnterCallback(window_, onMouseEnterStatic);
+  glfwSetScrollCallback(window_, onScrollStatic);
   glfwSetWindowIconifyCallback(window_, onSetWindowIconifyStatic);
 
   // 打印debug信息

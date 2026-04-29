@@ -19,6 +19,7 @@ using ::glfwSetFramebufferSizeCallback;
 using ::glfwSetCursorPosCallback;
 using ::glfwSetMouseButtonCallback;
 using ::glfwSetCursorEnterCallback;
+using ::glfwSetScrollCallback;
 using ::glfwSetWindowUserPointer;
 using ::glfwGetWindowUserPointer;
 using ::glfwPollEvents;
