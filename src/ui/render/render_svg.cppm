@@ -3,7 +3,6 @@ export module ui.render:svg;
 import :base;
 import skia.resource;
 import skia.api;
-import vulkan.context;
 import std;
 
 using namespace skia;
@@ -33,7 +32,7 @@ public:
 private:
   void rasterize();
 
-  std::string file_path;
+  std::string file_path{};
   sk_sp<SkSVGDOM> svg_dom = nullptr;
   sk_sp<SkImage> cache_ = nullptr;
   SkSize size_ = SkSize::MakeEmpty();
@@ -76,9 +75,8 @@ void RenderSvg::rasterize() {
   const int h = static_cast<int>(std::ceil(size_.height()));
   if (w <= 0 || h <= 0) return;
 
-  const auto surface =
-    SkSurfaces::RenderTarget(vulkan_context->skia_direct_context.get(), gpu::Budgeted::kNo,
-                             SkImageInfo::MakeN32Premul(w, h));
+  // 使用 CPU 光栅化，避免后台线程与主线程争用 GPU context
+  const auto surface = SkSurfaces::Raster(SkImageInfo::MakeN32Premul(w, h));
   if (!surface) return;
 
   SkCanvas *offscreen = surface->getCanvas();
@@ -87,7 +85,7 @@ void RenderSvg::rasterize() {
   cache_ = surface->makeImageSnapshot();
 }
 
-void RenderSvg::render(SkCanvas *canvas) {
+void RenderSvg::render(const SkCanvas *canvas) {
   if (!cache_) return;
   canvas->drawImage(cache_, offset_.x(), offset_.y(), SkSamplingOptions{}, nullptr);
 }
