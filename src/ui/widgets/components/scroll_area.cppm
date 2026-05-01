@@ -5,6 +5,7 @@
 export module ui.widgets:scroll_area;
 
 import :base;
+import core;
 import skia.api;
 import std;
 
@@ -26,6 +27,17 @@ public:
   void render(SkCanvas *canvas) override;
   void layoutChildren() override;
 
+  // 滚动位置变化信号（参数为当前滚动偏移量）
+  Signal<float> scrollChanged;
+
+  // 获取当前滚动偏移量
+  [[nodiscard]] float scrollOffset() const noexcept { return scroll_offset; }
+
+  // 获取最大滚动偏移量
+  [[nodiscard]] float maxScroll() const noexcept {
+    return std::max(0.f, content_height_ - contentHeight());
+  }
+
 protected:
   void MouseMove(float x, float y) override;
   void MouseLeftPressed(float x, float y) override;
@@ -35,7 +47,7 @@ protected:
 
 private:
   float content_height_ = 0;                // 内容总高度
-  float scroll_offset_ = 0;                 // 当前滚动偏移量
+  float scroll_offset = 0;                 // 当前滚动偏移量
   static constexpr float kBarWidth = 6;     // 滚动条宽度
   static constexpr float kBarPadding = 4;   // 滚动条边距
   static constexpr float kMinThumbH = 24;   // 滑块最小高度
@@ -46,27 +58,29 @@ ScrollArea::ScrollArea(Widget *parent) : Widget(parent) {
 }
 
 void ScrollArea::MouseMove(const float x, const float y) {
-  Widget::MouseMove(x, y + scroll_offset_);
+  Widget::MouseMove(x, y + scroll_offset);
 }
 
 void ScrollArea::MouseLeftPressed(const float x, const float y) {
-  Widget::MouseLeftPressed(x, y + scroll_offset_);
+  Widget::MouseLeftPressed(x, y + scroll_offset);
 }
 
 void ScrollArea::MouseLeftReleased(const float x, const float y) {
-  Widget::MouseLeftReleased(x, y + scroll_offset_);
+  Widget::MouseLeftReleased(x, y + scroll_offset);
 }
 
 void ScrollArea::MouseWheel(const float x, const float y, const float delta_x, const float delta_y) {
-  Widget::MouseWheel(x, y + scroll_offset_, delta_x, delta_y);
+  Widget::MouseWheel(x, y + scroll_offset, delta_x, delta_y);
 }
 
 void ScrollArea::onMouseWheel(const float delta_x, float const delta_y) {
-  scroll_offset_ -= delta_y * kScrollSpeed;
+  scroll_offset -= delta_y * kScrollSpeed;
 
   const float view_h = contentHeight();
   const float max_scroll = std::max(0.f, content_height_ - view_h);
-  scroll_offset_ = std::clamp(scroll_offset_, 0.f, max_scroll);
+  scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
+
+  scrollChanged.emit(scroll_offset);
 }
 
 void ScrollArea::paint(SkCanvas *canvas) {
@@ -76,7 +90,7 @@ void ScrollArea::paint(SkCanvas *canvas) {
   const float bar_x = contentWidth() - kBarPadding - kBarWidth;
   const float thumb_h = std::max(kMinThumbH, view_h * view_h / content_height_);
   const float max_scroll = content_height_ - view_h;
-  const float scroll_pct = max_scroll > 0 ? scroll_offset_ / max_scroll : 0;
+  const float scroll_pct = max_scroll > 0 ? scroll_offset / max_scroll : 0;
   const float thumb_y = scroll_pct * (view_h - thumb_h);
 
   SkPaint track_paint;
@@ -104,7 +118,7 @@ void ScrollArea::render(SkCanvas *canvas) {
   canvas->clipRect(SkRect::MakeWH(view_w, view_h));
 
   // 应用滚动偏移
-  canvas->translate(0, -scroll_offset_);
+  canvas->translate(0, -scroll_offset);
 
   // 仅绘制可见子控件（y 区间与视口有交集）
   for (const auto child : children_) {
@@ -113,7 +127,7 @@ void ScrollArea::render(SkCanvas *canvas) {
     }
     const float cy = child->y();
     const float ch = child->height();
-    if (cy + ch <= scroll_offset_ || cy >= scroll_offset_ + view_h) {
+    if (cy + ch <= scroll_offset || cy >= scroll_offset + view_h) {
       continue;
     } // 完全不可见
     child->render(canvas);
@@ -146,7 +160,9 @@ void ScrollArea::layoutChildren() {
   // 记录内容总高度并重新钳制滚动偏移（可能因窗口 resize 而变化）
   content_height_ = y;
   const float max_scroll = std::max(0.f, content_height_ - contentHeight());
-  scroll_offset_ = std::clamp(scroll_offset_, 0.f, max_scroll);
+  scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
+
+  scrollChanged.emit(scroll_offset);
 
   // 递归更新子控件布局
   for (const auto child : children_) {
