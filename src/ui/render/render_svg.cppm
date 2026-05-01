@@ -85,7 +85,7 @@ void RenderSvg::rasterize() {
   cache_ = surface->makeImageSnapshot();
 }
 
-void RenderSvg::render(const SkCanvas *canvas) {
+void RenderSvg::render(SkCanvas *canvas) {
   if (!cache_) return;
   canvas->drawImage(cache_, offset_.x(), offset_.y(), SkSamplingOptions{}, nullptr);
 }
