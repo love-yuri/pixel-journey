@@ -43,11 +43,16 @@ protected:
   void MouseLeftPressed(float x, float y) override;
   void MouseLeftReleased(float x, float y) override;
   void MouseWheel(float x, float y, float delta_x, float delta_y) override;
+  void onMouseMove(float x, float y) override;
+  void onMouseLeftReleased(float x, float y) override;
   void onMouseWheel(float delta_x, float delta_y) override;
 
 private:
   float content_height_ = 0;                // 内容总高度
   float scroll_offset = 0;                 // 当前滚动偏移量
+  bool thumb_dragging_ = false;            // 是否正在拖动滑块
+  float thumb_drag_start_y_ = 0;           // 拖动起始鼠标 y（视口坐标）
+  float drag_start_scroll_ = 0;            // 拖动起始 scroll_offset
   static constexpr float kBarWidth = 6;     // 滚动条宽度
   static constexpr float kBarPadding = 4;   // 滚动条边距
   static constexpr float kMinThumbH = 24;   // 滑块最小高度
@@ -58,10 +63,29 @@ ScrollArea::ScrollArea(Widget *parent) : Widget(parent) {
 }
 
 void ScrollArea::MouseMove(const float x, const float y) {
+  if (thumb_dragging_) {
+    onMouseMove(x, y);
+    return;
+  }
   Widget::MouseMove(x, y + scroll_offset);
 }
 
 void ScrollArea::MouseLeftPressed(const float x, const float y) {
+  // 视口坐标下检测是否命中滑块
+  const float view_h = contentHeight();
+  const float max_scroll = std::max(0.f, content_height_ - view_h);
+  if (max_scroll > 0) {
+    const float thumb_h = std::max(kMinThumbH, view_h * view_h / content_height_);
+    const float scroll_pct = scroll_offset / max_scroll;
+    const float thumb_y = scroll_pct * (view_h - thumb_h);
+    if (y >= thumb_y && y <= thumb_y + thumb_h) {
+      thumb_dragging_ = true;
+      is_dragging = true;
+      thumb_drag_start_y_ = y;
+      drag_start_scroll_ = scroll_offset;
+      return; // 不转发给子控件
+    }
+  }
   Widget::MouseLeftPressed(x, y + scroll_offset);
 }
 
@@ -83,6 +107,24 @@ void ScrollArea::onMouseWheel(const float delta_x, float const delta_y) {
   scrollChanged.emit(scroll_offset);
 }
 
+void ScrollArea::onMouseMove(const float x, float y) {
+  if (!thumb_dragging_) return;
+  const float view_h = contentHeight();
+  const float thumb_h = std::max(kMinThumbH, view_h * view_h / content_height_);
+  const float max_scroll = std::max(0.f, content_height_ - view_h);
+  const float dy = y - thumb_drag_start_y_;
+  scroll_offset = drag_start_scroll_ + dy * max_scroll / (view_h - thumb_h);
+  scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
+  scrollChanged.emit(scroll_offset);
+}
+
+void ScrollArea::onMouseLeftReleased(float, float) {
+  if (thumb_dragging_) {
+    thumb_dragging_ = false;
+    is_dragging = false;
+  }
+}
+
 void ScrollArea::paint(SkCanvas *canvas) {
   const float view_h = contentHeight();
   if (content_height_ <= view_h) return; // 内容未超出，不绘制滚动条
@@ -94,13 +136,13 @@ void ScrollArea::paint(SkCanvas *canvas) {
   const float thumb_y = scroll_pct * (view_h - thumb_h);
 
   SkPaint track_paint;
-  track_paint.setColor(ColorFromARGB(40, 255, 255, 255));
+  track_paint.setColor(ColorFromARGB(40, 128, 128, 128));
   track_paint.setAntiAlias(true);
   canvas->drawRoundRect(SkRect::MakeXYWH(bar_x, 0, kBarWidth, view_h), kBarWidth / 2, kBarWidth / 2,
                         track_paint);
 
   SkPaint thumb_paint;
-  thumb_paint.setColor(ColorFromARGB(120, 255, 255, 255));
+  thumb_paint.setColor(ColorFromARGB(120, 128, 128, 128));
   thumb_paint.setAntiAlias(true);
   canvas->drawRoundRect(SkRect::MakeXYWH(bar_x, thumb_y, kBarWidth, thumb_h), kBarWidth / 2,
                         kBarWidth / 2, thumb_paint);
