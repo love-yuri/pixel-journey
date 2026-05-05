@@ -27,7 +27,7 @@ add_subdirectory(test/yuri-music)
 target_sources(yuri_lib
     PUBLIC
     FILE_SET cxx_modules TYPE CXX_MODULES FILES
-    ${IXX_MODULES}
+    ${CPPM_MODULES}
 )
 set_property(TARGET yuri_lib PROPERTY CXX_SCAN_FOR_MODULES ON)
 

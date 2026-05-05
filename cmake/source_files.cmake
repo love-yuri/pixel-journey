@@ -1,24 +1,22 @@
 # 收集模块文件
-file(GLOB IXX_MODULES
+file(GLOB CPPM_MODULES
     # 核心基础设施
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/profiling/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core/utils/*.cppm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/configuration/*.cppm
 
     # glfw
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/glfw/*.ixx
     ${CMAKE_CURRENT_SOURCE_DIR}/src/glfw/*.cppm
 
     # vulkan
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/*.cppm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/detail/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/api/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/detail/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vulkan/api/*.cppm
 
     # skia
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/api/*.ixx
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/resource/*.ixx
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/api/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/skia/resource/*.cppm
 
     # ui - core
@@ -46,5 +44,5 @@ file(GLOB IXX_MODULES
 # 收集源文件
 file(GLOB_RECURSE PROJECT_SOURCES
     CONFIGURE_DEPENDS
-    ${IXX_MODULES}
+    ${CPPM_MODULES}
 )
