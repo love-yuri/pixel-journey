@@ -78,7 +78,8 @@ void ScrollArea::MouseLeftPressed(const float x, const float y) {
     const float thumb_h = std::max(kMinThumbH, view_h * view_h / content_height_);
     const float scroll_pct = scroll_offset / max_scroll;
     const float thumb_y = scroll_pct * (view_h - thumb_h);
-    if (y >= thumb_y && y <= thumb_y + thumb_h) {
+    const float bar_x = contentWidth() - kBarPadding - kBarWidth;
+    if (y >= thumb_y && y <= thumb_y + thumb_h && (x - padding_.left) >= bar_x) {
       thumb_dragging_ = true;
       is_dragging = true;
       thumb_drag_start_y_ = y;
