@@ -22,8 +22,10 @@ sk_sp<SkFontMgr> defaultFontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanne
 
 #if defined(_WIN32)
 constexpr auto default_font_path = R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-Medium.ttf)";
+constexpr auto bold_font_path = R"(E:\love-yuri\journal-kmp\composeApp\src\commonMain\composeResources\font\MapleMono-NF-CN-SemiBold.ttf)";
 #else
 constexpr auto default_font_path = "/usr/share/fonts/maple/MapleMono-NF-CN-Medium.ttf";
+constexpr auto bold_font_path = "/usr/share/fonts/maple/MapleMono-NF-CN-SemiBold.ttf";
 #endif
 
 /**
@@ -43,8 +45,10 @@ sk_sp<SkTypeface> load_from_file(const std::string_view path) {
 } // namespace skia::font
 
 sk_sp<SkTypeface> typeface = font::load_from_file(font::default_font_path);
+sk_sp<SkTypeface> bold_typeface = font::load_from_file(font::bold_font_path);
 export namespace skia::font {
 
 SkFont default_font(typeface, 24);
+SkFont bold_font(bold_typeface, 24);
 
 }
