@@ -38,6 +38,7 @@ module;
 #include <modules/skshaper/utils/FactoryHelpers.h>
 #include <include/core/SkStream.h>
 #include <include/core/SkPathBuilder.h>
+#include <include/effects/SkImageFilters.h>
 export module skia.api:core;
 
 import std;
@@ -89,6 +90,9 @@ using ::SkSVGDOM;
 using ::SkSize;
 using ::SkFILEStream;
 using ::SkScalar;
+using ::SkImageFilters;
+using ::SkImageFilter;
+using ::SkTileMode;
 
 /* 字体相关 */
 #if defined(_WIN32)
