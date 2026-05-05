@@ -30,10 +30,11 @@ public:
 
   [[nodiscard]] const SkRect &textBound() const;
   void setFontSize(float size);
+  void setFont(const SkFont &f);
   void setColor(SkColor color);
   void setText(std::string_view text);
   void setTextAndAlignment(std::string_view text, Alignment alignment);
-  const std::string &text() const;
+  [[nodiscard]] const std::string &text() const;
   void render(SkCanvas *canvas) override;
   void update() override;
 };
@@ -52,6 +53,11 @@ const SkRect &RenderText::textBound() const {
 
 void RenderText::setFontSize(const float size) {
   font.setSize(size);
+  update();
+}
+
+void RenderText::setFont(const SkFont &f) {
+  font = f;
   update();
 }
 
