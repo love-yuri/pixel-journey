@@ -62,6 +62,16 @@ public:
     return invoke_fun(object_ptr, std::forward<Args>(args)...);
   }
 
+  /** 获取目标对象指针 */
+  [[nodiscard]] void *target_object() const noexcept {
+    return object_ptr;
+  }
+
+  /** 获取目标函数指针 */
+  [[nodiscard]] InvokeFunType target_function() const noexcept {
+    return invoke_fun;
+  }
+
 private:
   void *object_ptr = nullptr;         // 指向对象或闭包
   InvokeFunType invoke_fun = nullptr; // 对象/成员函数调用
