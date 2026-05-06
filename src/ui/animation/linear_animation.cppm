@@ -28,6 +28,14 @@ public:
    */
   bool update(std::uint64_t now) override;
 
+  /** 获取动画目标标识 */
+  [[nodiscard]] AnimationTarget target() const noexcept override {
+    return {
+      setter.target_object(),
+      reinterpret_cast<void *>(setter.target_function())
+    };
+  }
+
 private:
   T from;              // 起始值
   T to;                // 目标值

@@ -77,6 +77,11 @@ void AnimationManager::start(const T &from, const T &to, float duration, T *valu
     )
   );
   // clang-format on
+  // 去重：移除同 target 的旧动画
+  const auto target = animations_.back()->target();
+  std::erase_if(animations_, [&](const auto &a) {
+    return a->target() == target && a.get() != animations_.back().get();
+  });
 }
 
 template <auto ptr, typename TObject, typename T>
@@ -87,7 +92,12 @@ void AnimationManager::start(const T &from, const T &to, float duration, TObject
       from, to, duration, LinearAnimation<T>::Setter::template from<ptr>(obj)
     )
   );
-  // clang-format off
+  // clang-format on
+  // 去重：移除同 target 的旧动画
+  const auto target = animations_.back()->target();
+  std::erase_if(animations_, [&](const auto &a) {
+    return a->target() == target && a.get() != animations_.back().get();
+  });
 }
 
 template <typename T>
@@ -97,6 +107,11 @@ void AnimationManager::start(const T &from, const T &to, float duration, T *valu
       from, to, duration, curve, typename BezierAnimation<T>::Setter{value, &setter_fn<T>}
     )
   );
+  // 去重：移除同 target 的旧动画
+  const auto target = animations_.back()->target();
+  std::erase_if(animations_, [&](const auto &a) {
+    return a->target() == target && a.get() != animations_.back().get();
+  });
 }
 
 template <auto ptr, typename TObject, typename T>
@@ -106,6 +121,11 @@ void AnimationManager::start(const T &from, const T &to, float duration, CubicBe
       from, to, duration, curve, BezierAnimation<T>::Setter::template from<ptr>(obj)
     )
   );
+  // 去重：移除同 target 的旧动画
+  const auto target = animations_.back()->target();
+  std::erase_if(animations_, [&](const auto &a) {
+    return a->target() == target && a.get() != animations_.back().get();
+  });
 }
 
 void AnimationManager::update() {
