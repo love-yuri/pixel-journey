@@ -135,7 +135,7 @@ private:
     return max_left_width > 0.f ? std::min(max_left_width, contentWidth()) : contentWidth();
   }
 
-  float split_pos = 250.f;    // 分割位置
+  float split_pos = 220.f;    // 分割位置
   float min_left_width = 0.f; // 左侧面板最小宽度，0 表示无限制
   float max_left_width = 0.f; // 左侧面板最大宽度，0 表示无限制
   static constexpr float default_handle_w = 1.f;
