@@ -8,8 +8,21 @@ import :core;
 import vulkan.api;
 import glfw.api;
 
-
 export namespace skia {
+
+/**
+ * 从编码后的图片数据解码 SkImage
+ * @param data 图片二进制数据
+ * @return 解码后的图片，失败时为空
+ */
+sk_sp<SkImage> decodeImage(const std::string_view data) {
+  if (data.empty()) {
+    return nullptr;
+  }
+
+  const auto sk_data = SkData::MakeWithCopy(data.data(), data.size());
+  return images::DeferredFromEncodedData(sk_data);
+}
 
 /**
  * 创建VkImageInfo

@@ -29,6 +29,7 @@ module;
 #include <include/core/SkColor.h>
 #include <include/core/SkRRect.h>
 #include <include/core/SkImage.h>
+#include <include/core/SkData.h>
 #include <include/core/SkSamplingOptions.h>
 #include <include/core/SkTextBlob.h>
 #include <include/core/SkColorFilter.h>
@@ -51,6 +52,10 @@ export namespace skia {
 using ::SkColorFilters;
 using ::SkColorFilter;
 using ::SkSamplingOptions;
+using ::SkCubicResampler;
+using ::SkFilterMode;
+using ::SkMipmapMode;
+using ::SkData;
 using ::SkImageInfo;
 using ::SkImage;
 using ::SkPathFillType;
@@ -114,12 +119,16 @@ constexpr SkColor ColorFromARGB(const U8CPU a,const U8CPU r, const U8CPU g, cons
  * @param color  原颜色
  * @param hsv hsv数组
  */
-void ColorToHSV(const SkColor color, SkScalar hsv[3]) { return SkColorToHSV(color, hsv); }
+void ColorToHSV(const SkColor color, SkScalar hsv[3]) {
+  return SkColorToHSV(color, hsv);
+}
 
 /**
  * hsv转color
  */
-SkColor HSVToColor(const U8CPU alpha, const SkScalar hsv[3]) { return SkHSVToColor(alpha, hsv); }
+SkColor HSVToColor(const U8CPU alpha, const SkScalar hsv[3]) {
+  return SkHSVToColor(alpha, hsv);
+}
 
 } // namespace skia
 
@@ -174,5 +183,11 @@ using skresources::DataURIResourceProviderProxy;
 export namespace skia::shapers {
 
 using SkShapers::BestAvailable;
+
+}
+
+export namespace skia::images {
+
+using SkImages::DeferredFromEncodedData;
 
 }
