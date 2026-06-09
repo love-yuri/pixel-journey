@@ -14,7 +14,7 @@ if (WIN32)
   # windows默认静态链接
   set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
 
-  message("-- Windows 工具链已配置")
+  message(STATUS "Windows 工具链已配置")
 else ()
   set(CMAKE_CXX_COMPILER "clang++" CACHE STRING "C++ 编译器")
 endif()
