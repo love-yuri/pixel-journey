@@ -7,9 +7,11 @@ export module ui.widgets:scroll_area;
 import :base;
 import core;
 import skia.api;
+import ui.animation;
 import std;
 
 using namespace skia;
+using namespace ui::animation;
 
 export namespace ui::widgets {
 
@@ -48,8 +50,13 @@ protected:
   void onMouseWheel(float delta_x, float delta_y) override;
 
 private:
+  void setScrollOffset(float value);
+  void setScrollbarFeedback(float value) noexcept { scrollbar_t_ = value; }
+
   float content_height_ = 0;                // 内容总高度
   float scroll_offset = 0;                 // 当前滚动偏移量
+  float target_scroll_offset_ = 0;          // 滚轮动画目标偏移量
+  float scrollbar_t_ = 0;                   // 滚动条高亮强度
   bool thumb_dragging_ = false;            // 是否正在拖动滑块
   float thumb_drag_start_y_ = 0;           // 拖动起始鼠标 y（视口坐标）
   float drag_start_scroll_ = 0;            // 拖动起始 scroll_offset
@@ -57,6 +64,7 @@ private:
   static constexpr float kBarPadding = 4;   // 滚动条边距
   static constexpr float kMinThumbH = 24;   // 滑块最小高度
   static constexpr float kScrollSpeed = 40; // 滚轮速度（像素/档）
+  static constexpr float kSmoothScrollMs = 180.0f;
 };
 
 ScrollArea::ScrollArea(Widget *parent) : Widget(parent) {
@@ -84,6 +92,7 @@ void ScrollArea::MouseLeftPressed(const float x, const float y) {
       is_dragging = true;
       thumb_drag_start_y_ = y;
       drag_start_scroll_ = scroll_offset;
+      scrollbar_t_ = 1.0f;
       return; // 不转发给子控件
     }
   }
@@ -99,13 +108,23 @@ void ScrollArea::MouseWheel(const float x, const float y, const float delta_x, c
 }
 
 void ScrollArea::onMouseWheel(const float delta_x, float const delta_y) {
-  scroll_offset -= delta_y * kScrollSpeed;
-
   const float view_h = contentHeight();
   const float max_scroll = std::max(0.f, content_height_ - view_h);
-  scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
+  const float next = std::clamp(target_scroll_offset_ - delta_y * kScrollSpeed, 0.f, max_scroll);
+  if (std::abs(next - target_scroll_offset_) <= 0.01f) {
+    return;
+  }
 
-  scrollChanged.emit(scroll_offset);
+  target_scroll_offset_ = next;
+  startAnimation<&ScrollArea::setScrollOffset>(
+    scroll_offset,
+    target_scroll_offset_,
+    kSmoothScrollMs,
+    CubicBezier(0.22f, 0.9f, 0.22f, 1.0f)
+  );
+
+  scrollbar_t_ = 1.0f;
+  startAnimation<&ScrollArea::setScrollbarFeedback>(scrollbar_t_, 0.0f, 650.0f, CubicBezier::EaseOut());
 }
 
 void ScrollArea::onMouseMove(const float x, float y) {
@@ -114,15 +133,16 @@ void ScrollArea::onMouseMove(const float x, float y) {
   const float thumb_h = std::max(kMinThumbH, view_h * view_h / content_height_);
   const float max_scroll = std::max(0.f, content_height_ - view_h);
   const float dy = y - thumb_drag_start_y_;
-  scroll_offset = drag_start_scroll_ + dy * max_scroll / (view_h - thumb_h);
-  scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
-  scrollChanged.emit(scroll_offset);
+  setScrollOffset(drag_start_scroll_ + dy * max_scroll / (view_h - thumb_h));
+  target_scroll_offset_ = scroll_offset;
+  scrollbar_t_ = 1.0f;
 }
 
 void ScrollArea::onMouseLeftReleased(float, float) {
   if (thumb_dragging_) {
     thumb_dragging_ = false;
     is_dragging = false;
+    startAnimation<&ScrollArea::setScrollbarFeedback>(scrollbar_t_, 0.0f, 420.0f, CubicBezier::EaseOut());
   }
 }
 
@@ -130,23 +150,25 @@ void ScrollArea::paint(SkCanvas *canvas) {
   const float view_h = contentHeight();
   if (content_height_ <= view_h) return; // 内容未超出，不绘制滚动条
 
-  const float bar_x = contentWidth() - kBarPadding - kBarWidth;
   const float thumb_h = std::max(kMinThumbH, view_h * view_h / content_height_);
   const float max_scroll = content_height_ - view_h;
   const float scroll_pct = max_scroll > 0 ? scroll_offset / max_scroll : 0;
   const float thumb_y = scroll_pct * (view_h - thumb_h);
+  const float active_t = std::max(scrollbar_t_, thumb_dragging_ ? 1.0f : 0.0f);
+  const float bar_w = kBarWidth + active_t * 3.0f;
+  const float active_bar_x = contentWidth() - kBarPadding - bar_w;
 
   SkPaint track_paint;
-  track_paint.setColor(ColorFromARGB(40, 128, 128, 128));
+  track_paint.setColor(ColorFromARGB(static_cast<U8CPU>(30.0f + active_t * 28.0f), 128, 128, 128));
   track_paint.setAntiAlias(true);
-  canvas->drawRoundRect(SkRect::MakeXYWH(bar_x, 0, kBarWidth, view_h), kBarWidth / 2, kBarWidth / 2,
+  canvas->drawRoundRect(SkRect::MakeXYWH(active_bar_x, 0, bar_w, view_h), bar_w / 2, bar_w / 2,
                         track_paint);
 
   SkPaint thumb_paint;
-  thumb_paint.setColor(ColorFromARGB(120, 128, 128, 128));
+  thumb_paint.setColor(ColorFromARGB(static_cast<U8CPU>(112.0f + active_t * 76.0f), 128, 128, 128));
   thumb_paint.setAntiAlias(true);
-  canvas->drawRoundRect(SkRect::MakeXYWH(bar_x, thumb_y, kBarWidth, thumb_h), kBarWidth / 2,
-                        kBarWidth / 2, thumb_paint);
+  canvas->drawRoundRect(SkRect::MakeXYWH(active_bar_x, thumb_y, bar_w, thumb_h), bar_w / 2,
+                        bar_w / 2, thumb_paint);
 }
 
 void ScrollArea::render(SkCanvas *canvas) {
@@ -204,6 +226,7 @@ void ScrollArea::layoutChildren() {
   content_height_ = y;
   const float max_scroll = std::max(0.f, content_height_ - contentHeight());
   scroll_offset = std::clamp(scroll_offset, 0.f, max_scroll);
+  target_scroll_offset_ = std::clamp(target_scroll_offset_, 0.f, max_scroll);
 
   scrollChanged.emit(scroll_offset);
 
@@ -211,6 +234,16 @@ void ScrollArea::layoutChildren() {
   for (const auto child : children_) {
     child->updateLayout();
   }
+}
+
+void ScrollArea::setScrollOffset(const float value) {
+  const float max_scroll = std::max(0.f, content_height_ - contentHeight());
+  const float next = std::clamp(value, 0.f, max_scroll);
+  if (std::abs(scroll_offset - next) <= 0.01f) {
+    return;
+  }
+  scroll_offset = next;
+  scrollChanged.emit(scroll_offset);
 }
 
 } // namespace ui::widgets
