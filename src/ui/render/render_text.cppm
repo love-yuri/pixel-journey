@@ -9,6 +9,34 @@ import std;
 
 using namespace skia;
 
+namespace ui::render::detail {
+
+/**
+ * 配置文本字体渲染参数
+ * @param font 待配置的字体
+ */
+void configureTextFont(SkFont &font) noexcept;
+
+/**
+ * 将文本绘制坐标吸附到整数像素
+ * @param value 原始坐标
+ * @return 吸附后的坐标
+ */
+float snapTextPosition(const float value) noexcept;
+
+} // namespace ui::render::detail
+
+void ui::render::detail::configureTextFont(SkFont &font) noexcept {
+  font.setEdging(SkFont::Edging::kSubpixelAntiAlias);
+  font.setHinting(SkFontHinting::kFull);
+  font.setSubpixel(false);
+  font.setLinearMetrics(false);
+}
+
+float ui::render::detail::snapTextPosition(const float value) noexcept {
+  return std::round(value);
+}
+
 export namespace ui::render {
 
 class RenderText : public RenderNode {
@@ -26,7 +54,7 @@ public:
 
   RenderText(std::string_view text, const SkRect &rect);
   explicit RenderText(std::string_view text);
-  RenderText() = default;
+  RenderText();
 
   [[nodiscard]] const SkRect &textBound() const;
   void setFontSize(float size);
@@ -41,10 +69,16 @@ public:
 
 RenderText::RenderText(const std::string_view text, const SkRect &rect) :
   RenderNode(rect), text_(text) {
+  detail::configureTextFont(font);
   RenderText::update();
 }
 
 RenderText::RenderText(const std::string_view text) : text_(text) {
+  detail::configureTextFont(font);
+}
+
+RenderText::RenderText() {
+  detail::configureTextFont(font);
 }
 
 const SkRect &RenderText::textBound() const {
@@ -53,11 +87,13 @@ const SkRect &RenderText::textBound() const {
 
 void RenderText::setFontSize(const float size) {
   font.setSize(size);
+  detail::configureTextFont(font);
   update();
 }
 
 void RenderText::setFont(const SkFont &f) {
   font = f;
+  detail::configureTextFont(font);
   update();
 }
 
@@ -89,8 +125,8 @@ void RenderText::render(SkCanvas *canvas) {
 void RenderText::update() {
   font.measureText(text_.data(), text_.size(), SkTextEncoding::kUTF8, &font_rect);
   const auto pos = calcAlignedPosition(font_rect);
-  x = pos.x();
-  y = pos.y();
+  x = detail::snapTextPosition(pos.x());
+  y = detail::snapTextPosition(pos.y());
 
   blob = SkTextBlob::MakeFromText(text_.data(), text_.size(), font, SkTextEncoding::kUTF8);
 }

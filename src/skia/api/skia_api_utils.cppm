@@ -38,7 +38,7 @@ sk_sp<SkSurface> create_surface(
   const std::uint32_t queue_family_index,
   GrDirectContext* context
 ) {
-  const SkSurfaceProps props(0, kUnknown_SkPixelGeometry);
+  const SkSurfaceProps props(0, kRGB_H_SkPixelGeometry);
 
   GrVkImageInfo imageInfo{};
   imageInfo.fImage = *image;
