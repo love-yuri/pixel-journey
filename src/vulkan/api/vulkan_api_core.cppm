@@ -105,5 +105,6 @@ using ::VK_IMAGE_TILING_OPTIMAL;
 using ::PFN_vkVoidFunction;
 using ::VK_IMAGE_LAYOUT_UNDEFINED;
 using ::VkDevice;
+using ::VkFormat;
 
 } // namespace vk

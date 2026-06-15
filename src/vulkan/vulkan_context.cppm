@@ -106,12 +106,23 @@ VulkanContext::VulkanContext() : instance(nullptr) {
   skia_vk_context.fGraphicsQueueIndex = queue_family_index;
   skia_vk_context.fQueue = queue;
   skia_vk_context.fGetProc = vulkan_get_proc;
+  skia_vk_context.fMemoryAllocator = gpu::VulkanMemoryAllocators::Make(
+    skia_vk_context,
+    gpu::ThreadSafe::kNo
+  );
+  if (!skia_vk_context.fMemoryAllocator) {
+    throw std::runtime_error("创建 Skia Vulkan MemoryAllocator 失败");
+  }
   skia_direct_context = MakeVulkan(skia_vk_context);
+  if (!skia_direct_context) {
+    throw std::runtime_error("创建 Skia Vulkan DirectContext 失败");
+  }
   present_state = gpu::MutableTextureStates::MakeVulkan(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, queue_family_index);
 }
 
 VulkanContext::~VulkanContext() {
   skia_direct_context.reset();
+  skia_vk_context.fMemoryAllocator.reset();
   logic_device.destroyCommandPool(command_pool);
   logic_device.destroy();
   if constexpr (is_debug_mode) {

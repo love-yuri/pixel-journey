@@ -11,12 +11,6 @@ import yuri_log;
 import glfw.api;
 import skia.api;
 
-// 等待信息
-constexpr vk::PipelineStageFlags wait_stage = vk::PipelineStageFlagBits::eTransfer;
-
-// 开始绘制信息
-constexpr vk::CommandBufferBeginInfo command_buffer_begin_info{};
-
 // 最大值
 constexpr auto uint_32_max = std::numeric_limits<std::uint32_t>::max();
 
@@ -25,24 +19,16 @@ constexpr auto uint_32_max = std::numeric_limits<std::uint32_t>::max();
  */
 export class render_frame {
   vk::SwapchainKHR* swapchain = nullptr;        // 不持有交换链，仅作api使用
-  vk::CommandBuffer* command_buffer = nullptr;  // 正在使用的command buffer
 
 public:
-  std::uint32_t image_index{};                       // image index
-  vk::Image* image{};                                // 当前帧image
-  vk::Semaphore* render_finished{};                  // 渲染完成的信号
-  vk::Semaphore* image_available{};                  // 图像获取完成的信号
-  vk::Fence* fence{};                                // 帧渲染完成的栅栏
-  skia::SkSurface* sk_surface{};                     // surface
-  std::vector<vk::CommandBuffer>* command_buffers{}; // 专属命令缓冲区
+  std::uint32_t image_index{};          // image index
+  vk::Image* image{};                   // 当前帧image
+  vk::Semaphore* render_finished{};     // 渲染完成的信号
+  vk::Semaphore* image_available{};     // 图像获取完成的信号
+  skia::SkSurface* sk_surface{};        // surface
+  std::atomic_bool* frame_finished{};   // 帧完成标记
 
   explicit render_frame(vk::SwapchainKHR &swapchain);
-
-  /**
-   * 开始绘制
-   * @return 需要录制的commandBuffer
-   */
-  vk::CommandBuffer* begin_frame();
 
   /**
    * 提交渲染指令
@@ -72,11 +58,10 @@ public:
   vk::SwapchainKHR swapchain;              // 交换链对象
   std::uint32_t image_count{};             // 图像数量: 默认min + 1
   std::vector<vk::Image> images;           // 所有图像
-  std::vector<vk::Fence> fences;           // fence 同步量
-  std::vector<vk::Semaphore> render_finished_semaphores;       // render 同步量
-  std::vector<vk::Semaphore> image_available_semaphores;       // 图像可用同步量
-  std::vector<std::vector<vk::CommandBuffer>> command_buffers; // buffers
-  std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;       // skia surface
+  std::vector<vk::Semaphore> render_finished_semaphores;        // render 同步量
+  std::vector<vk::Semaphore> image_available_semaphores;        // 图像可用同步量
+  std::vector<std::unique_ptr<std::atomic_bool>> frame_finished_flags; // 帧完成标记
+  std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;        // skia surface
 
   explicit WindowContext(glfw::GLFWwindow *window);
 
@@ -93,7 +78,7 @@ public:
   /**
    * 销毁交换链
    */
-  void destroy_swapchain() const;
+  void destroy_swapchain();
 
   /**
    * 获取下一个渲染帧数据
@@ -107,23 +92,24 @@ render_frame::render_frame(vk::SwapchainKHR &swapchain):swapchain(&swapchain) {
 
 }
 
-vk::CommandBuffer* render_frame::begin_frame() {
-  command_buffer = &command_buffers->at(0);
-  vk::check_vk_result(command_buffer->reset(), "重置cmd");
-  vk::check_vk_result(command_buffer->begin(command_buffer_begin_info), "开始绘制");
-  return command_buffer;
-}
-
 void render_frame::submit() const {
-  vk::check_vk_result(command_buffer->end(), "结束录制");
-  const vk::SubmitInfo submit_info {
-    1, image_available,
-    &wait_stage, 1,
-    command_buffer, 1,
-    render_finished
-  };
+  const auto wait_semaphore = skia::GrBackendSemaphores::MakeVk(*image_available);
+  vulkan_context->skia_direct_context->wait(1, &wait_semaphore, false);
 
-  vk::check_vk_result(vulkan_context->queue.submit(submit_info, *fence), "提交绘制信息");
+  auto signal_semaphore = skia::GrBackendSemaphores::MakeVk(*render_finished);
+  auto on_frame_finished = [](skia::GrGpuFinishedContext context) {
+    static_cast<std::atomic_bool*>(context)->store(true, std::memory_order_release);
+  };
+  skia::GrFlushInfo flush_info{1, {}, &signal_semaphore};
+  flush_info.fFinishedProc = on_frame_finished;
+  flush_info.fFinishedContext = frame_finished;
+
+  vulkan_context->skia_direct_context->flush(
+    sk_surface,
+    flush_info,
+    &vulkan_context->present_state
+  );
+  vulkan_context->skia_direct_context->submit(skia::GrSyncCpu::kNo);
 }
 
 void render_frame::present() {
@@ -169,13 +155,37 @@ void WindowContext::create_swapchain() {
     extent = vk::get_buffer_size(window);
   }
 
+  const auto surface_formats = vk::check_vk_result(
+    vulkan_context->physical_device.getSurfaceFormatsKHR(surface),
+    "获取 Surface Formats"
+  );
+  const auto selected_format = vk::choose_surface_format(surface_formats);
+  format = selected_format.format;
+  color_space = selected_format.colorSpace;
+
+  const auto requested_image_count = capabilities.minImageCount + 1;
+  auto selected_image_count = requested_image_count;
+  if (capabilities.maxImageCount > 0) {
+    selected_image_count = std::min(selected_image_count, capabilities.maxImageCount);
+  }
+
+  yuri::info("Surface capabilities:");
+  yuri::info("  minImageCount: {}", capabilities.minImageCount);
+  yuri::info("  maxImageCount: {}", capabilities.maxImageCount);
+  yuri::info("  currentExtent: {} x {}", capabilities.currentExtent.width, capabilities.currentExtent.height);
+  yuri::info("  selectedExtent: {} x {}", extent.width, extent.height);
+  yuri::info("Swapchain image count:");
+  yuri::info("  requested: {}", requested_image_count);
+  yuri::info("  selectedForCreate: {}", selected_image_count);
+  yuri::info("Swapchain format: format={}, colorSpace={}", vk::to_string(format), vk::to_string(color_space));
+
   // 创建
-  image_count = capabilities.minImageCount + 1;
+  image_count = selected_image_count;
   const vk::detail::swapchain_create_info info {
     surface,
     image_count,
-    vk::defaults::default_surface_format,
-    vk::defaults::default_surface_color_space,
+    format,
+    color_space,
     extent,
     capabilities.currentTransform
   };
@@ -187,52 +197,57 @@ void WindowContext::create_swapchain() {
 
   current_frame = std::make_unique<render_frame>(swapchain);
   images = vulkan_context->get_images(swapchain);
+  if (images.empty()) {
+    throw std::runtime_error("获取到的 swapchain image 数量为 0");
+  }
+  image_count = static_cast<std::uint32_t>(images.size());
+  yuri::info("  actualImages: {}", image_count);
 
   // 创建渲染帧
-  fences.resize(image_count);
   render_finished_semaphores.resize(image_count);
   image_available_semaphores.resize(image_count);
-  command_buffers.resize(image_count);
+  frame_finished_flags.resize(image_count);
   sk_surfaces.resize(image_count);
 
-  for (auto i = 0; i < image_count; ++i) {
+  for (std::uint32_t i = 0; i < image_count; ++i) {
     render_finished_semaphores[i] = vulkan_context->create_semaphore();
     image_available_semaphores[i] = vulkan_context->create_semaphore();
-    fences[i] = vulkan_context->create_fence();
-    command_buffers[i] = vulkan_context->allocate_command_buffer();
+    frame_finished_flags[i] = std::make_unique<std::atomic_bool>(true);
     sk_surfaces[i] = skia::create_surface(
       &images[i],
       extent,
+      format,
       vulkan_context->queue_family_index,
       vulkan_context->skia_direct_context.get()
     );
-
-    // 再次提交更新layout
-    vulkan_context->skia_direct_context->flush(sk_surfaces[i].get(), {}, &vulkan_context->present_state);
-    vulkan_context->skia_direct_context->submit();
   }
 }
 
-void WindowContext::destroy_swapchain() const {
-  auto _ = vulkan_context->logic_device.waitIdle();
+void WindowContext::destroy_swapchain() {
+  if (!swapchain) return;
 
-  for (auto &k : command_buffers) {
-    vulkan_context->logic_device.freeCommandBuffers(vulkan_context->command_pool, k);
-  }
+  vulkan_context->skia_direct_context->flushAndSubmit(skia::GrSyncCpu::kYes);
+  void(vulkan_context->logic_device.waitIdle());
+
+  sk_surfaces.clear();
+  frame_finished_flags.clear();
+  images.clear();
 
   for (const auto &k : image_available_semaphores) {
     vulkan_context->logic_device.destroySemaphore(k);
   }
+  image_available_semaphores.clear();
 
   for (const auto &k : render_finished_semaphores) {
     vulkan_context->logic_device.destroySemaphore(k);
   }
-
-  for (const auto &k : fences) {
-    vulkan_context->logic_device.destroyFence(k);
-  }
+  render_finished_semaphores.clear();
 
   vulkan_context->logic_device.destroySwapchainKHR(swapchain);
+  swapchain = nullptr;
+  current_frame.reset();
+  current_frame_index = -1;
+  image_count = 0;
 
   // 释放显存
   vulkan_context->logic_device.freeMemory();
@@ -242,17 +257,17 @@ render_frame* WindowContext::acquire_next_frame() {
   // 获取下一帧
   current_frame_index = (current_frame_index + 1) % image_count;
 
-  // 等待并重置fence
-  const auto &device = vulkan_context->logic_device;
-  vk::check_vk_result(
-    device.waitForFences(fences[current_frame_index], true, vk::wait_fence_timeout),
-    "等待 Fence"
-  );
-  vk::check_vk_result(device.resetFences(fences[current_frame_index]),"重置 Fence");
+  // 等待当前帧槽位释放
+  auto &frame_finished = *frame_finished_flags[current_frame_index];
+  while (!frame_finished.load(std::memory_order_acquire)) {
+    vulkan_context->skia_direct_context->checkAsyncWorkCompletion();
+    std::this_thread::yield();
+  }
+  frame_finished.store(false, std::memory_order_release);
 
   // 拿到所需image_index
   std::uint32_t image_index;
-  vk::check_vk_result(device.acquireNextImageKHR(
+  vk::check_vk_result(vulkan_context->logic_device.acquireNextImageKHR(
     swapchain, std::numeric_limits<std::uint64_t>::max(),
     image_available_semaphores[current_frame_index], nullptr, &image_index
   ), "acquire image index");
@@ -260,11 +275,10 @@ render_frame* WindowContext::acquire_next_frame() {
   // 更新当前帧数据
   current_frame->image_index = image_index;
   current_frame->image = &images[image_index];
-  current_frame->render_finished = &render_finished_semaphores[image_index];
+  current_frame->render_finished = &render_finished_semaphores[current_frame_index];
   current_frame->image_available = &image_available_semaphores[current_frame_index];
-  current_frame->fence = &fences[current_frame_index];
-  current_frame->command_buffers = &command_buffers[current_frame_index];
-  current_frame->sk_surface = sk_surfaces[current_frame_index].get();
+  current_frame->frame_finished = frame_finished_flags[current_frame_index].get();
+  current_frame->sk_surface = sk_surfaces[image_index].get();
 
   return current_frame.get();
 }

@@ -15,7 +15,10 @@ module;
 #include <include/gpu/vk/VulkanBackendContext.h>
 #include <include/gpu/ganesh/vk/GrVkDirectContext.h>
 #include <include/gpu/ganesh/vk/GrVkBackendSurface.h>
+#include <include/gpu/ganesh/vk/GrVkBackendSemaphore.h>
 #include <include/gpu/ganesh/GrBackendSurface.h>
+#include <include/gpu/ganesh/GrBackendSemaphore.h>
+#include <include/gpu/ganesh/GrTypes.h>
 #include <include/gpu/ganesh/vk/GrVkTypes.h>
 #include <include/gpu/vk/VulkanMutableTextureState.h>
 #include <include/gpu/ganesh/SkSurfaceGanesh.h>
@@ -40,6 +43,8 @@ module;
 #include <include/core/SkStream.h>
 #include <include/core/SkPathBuilder.h>
 #include <include/effects/SkImageFilters.h>
+#include <src/gpu/GpuTypesPriv.h>
+#include <src/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorPriv.h>
 export module skia.api:core;
 
 import std;
@@ -79,11 +84,18 @@ using ::SkFontHinting;
 using ::SkPaint;
 using ::kUnknown_SkPixelGeometry;
 using ::kRGB_H_SkPixelGeometry;
+using ::SkColorType;
 using ::GrVkImageInfo;
 using ::GrBackendRenderTarget;
 using ::kTopLeft_GrSurfaceOrigin;
 using ::kBGRA_8888_SkColorType;
+using ::kRGBA_8888_SkColorType;
 using ::GrSyncCpu;
+using ::GrFlushInfo;
+using ::GrBackendSemaphore;
+using ::GrSemaphoresSubmitted;
+using ::GrGpuFinishedProc;
+using ::GrGpuFinishedContext;
 using ::GrDirectContext;
 using ::SkFontMgr;
 using ::SkColor;
@@ -140,6 +152,10 @@ SkColor HSVToColor(const U8CPU alpha, const SkScalar hsv[3]) {
 export namespace skia::gpu {
 
 using skgpu::VulkanBackendContext;
+using skgpu::VulkanMemoryAllocator;
+using skgpu::VulkanBackendMemory;
+using skgpu::VulkanAlloc;
+using skgpu::ThreadSafe;
 using skgpu::MutableTextureState;
 using skgpu::Budgeted;
 
@@ -151,6 +167,25 @@ using skgpu::Budgeted;
 export namespace skia::gpu::MutableTextureStates {
 
 using skgpu::MutableTextureStates::MakeVulkan;
+
+}
+
+/**
+ * Vulkan内存分配器
+ */
+export namespace skia::gpu::VulkanMemoryAllocators {
+
+using skgpu::VulkanMemoryAllocators::Make;
+
+}
+
+/**
+ * GrBackendSemaphores
+ */
+export namespace skia::GrBackendSemaphores {
+
+using ::GrBackendSemaphores::MakeVk;
+using ::GrBackendSemaphores::GetVkSemaphore;
 
 }
 

@@ -200,7 +200,6 @@ void Window::run() {
 
     // 获取下一帧图像
     const auto frame = acquireNextFrame();
-    frame->begin_frame();
 
     // 更新clock
     profiling::frame_clock.update();
@@ -214,11 +213,7 @@ void Window::run() {
     // 渲染
     render(frame->sk_surface->getCanvas());
 
-    // 提交skia指令并转换布局
-    vulkan_context->skia_direct_context->flush(frame->sk_surface, {}, &vulkan_context->present_state);
-    vulkan_context->skia_direct_context->submit(skia::GrSyncCpu::kNo);
-
-    // 提交绘制信息
+    // 提交并展示渲染内容
     frame->submit();
     frame->present();
 

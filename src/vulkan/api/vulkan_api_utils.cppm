@@ -5,6 +5,7 @@
 export module vulkan.api:utils;
 
 import :core;
+import :config;
 import glfw.api;
 import yuri_log;
 import configuration;
@@ -145,6 +146,60 @@ bool check_surface_format_support(const std::vector<SurfaceFormatKHR>& format_kh
   return std::ranges::any_of(format_khrs, [format, space_khr](const SurfaceFormatKHR& format_khr) {
     return format_khr.format == format && format_khr.colorSpace == space_khr;
   });
+}
+
+/**
+ * 选择Skia可用的Surface格式
+ * @param formats 设备支持的Surface格式
+ * @return 选中的格式
+ */
+SurfaceFormatKHR choose_surface_format(const std::vector<SurfaceFormatKHR>& formats) {
+  if (formats.empty()) {
+    throw std::runtime_error("Surface formats 为空，无法创建 swapchain");
+  }
+
+  yuri::info("Surface formats count: {}", formats.size());
+
+  if (formats.size() == 1 && formats[0].format == Format::eUndefined) {
+    yuri::info(
+      "Surface format 为 eUndefined，使用默认格式: format={}, colorSpace={}",
+      to_string(defaults::default_surface_format),
+      to_string(defaults::default_surface_color_space)
+    );
+    return {defaults::default_surface_format, defaults::default_surface_color_space};
+  }
+
+  constexpr std::array preferred_formats{
+    Format::eB8G8R8A8Unorm,
+    Format::eB8G8R8A8Srgb,
+    Format::eR8G8B8A8Unorm,
+    Format::eR8G8B8A8Srgb,
+  };
+
+  for (const auto preferred_format : preferred_formats) {
+    const auto it = std::ranges::find_if(formats, [preferred_format](const SurfaceFormatKHR& format_khr) {
+      return format_khr.format == preferred_format &&
+             format_khr.colorSpace == defaults::default_surface_color_space;
+    });
+    if (it != formats.end()) {
+      yuri::info(
+        "Selected surface format: format={}, colorSpace={}",
+        to_string(it->format),
+        to_string(it->colorSpace)
+      );
+      return *it;
+    }
+  }
+
+  std::string supported_formats;
+  for (const auto& format_khr : formats) {
+    supported_formats += std::format(
+      "[format={}, colorSpace={}] ",
+      to_string(format_khr.format),
+      to_string(format_khr.colorSpace)
+    );
+  }
+  throw std::runtime_error(std::format("没有找到Skia可用的Surface格式: {}", supported_formats));
 }
 
 /**
