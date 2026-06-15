@@ -526,8 +526,8 @@ WindowBase *Widget::window() {
   }
   auto parent = parent_;
   while (parent) {
-    if (dynamic_cast<WindowBase *>(parent)) {
-      return window_ = dynamic_cast<WindowBase *>(parent);
+    if (const auto w = dynamic_cast<WindowBase *>(parent)) {
+      return window_ = w;
     }
     parent = parent->parent_;
   }
