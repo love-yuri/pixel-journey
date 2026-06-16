@@ -4,7 +4,7 @@
 module;
 #if defined(_WIN32)
 // ReSharper disable once CppUnusedIncludeDirective
-#include "include/private/base/SkFloatingPoint.h"
+#include "include/private/SkFloatingPoint.h"
 #endif
 export module ui.render:base;
 

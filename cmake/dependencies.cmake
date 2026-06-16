@@ -26,6 +26,10 @@ if(WIN32)
         ${SKIA_OUT}/skshaper.lib
         ${SKIA_OUT}/skunicode_icu.lib
         ${SKIA_OUT}/skunicode_core.lib
+        ${SKIA_OUT}/allocator_base.lib
+        ${SKIA_OUT}/allocator_core.lib
+        ${SKIA_OUT}/raw_ptr.lib
+        winmm.lib
     )
 elseif(UNIX)
     set(SKIA_ROOT "/home/yuri/github/skia")

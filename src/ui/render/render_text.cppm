@@ -1,6 +1,6 @@
 module;
 // ReSharper disable once CppUnusedIncludeDirective
-#include "include/private/base/SkFloatingPoint.h"
+#include "include/private/SkFloatingPoint.h"
 export module ui.render:text;
 
 import :base;
