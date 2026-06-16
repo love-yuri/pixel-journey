@@ -25,8 +25,8 @@ public:
   vk::Image* image{};                   // 当前帧image
   vk::Semaphore* render_finished{};     // 渲染完成的信号
   vk::Semaphore* image_available{};     // 图像获取完成的信号
+  vk::Fence* frame_fence{};             // 帧槽位完成栅栏
   skia::SkSurface* sk_surface{};        // surface
-  std::atomic_bool* frame_finished{};   // 帧完成标记
 
   explicit render_frame(vk::SwapchainKHR &swapchain);
 
@@ -60,7 +60,7 @@ public:
   std::vector<vk::Image> images;           // 所有图像
   std::vector<vk::Semaphore> render_finished_semaphores;        // render 同步量
   std::vector<vk::Semaphore> image_available_semaphores;        // 图像可用同步量
-  std::vector<std::unique_ptr<std::atomic_bool>> frame_finished_flags; // 帧完成标记
+  std::vector<vk::Fence> frame_fences;                          // 帧槽位完成栅栏
   std::vector<skia::sk_sp<skia::SkSurface>> sk_surfaces;        // skia surface
 
   explicit WindowContext(glfw::GLFWwindow *window);
@@ -97,12 +97,7 @@ void render_frame::submit() const {
   vulkan_context->skia_direct_context->wait(1, &wait_semaphore, false);
 
   auto signal_semaphore = skia::GrBackendSemaphores::MakeVk(*render_finished);
-  auto on_frame_finished = [](skia::GrGpuFinishedContext context) {
-    static_cast<std::atomic_bool*>(context)->store(true, std::memory_order_release);
-  };
-  skia::GrFlushInfo flush_info{1, {}, &signal_semaphore};
-  flush_info.fFinishedProc = on_frame_finished;
-  flush_info.fFinishedContext = frame_finished;
+  const skia::GrFlushInfo flush_info{1, {}, &signal_semaphore};
 
   vulkan_context->skia_direct_context->flush(
     sk_surface,
@@ -110,6 +105,7 @@ void render_frame::submit() const {
     &vulkan_context->present_state
   );
   vulkan_context->skia_direct_context->submit(skia::GrSyncCpu::kNo);
+  vk::check_vk_result(vulkan_context->queue.submit(0, nullptr, *frame_fence), "提交帧完成 Fence");
 }
 
 void render_frame::present() {
@@ -206,13 +202,13 @@ void WindowContext::create_swapchain() {
   // 创建渲染帧
   render_finished_semaphores.resize(image_count);
   image_available_semaphores.resize(image_count);
-  frame_finished_flags.resize(image_count);
+  frame_fences.resize(image_count);
   sk_surfaces.resize(image_count);
 
   for (std::uint32_t i = 0; i < image_count; ++i) {
     render_finished_semaphores[i] = vulkan_context->create_semaphore();
     image_available_semaphores[i] = vulkan_context->create_semaphore();
-    frame_finished_flags[i] = std::make_unique<std::atomic_bool>(true);
+    frame_fences[i] = vulkan_context->create_fence();
     sk_surfaces[i] = skia::create_surface(
       &images[i],
       extent,
@@ -230,8 +226,12 @@ void WindowContext::destroy_swapchain() {
   void(vulkan_context->logic_device.waitIdle());
 
   sk_surfaces.clear();
-  frame_finished_flags.clear();
   images.clear();
+
+  for (const auto &k : frame_fences) {
+    vulkan_context->logic_device.destroyFence(k);
+  }
+  frame_fences.clear();
 
   for (const auto &k : image_available_semaphores) {
     vulkan_context->logic_device.destroySemaphore(k);
@@ -258,12 +258,12 @@ render_frame* WindowContext::acquire_next_frame() {
   current_frame_index = (current_frame_index + 1) % image_count;
 
   // 等待当前帧槽位释放
-  auto &frame_finished = *frame_finished_flags[current_frame_index];
-  while (!frame_finished.load(std::memory_order_acquire)) {
-    vulkan_context->skia_direct_context->checkAsyncWorkCompletion();
-    std::this_thread::yield();
-  }
-  frame_finished.store(false, std::memory_order_release);
+  const auto &frame_fence = frame_fences[current_frame_index];
+  vk::check_vk_result(
+    vulkan_context->logic_device.waitForFences(frame_fence, true, std::numeric_limits<std::uint64_t>::max()),
+    "等待帧完成 Fence"
+  );
+  vk::check_vk_result(vulkan_context->logic_device.resetFences(frame_fence), "重置帧完成 Fence");
 
   // 拿到所需image_index
   std::uint32_t image_index;
@@ -275,9 +275,9 @@ render_frame* WindowContext::acquire_next_frame() {
   // 更新当前帧数据
   current_frame->image_index = image_index;
   current_frame->image = &images[image_index];
-  current_frame->render_finished = &render_finished_semaphores[current_frame_index];
+  current_frame->render_finished = &render_finished_semaphores[image_index];
   current_frame->image_available = &image_available_semaphores[current_frame_index];
-  current_frame->frame_finished = frame_finished_flags[current_frame_index].get();
+  current_frame->frame_fence = &frame_fences[current_frame_index];
   current_frame->sk_surface = sk_surfaces[image_index].get();
 
   return current_frame.get();
