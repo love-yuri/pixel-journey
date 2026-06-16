@@ -165,15 +165,17 @@ void WindowContext::create_swapchain() {
     selected_image_count = std::min(selected_image_count, capabilities.maxImageCount);
   }
 
-  yuri::info("Surface capabilities:");
-  yuri::info("  minImageCount: {}", capabilities.minImageCount);
-  yuri::info("  maxImageCount: {}", capabilities.maxImageCount);
-  yuri::info("  currentExtent: {} x {}", capabilities.currentExtent.width, capabilities.currentExtent.height);
-  yuri::info("  selectedExtent: {} x {}", extent.width, extent.height);
-  yuri::info("Swapchain image count:");
-  yuri::info("  requested: {}", requested_image_count);
-  yuri::info("  selectedForCreate: {}", selected_image_count);
-  yuri::info("Swapchain format: format={}, colorSpace={}", vk::to_string(format), vk::to_string(color_space));
+  if constexpr (is_debug_mode) {
+    yuri::info("Surface capabilities:");
+    yuri::info("  minImageCount: {}", capabilities.minImageCount);
+    yuri::info("  maxImageCount: {}", capabilities.maxImageCount);
+    yuri::info("  currentExtent: {} x {}", capabilities.currentExtent.width, capabilities.currentExtent.height);
+    yuri::info("  selectedExtent: {} x {}", extent.width, extent.height);
+    yuri::info("Swapchain image count:");
+    yuri::info("  requested: {}", requested_image_count);
+    yuri::info("  selectedForCreate: {}", selected_image_count);
+    yuri::info("Swapchain format: format={}, colorSpace={}", vk::to_string(format), vk::to_string(color_space));
+  }
 
   // 创建
   image_count = selected_image_count;
