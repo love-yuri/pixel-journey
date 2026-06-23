@@ -12,6 +12,7 @@ import std;
 
 using namespace skia;
 using namespace ui::animation;
+using namespace profiling;
 
 export namespace ui::widgets {
 
@@ -53,18 +54,29 @@ private:
   void setScrollOffset(float value);
   void setScrollbarFeedback(float value) noexcept { scrollbar_t_ = value; }
 
-  float content_height_ = 0;                // 内容总高度
-  float scroll_offset = 0;                 // 当前滚动偏移量
-  float target_scroll_offset_ = 0;          // 滚轮动画目标偏移量
-  float scrollbar_t_ = 0;                   // 滚动条高亮强度
-  bool thumb_dragging_ = false;            // 是否正在拖动滑块
-  float thumb_drag_start_y_ = 0;           // 拖动起始鼠标 y（视口坐标）
-  float drag_start_scroll_ = 0;            // 拖动起始 scroll_offset
-  static constexpr float kBarWidth = 6;     // 滚动条宽度
-  static constexpr float kBarPadding = 4;   // 滚动条边距
-  static constexpr float kMinThumbH = 24;   // 滑块最小高度
-  static constexpr float kScrollSpeed = 40; // 滚轮速度（像素/档）
-  static constexpr float kSmoothScrollMs = 180.0f;
+  /** 平滑激活滚动条（变大变亮），并重置淡出计时 */
+  void activateScrollbar() noexcept;
+
+  /** 每帧检查并调度延迟淡出 */
+  void scheduleScrollbarFadeOut() noexcept;
+
+  float content_height_ = 0;                 // 内容总高度
+  float scroll_offset = 0;                   // 当前滚动偏移量
+  float target_scroll_offset_ = 0;           // 滚轮动画目标偏移量
+  float scrollbar_t_ = 0;                    // 滚动条高亮强度
+  bool thumb_dragging_ = false;              // 是否正在拖动滑块
+  bool fading_out_ = false;                  // 滚动条是否正在淡出
+  std::uint64_t last_interaction_time_ = 0;  // 最后一次交互时间（微秒）
+  float thumb_drag_start_y_ = 0;             // 拖动起始鼠标 y（视口坐标）
+  float drag_start_scroll_ = 0;              // 拖动起始 scroll_offset
+  static constexpr float kBarWidth = 4;      // 滚动条宽度（激活前后一致）
+  static constexpr float kBarPadding = 4;    // 滚动条边距
+  static constexpr float kMinThumbH = 24;    // 滑块最小高度
+  static constexpr float kScrollSpeed = 40;  // 滚轮速度（像素/档）
+  static constexpr float kSmoothScrollMs = 180.0f;  // 滚动平滑时长
+  static constexpr float kActivateMs = 160.0f;      // 滚动条激活动画时长
+  static constexpr float kFadeDelayMs = 360.0f;     // 停止交互后淡出延迟
+  static constexpr float kFadeMs = 420.0f;          // 滚动条淡出时长
 };
 
 ScrollArea::ScrollArea(Widget *parent) : Widget(parent) {
@@ -92,6 +104,9 @@ void ScrollArea::MouseLeftPressed(const float x, const float y) {
       is_dragging = true;
       thumb_drag_start_y_ = y;
       drag_start_scroll_ = scroll_offset;
+      // 拖拽即时显示滚动条，并重置淡出计时
+      fading_out_ = false;
+      last_interaction_time_ = frame_clock.now;
       scrollbar_t_ = 1.0f;
       return; // 不转发给子控件
     }
@@ -123,8 +138,7 @@ void ScrollArea::onMouseWheel(const float delta_x, float const delta_y) {
     CubicBezier(0.22f, 0.9f, 0.22f, 1.0f)
   );
 
-  scrollbar_t_ = 1.0f;
-  startAnimation<&ScrollArea::setScrollbarFeedback>(scrollbar_t_, 0.0f, 650.0f, CubicBezier::EaseOut());
+  activateScrollbar();
 }
 
 void ScrollArea::onMouseMove(const float x, float y) {
@@ -135,14 +149,49 @@ void ScrollArea::onMouseMove(const float x, float y) {
   const float dy = y - thumb_drag_start_y_;
   setScrollOffset(drag_start_scroll_ + dy * max_scroll / (view_h - thumb_h));
   target_scroll_offset_ = scroll_offset;
-  scrollbar_t_ = 1.0f;
+  // 拖拽进行中，保持滚动条高亮并重置淡出计时
+  fading_out_ = false;
+  last_interaction_time_ = frame_clock.now;
 }
 
 void ScrollArea::onMouseLeftReleased(float, float) {
   if (thumb_dragging_) {
     thumb_dragging_ = false;
     is_dragging = false;
-    startAnimation<&ScrollArea::setScrollbarFeedback>(scrollbar_t_, 0.0f, 420.0f, CubicBezier::EaseOut());
+    // 拖拽结束，进入延迟淡出阶段
+    fading_out_ = false;
+    last_interaction_time_ = frame_clock.now;
+  }
+}
+
+void ScrollArea::activateScrollbar() noexcept {
+  // 取消正在进行的淡出
+  fading_out_ = false;
+  // 记录最后一次交互时刻，用于延迟淡出计时
+  last_interaction_time_ = frame_clock.now;
+
+  // 平滑过渡高亮强度到 1；无条件启动可借助去重机制取消进行中的淡出动画
+  startAnimation<&ScrollArea::setScrollbarFeedback>(
+    scrollbar_t_, 1.0f, kActivateMs, CubicBezier::EaseOut());
+}
+
+void ScrollArea::scheduleScrollbarFadeOut() noexcept {
+  // 拖拽中、已不可滚动或滚动条本就隐藏时不参与淡出调度
+  if (thumb_dragging_ || content_height_ <= contentHeight() || scrollbar_t_ <= 0.001f) {
+    return;
+  }
+
+  // 已在淡出，等待动画自行结束
+  if (fading_out_) {
+    return;
+  }
+
+  // 距离最后一次交互超过延迟阈值，启动淡出
+  const auto elapsed_us = frame_clock.now - last_interaction_time_;
+  if (elapsed_us >= static_cast<std::uint64_t>(kFadeDelayMs * 1000.0f)) {
+    fading_out_ = true;
+    startAnimation<&ScrollArea::setScrollbarFeedback>(
+      scrollbar_t_, 0.0f, kFadeMs, CubicBezier::EaseInOut());
   }
 }
 
@@ -154,8 +203,10 @@ void ScrollArea::paint(SkCanvas *canvas) {
   const float max_scroll = content_height_ - view_h;
   const float scroll_pct = max_scroll > 0 ? scroll_offset / max_scroll : 0;
   const float thumb_y = scroll_pct * (view_h - thumb_h);
+  // 拖拽时强制满强度，其余时刻跟随激活动画值
   const float active_t = std::max(scrollbar_t_, thumb_dragging_ ? 1.0f : 0.0f);
-  const float bar_w = kBarWidth + active_t * 3.0f;
+  // 激活前后宽度保持一致，避免变形突兀
+  const float bar_w = kBarWidth;
   const float active_bar_x = contentWidth() - kBarPadding - bar_w;
 
   SkPaint track_paint;
@@ -199,6 +250,9 @@ void ScrollArea::render(SkCanvas *canvas) {
   }
 
   canvas->restore();
+
+  // 每帧检查是否需要启动延迟淡出
+  scheduleScrollbarFadeOut();
 
   // 滚动条绘制在裁剪区域之外（不受 scroll offset 影响）
   canvas->save();
