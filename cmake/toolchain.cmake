@@ -1,12 +1,12 @@
 if (WIN32)
   # 工具链配置
-  if (DEFINED ENV{VCPKG_ROOT})
-    set(VCPKG_ROOT $ENV{VCPKG_ROOT} CACHE PATH "VCPKG 根目录")
-    message(STATUS "VCPKG_ROOT: ${VCPKG_ROOT}")
-  else()
-    set(VCPKG_ROOT "E:/love-yuri/github/vcpkg" CACHE PATH "默认 VCPKG 路径")
-    message(WARNING "VCPKG_ROOT 未设置，使用默认值: ${VCPKG_ROOT}")
-  endif()
+  find_program(_VCPKG_EXECUTABLE vcpkg)
+  if (_VCPKG_EXECUTABLE)
+    get_filename_component(VCPKG_ROOT "${_VCPKG_EXECUTABLE}" DIRECTORY)
+    message(STATUS "找到 VCPKG_ROOT: ${VCPKG_ROOT}")
+  else ()
+    message(FATAL_ERROR "找不到 vcpkg，请设置环境变量 VCPKG_ROOT 或确保 vcpkg 在 PATH 中")
+  endif ()
 
   # 设置 vcpkg 工具链文件
   set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "VCPKG 工具链文件路径")
