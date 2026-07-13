@@ -54,7 +54,7 @@ public:
    * 获取当前鼠标指针位置
    * @return 鼠标位置
    */
-  [[nodiscard]] skia::SkPoint getCursorPosition() const;
+  [[nodiscard]] skia::SkPoint cursorPosition() const override;
 
   /**
    * 展示debug信息
@@ -99,9 +99,9 @@ void onResizeStatic(GLFWwindow *window, const int width, const int height) {
  */
 void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+  self->cursor_x = static_cast<float>(x);
+  self->cursor_y = static_cast<float>(y);
   if (self->visible_) {
-    self->cursor_x = static_cast<float>(x);
-    self->cursor_y = static_cast<float>(y);
     self->MouseMove(self->cursor_x, self->cursor_y);
   }
 }
@@ -121,11 +121,21 @@ void onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
  */
 void onMouseButtonStatic(GLFWwindow *window, const int button, const int action, const int mods) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (self->visible_ && button == left_mouse_button) {
+  if (!self->visible_) {
+    return;
+  }
+
+  if (button == left_mouse_button) {
     if (action == button_pressed) {
       self->MouseLeftPressed(self->cursor_x, self->cursor_y);
     } else if (action == button_released) {
       self->MouseLeftReleased(self->cursor_x, self->cursor_y);
+    }
+  } else if (button == right_mouse_button) {
+    if (action == button_pressed) {
+      self->MouseRightPressed(self->cursor_x, self->cursor_y);
+    } else if (action == button_released) {
+      self->MouseRightReleased(self->cursor_x, self->cursor_y);
     }
   }
 }
@@ -221,13 +231,8 @@ void Window::run() {
   }
 }
 
-skia::SkPoint Window::getCursorPosition() const {
-  double x, y;
-  glfwGetCursorPos(window_, &x, &y);
-  return {
-    static_cast<float>(x),
-    static_cast<float>(y),
-  };
+skia::SkPoint Window::cursorPosition() const {
+  return {cursor_x, cursor_y};
 }
 
 void Window::showDebugInfo() const { // NOLINT(*-convert-member-functions-to-static)

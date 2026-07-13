@@ -45,6 +45,13 @@ protected:
   void MouseMove(float x, float y) override;
   void MouseLeftPressed(float x, float y) override;
   void MouseLeftReleased(float x, float y) override;
+
+  /** 分发滚动内容区域内的鼠标右键事件 */
+  void MouseRightPressed(float x, float y) override;
+
+  /** 分发滚动内容区域内的鼠标右键松开事件 */
+  void MouseRightReleased(float x, float y) override;
+
   void MouseWheel(float x, float y, float delta_x, float delta_y) override;
   void onMouseMove(float x, float y) override;
   void onMouseLeftReleased(float x, float y) override;
@@ -116,6 +123,14 @@ void ScrollArea::MouseLeftPressed(const float x, const float y) {
 
 void ScrollArea::MouseLeftReleased(const float x, const float y) {
   Widget::MouseLeftReleased(x, y + scroll_offset);
+}
+
+void ScrollArea::MouseRightPressed(const float x, const float y) {
+  Widget::MouseRightPressed(x, y + scroll_offset);
+}
+
+void ScrollArea::MouseRightReleased(const float x, const float y) {
+  Widget::MouseRightReleased(x, y + scroll_offset);
 }
 
 void ScrollArea::MouseWheel(const float x, const float y, const float delta_x, const float delta_y) {

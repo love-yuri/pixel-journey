@@ -5,6 +5,7 @@
 export module ui.widgets:window_base;
 
 import glfw.api;
+import skia.api;
 
 using namespace glfw;
 
@@ -14,6 +15,12 @@ class WindowBase {
 public:
   virtual ~WindowBase() = default;
   void setCursor(CursorType type);
+
+  /**
+   * 获取当前鼠标在窗口内的位置
+   * @return 鼠标坐标
+   */
+  [[nodiscard]] virtual skia::SkPoint cursorPosition() const = 0;
 
   /**
    * 获取当前鼠标类型

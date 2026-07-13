@@ -21,9 +21,10 @@ export namespace ui::widgets {
  * 控件基类
  */
 class Widget {
-  WindowBase *window_ = nullptr;   // 窗口指针
-  Widget *mouse_capture = nullptr; // 正在被点击的控件
-  friend Layout<Widget>;           // 友元layout组件
+  WindowBase *window_ = nullptr;         // 窗口指针
+  Widget *mouse_capture = nullptr;       // 正在被点击的控件
+  Widget *right_mouse_capture = nullptr; // 正在被右键点击的控件
+  friend Layout<Widget>;                 // 友元layout组件
 
 protected:
   Widget *parent_ = nullptr;                         // 父控件
@@ -83,6 +84,20 @@ protected:
   virtual void MouseLeftReleased(float x, float y);
 
   /**
+   * 鼠标右侧点击事件分发
+   * @param x 鼠标位置x: 相对于控件左上角
+   * @param y 鼠标位置y: 相对于控件左上角
+   */
+  virtual void MouseRightPressed(float x, float y);
+
+  /**
+   * 鼠标右侧松开事件分发
+   * @param x 鼠标位置x: 相对于控件左上角
+   * @param y 鼠标位置y: 相对于控件左上角
+   */
+  virtual void MouseRightReleased(float x, float y);
+
+  /**
    * 鼠标滚轮事件分发
    * @param x 鼠标位置x（相对于控件左上角）
    * @param y 鼠标位置y（相对于控件左上角）
@@ -129,6 +144,22 @@ protected:
    * @param y 鼠标当前位置 y
    */
   virtual void onMouseLeftReleased(float x, float y) {
+  }
+
+  /**
+   * 鼠标右侧点击事件
+   * @param x 鼠标当前位置 x
+   * @param y 鼠标当前位置 y
+   */
+  virtual void onMouseRightPressed(float x, float y) {
+  }
+
+  /**
+   * 鼠标右侧松开事件
+   * @param x 鼠标当前位置 x
+   * @param y 鼠标当前位置 y
+   */
+  virtual void onMouseRightReleased(float x, float y) {
   }
 
   /**
@@ -227,6 +258,12 @@ public:
   [[nodiscard]] std::vector<Widget *> &children() noexcept {
     return children_;
   }
+
+  /**
+   * 获取控件树的根控件
+   * @return 根控件
+   */
+  [[nodiscard]] Widget *rootWidget() noexcept;
 
   /**
    * 获取内边距
@@ -520,6 +557,14 @@ Widget::Widget(Widget *parent) : parent_(parent) {
   }
 }
 
+Widget *Widget::rootWidget() noexcept {
+  auto *root = this;
+  while (root->parent_ != nullptr) {
+    root = root->parent_;
+  }
+  return root;
+}
+
 WindowBase *Widget::window() {
   if (window_) {
     return window_;
@@ -658,7 +703,7 @@ void Widget::MouseMove(const float x, const float y) {
   const auto child_x = x - padding_.left;
   const auto child_y = y - padding_.top;
 
-  for (const auto child : children_) {
+  for (const auto child : std::views::reverse(children_)) {
     if (!child->visible_) continue;
     if (child->contains(child_x, child_y) || child->is_dragging) {
       // 鼠标在此子控件内，清除其他兄弟的悬浮状态
@@ -685,8 +730,8 @@ void Widget::MouseLeftPressed(const float x, const float y) {
   const auto child_x = x - padding_.left;
   const auto child_y = y - padding_.top;
 
-  for (const auto child : children_) {
-    if (child->visible_ && child->contains(child_x, child_y)) {
+  for (const auto child : std::views::reverse(children_)) {
+    if (child->visible_ && (child->contains(child_x, child_y) || child->is_dragging)) {
       child->MouseLeftPressed(child_x - child->x_, child_y - child->y_);
       mouse_capture = child;
       break;
@@ -708,6 +753,40 @@ void Widget::MouseLeftReleased(const float x, const float y) {
   }
 
   onMouseLeftReleased(x, y);
+}
+
+void Widget::MouseRightPressed(const float x, const float y) {
+  // 减去padding 再开始判定
+  const auto child_x = x - padding_.left;
+  const auto child_y = y - padding_.top;
+
+  for (std::size_t index = children_.size(); index > 0; --index) {
+    const auto child = children_[index - 1];
+    if (child->visible_ && child->contains(child_x, child_y)) {
+      child->MouseRightPressed(child_x - child->x_, child_y - child->y_);
+      right_mouse_capture = child;
+      break;
+    }
+  }
+
+  // 使用原坐标处理自身
+  onMouseRightPressed(x, y);
+}
+
+void Widget::MouseRightReleased(const float x, const float y) {
+  // 减去padding 再开始判定
+  const auto child_x = x - padding_.left;
+  const auto child_y = y - padding_.top;
+
+  if (right_mouse_capture != nullptr) {
+    right_mouse_capture->MouseRightReleased(
+      child_x - right_mouse_capture->x_,
+      child_y - right_mouse_capture->y_
+    );
+    right_mouse_capture = nullptr;
+  }
+
+  onMouseRightReleased(x, y);
 }
 
 void Widget::MouseWheel(const float x, const float y, const float delta_x, const float delta_y) {
