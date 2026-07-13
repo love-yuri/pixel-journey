@@ -11,3 +11,4 @@ export import :box;
 export import :text;
 export import :splitter;
 export import :scroll_area;
+export import :context_menu;
