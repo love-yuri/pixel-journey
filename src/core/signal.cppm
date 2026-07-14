@@ -72,6 +72,14 @@ public:
     return invoke_fun;
   }
 
+  /** 三元运算符 */
+  auto operator<=>(const function_ref& ref) const {
+    if (auto cmp = object_ptr <=> ref.object_ptr; cmp != 0) {
+      return cmp;
+    }
+    return invoke_fun <=> ref.invoke_fun;
+  }
+
 private:
   void *object_ptr = nullptr;         // 指向对象或闭包
   InvokeFunType invoke_fun = nullptr; // 对象/成员函数调用
