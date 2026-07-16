@@ -1,7 +1,6 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-修改本文件请同步需改 CLAUDE.md
 
 ## Build Commands
 
@@ -62,7 +61,7 @@ configuration (is_debug_mode, vulkan constants)
 
 ### Coding Conventions
 
-代码规范请读取 项目目录下 .claude/commands/style.md 获取
+代码规范请读取 项目目录下 docs/style.md 获取
 
 ### File Conventions
 
@@ -74,11 +73,7 @@ configuration (is_debug_mode, vulkan constants)
 ### Test / Example Apps
 
 - `test/vulkan_hello.cpp` — Minimal Vulkan random-color demo, built as CTest
-- `test/yuri-music/` — **实际音乐应用项目**（QQ Music clone），基于 yuri_lib 构建，包含多个页面和 SVG 资源
-- `test/validation-html/` — 验证用 HTML 文件，用于对照设计稿效果
 
 ### Project Roles
 
 - `src/` — 通用 UI 框架（yuri_lib），服务于上层应用
-- `test/yuri-music/` — 实际业务项目，最终产品
-- `test/validation-html/` — 设计稿验证参考
