@@ -14,7 +14,7 @@ export template <typename R, typename... Args>
 class function_ref<R(Args...)> {
 public:
   // 函数类型
-  using InvokeFunType = R (*)(void *, Args &&...);
+  using InvokeFunType = R (*)(void *, Args...);
   function_ref() = delete;
 
   /**
@@ -34,8 +34,8 @@ public:
   template <auto ptr, typename T>
   static function_ref from(T *obj) noexcept {
     static_assert(ptr != nullptr, "ptr cannot be null");
-    const auto func = [](void *this_, Args &&...args) -> R {
-      return (static_cast<T *>(this_)->*ptr)(std::forward<Args>(args)...);
+    const auto func = [](void *this_, Args... args) -> R {
+      return std::invoke(ptr, static_cast<T *>(this_), std::forward<Args>(args)...);
     };
     return { obj, func };
   }
@@ -49,12 +49,12 @@ public:
   template <typename F>
     requires std::invocable<F &, Args...>
   static function_ref from(F &f) noexcept {
-    return function_ref(std::addressof(f), [](void *p, Args &&...args) -> R {
-      return (*static_cast<F *>(p))(std::forward<Args>(args)...);
+    return function_ref(std::addressof(f), [](void *p, Args... args) -> R {
+      return std::invoke(*static_cast<F *>(p), std::forward<Args>(args)...);
     });
   }
 
-  R operator()(Args &&...args) const {
+  R operator()(Args... args) const {
     return invoke_fun(object_ptr, std::forward<Args>(args)...);
   }
 
@@ -131,7 +131,8 @@ public:
    */
   inline void emit(Args... args) {
     for (auto &slot : slots) {
-      slot(std::forward<Args>(args)...);
+      // 不使用std::forward
+      slot(args...);
     }
   }
 
