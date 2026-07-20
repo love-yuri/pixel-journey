@@ -7,15 +7,14 @@ export module core:signal;
 import std;
 import yuri_log;
 
-export template<typename>
+export template <typename>
 class function_ref;
 
 export template <typename R, typename... Args>
 class function_ref<R(Args...)> {
-
 public:
   // 函数类型
-  using InvokeFunType = R (*)(void *, Args&&...);
+  using InvokeFunType = R (*)(void *, Args &&...);
   function_ref() = delete;
 
   /**
@@ -38,7 +37,7 @@ public:
     const auto func = [](void *this_, Args &&...args) -> R {
       return (static_cast<T *>(this_)->*ptr)(std::forward<Args>(args)...);
     };
-    return {obj, func};
+    return { obj, func };
   }
 
   /**
@@ -48,17 +47,14 @@ public:
    * @return
    */
   template <typename F>
-  requires std::invocable<F &, Args...>
+    requires std::invocable<F &, Args...>
   static function_ref from(F &f) noexcept {
-    return function_ref(
-      std::addressof(f),
-      [](void *p, Args&& ...args) -> R {
-        return (*static_cast<F *>(p))(std::forward<Args>(args)...);
-      }
-    );
+    return function_ref(std::addressof(f), [](void *p, Args &&...args) -> R {
+      return (*static_cast<F *>(p))(std::forward<Args>(args)...);
+    });
   }
 
-  R operator()(Args&&... args) const {
+  R operator()(Args &&...args) const {
     return invoke_fun(object_ptr, std::forward<Args>(args)...);
   }
 
@@ -73,7 +69,7 @@ public:
   }
 
   /** 三元运算符 */
-  auto operator<=>(const function_ref& ref) const {
+  auto operator<=>(const function_ref &ref) const {
     if (auto cmp = object_ptr <=> ref.object_ptr; cmp != 0) {
       return cmp;
     }
@@ -85,19 +81,15 @@ private:
   InvokeFunType invoke_fun = nullptr; // 对象/成员函数调用
 };
 
-export template <typename ...Args>
+export template <typename... Args>
 class Signal {
-  using SignalType = function_ref<void(Args...)>;
-  std::vector<SignalType> slots{};
-
 public:
-
   /**
    * 创建信号连接
    * @param obj this
    */
   template <auto ptr, typename T>
-  inline void connect(T* obj) noexcept {
+  inline void connect(T *obj) noexcept {
     slots.emplace_back(SignalType::template from<ptr, T>(obj));
   }
 
@@ -105,9 +97,22 @@ public:
    * 创建信号连接
    */
   template <typename F>
-  requires std::invocable<F &, Args...>
-  inline void connect(F& f) noexcept {
+    requires std::invocable<F &, Args...>
+  inline void connect(F &f) noexcept {
     slots.emplace_back(SignalType::from(f));
+  }
+
+  /**
+   * 断开链接
+   */
+  template <typename T>
+  inline void disconnect(T *obj) noexcept {
+    slots.erase(
+      std::remove_if(
+        slots.begin(), slots.end(), [obj](auto slot) { return slot.target_object() == obj; }
+      ),
+      slots.end()
+    );
   }
 
   /**
@@ -115,8 +120,8 @@ public:
    * 可以传临时lambda 但是仅限测试
    */
   template <typename F>
-  requires std::invocable<F &, Args...>
-  inline void connect(F&& f) noexcept {
+    requires std::invocable<F &, Args...>
+  inline void connect(F &&f) noexcept {
     slots.emplace_back(SignalType::from(f));
   }
 
@@ -125,8 +130,12 @@ public:
    * @param args 参数
    */
   inline void emit(Args... args) {
-    for (auto & slot: slots) {
+    for (auto &slot : slots) {
       slot(std::forward<Args>(args)...);
     }
   }
+
+private:
+  using SignalType = function_ref<void(Args...)>; // 信号类型
+  std::vector<SignalType> slots{};                // 信号列表
 };
