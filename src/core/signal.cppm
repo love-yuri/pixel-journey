@@ -109,9 +109,10 @@ public:
   inline void disconnect(T *obj) noexcept {
     slots.erase(
       std::remove_if(
-        slots.begin(), slots.end(), [obj](auto slot) { return slot.target_object() == obj; }
-      ),
-      slots.end()
+        slots.begin(), slots.end(), [obj](auto slot) {
+          return slot.target_object() == obj;
+        }
+      ), slots.end()
     );
   }
 
