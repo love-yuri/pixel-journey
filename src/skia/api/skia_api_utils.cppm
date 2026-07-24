@@ -33,14 +33,14 @@ sk_sp<SkImage> decodeImage(const std::string_view data) {
  */
 SkColorType color_type_from_format(const vk::Format format) {
   switch (format) {
-  case vk::Format::eB8G8R8A8Unorm:
-  case vk::Format::eB8G8R8A8Srgb:
-    return kBGRA_8888_SkColorType;
-  case vk::Format::eR8G8B8A8Unorm:
-  case vk::Format::eR8G8B8A8Srgb:
-    return kRGBA_8888_SkColorType;
-  default:
-    throw std::runtime_error(std::format("创建 Skia Surface 失败: 不支持的 swapchain format={}", vk::to_string(format)));
+    case vk::Format::eB8G8R8A8Unorm:
+    case vk::Format::eB8G8R8A8Srgb:
+      return kBGRA_8888_SkColorType;
+    case vk::Format::eR8G8B8A8Unorm:
+    case vk::Format::eR8G8B8A8Srgb:
+      return kRGBA_8888_SkColorType;
+    default:
+      throw std::runtime_error(std::format("创建 Skia Surface 失败: 不支持的 swapchain format={}", vk::to_string(format)));
   }
 }
 
