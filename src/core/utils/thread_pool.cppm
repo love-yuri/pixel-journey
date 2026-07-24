@@ -2,22 +2,23 @@
 // Created by love-yuri on 2026/4/28.
 //
 
-export module thread_pool;
+export module core.utils:thread_pool;
 
 import std;
 import yuri_log;
 
 class ThreadPool {
-  std::atomic_bool stopped{false};
+  std::atomic_bool stopped{ false };
   std::once_flag init_flag;
   std::once_flag shutdown_flag;
   std::mutex mutex;
   std::condition_variable cv;
-  std::queue<std::function<void()>> tasks;
+  std::queue<std::move_only_function<void()>> tasks;
   std::vector<std::thread> threads;
 
 public:
-  explicit ThreadPool(const int n = 5) : threads(n) {}
+  explicit ThreadPool(const int n = 5) : threads(n) {
+  }
 
   ThreadPool(const ThreadPool &) = delete;
   ThreadPool(ThreadPool &&) = delete;
@@ -32,7 +33,7 @@ public:
     std::call_once(init_flag, [this] {
       for (int i = 0; i < static_cast<int>(threads.size()); i++) {
         threads[i] = std::thread([this, id = i + 1] {
-          std::function<void()> task;
+          std::move_only_function<void()> task;
           while (true) {
             {
               std::unique_lock lock(mutex);
@@ -59,19 +60,20 @@ public:
     init();
 
     using return_type = std::invoke_result_t<Fun, Args...>;
-
-    auto task = std::make_shared<std::packaged_task<return_type()>>(
-      [f = std::forward<Fun>(fun), ... a = std::forward<Args>(args)] {
-        return std::invoke(f, a...);
-      });
+    std::packaged_task<return_type()> task([f = std::forward<Fun>(fun), ... a = std::forward<Args>(args)]() mutable {
+      return std::invoke(f, a...);
+    });
+    auto future = task.get_future();
 
     {
       std::lock_guard lock(mutex);
-      tasks.emplace([task] { (*task)(); });
+      tasks.emplace([task = std::move(task)]() mutable {
+        task();
+      });
     }
 
     cv.notify_one();
-    return task->get_future();
+    return future;
   }
 
 private:

@@ -5,3 +5,5 @@
 export module core.utils;
 
 export import :uuid;
+export import :thread_pool;
+export import :timer;
