@@ -10,7 +10,7 @@ import yuri_log;
 export template <typename>
 class function_ref;
 
-export template <typename R, typename... Args>
+template <typename R, typename... Args>
 class function_ref<R(Args...)> {
 public:
   // 函数类型
@@ -109,10 +109,9 @@ public:
   inline void disconnect(T *obj) noexcept {
     slots.erase(
       std::remove_if(
-        slots.begin(), slots.end(), [obj](auto slot) {
-          return slot.target_object() == obj;
-        }
-      ), slots.end()
+        slots.begin(), slots.end(), [obj](auto slot) { return slot.target_object() == obj; }
+      ),
+      slots.end()
     );
   }
 
