@@ -40,8 +40,6 @@ public:
   /** 获取菜单项名称 */
   [[nodiscard]] const std::string &name() const noexcept;
 
-  Signal<> clicked; // 菜单项点击信号
-
 private:
   std::string name_{}; // 菜单项名称
 };
@@ -72,6 +70,9 @@ public:
 
   /** 绘制上下文菜单 */
   void paint(SkCanvas *canvas) override;
+
+  /** 菜单项点击事件 */
+  Signal<std::size_t> itemClicked{};
 
 protected:
   /** 更新菜单项悬浮状态 */
@@ -253,7 +254,7 @@ void ContextMenu::onMouseLeftReleased(const float x, const float y) {
   const int clicked_item = itemIndexAt(x, y);
   hide();
   if (clicked_item >= 0) {
-    items_[static_cast<std::size_t>(clicked_item)].clicked.emit();
+    itemClicked.emit(static_cast<std::size_t>(clicked_item));
   }
 }
 
