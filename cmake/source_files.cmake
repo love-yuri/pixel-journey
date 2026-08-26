@@ -22,6 +22,7 @@ file(GLOB CPPM_MODULES
     # ui - core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cppm
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/animation/*.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/runtime/*.cppm
 
     # ui - render
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/render/*.cppm

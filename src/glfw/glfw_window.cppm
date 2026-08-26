@@ -214,6 +214,9 @@ void Window::run() {
     // 更新clock
     profiling::frame_clock.update();
 
+    // 处理 UI 线程待执行任务
+    ui::dispatcher.processPending();
+
     // 更新动画
     animation_manager->update();
 
