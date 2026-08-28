@@ -218,7 +218,7 @@ void Window::run() {
     ui::dispatcher.processPending();
 
     // 更新动画
-    animation_manager->update();
+    const bool update_animation_success = animation_manager->update();
 
     // 更新布局
     updateLayout();
@@ -231,6 +231,11 @@ void Window::run() {
     frame->present();
 
     glfwPollEvents();
+
+    // 等待新事件-避免一直刷新
+    if (!update_animation_success) {
+      glfwWaitEvents();
+    }
   }
 }
 

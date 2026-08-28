@@ -27,9 +27,9 @@ export namespace ui::animation {
 class AnimationManager {
 public:
   /**
-   * 更新渲染帧周期
+   * 更新渲染帧周期返回false则表示没有后续更新
    */
-  void update();
+  bool update();
 
   /**
    * 开启动画
@@ -128,7 +128,7 @@ void AnimationManager::start(const T &from, const T &to, float duration, CubicBe
   });
 }
 
-void AnimationManager::update() {
+bool AnimationManager::update() {
   std::size_t i = 0;
   while (i < this->animations_.size()) {
     if (const auto &animation = animations_[i]; animation->update(frame_clock.now)) {
@@ -138,6 +138,8 @@ void AnimationManager::update() {
       i++;
     }
   }
+
+  return !this->animations_.empty();
 }
 
 } // namespace ui::animation

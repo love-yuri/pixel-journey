@@ -5,6 +5,7 @@
 export module ui.runtime:dispatcher;
 
 import std;
+import glfw.api;
 
 /**
  * UI 线程任务队列。
@@ -23,6 +24,7 @@ public:
   void post(F &&task) {
     std::lock_guard lock(mutex_);
     tasks_.emplace(std::forward<F>(task));
+    glfw::glfwPostEmptyEvent();
   }
 
   /** 执行当前已经投递的全部 UI 任务。 */

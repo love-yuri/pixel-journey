@@ -31,6 +31,8 @@ using ::glfwWaitEvents;
 using ::GLFWcursor;
 using ::glfwCreateStandardCursor;
 using ::glfwSetCursor;
+using ::glfwPostEmptyEvent;
+using ::glfwWaitEventsTimeout;
 
 constexpr auto left_mouse_button = GLFW_MOUSE_BUTTON_LEFT;
 constexpr auto right_mouse_button = GLFW_MOUSE_BUTTON_RIGHT;
