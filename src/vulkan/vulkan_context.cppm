@@ -3,6 +3,7 @@
  */
 export module yuri.vulkan.context;
 
+import yuri.core;
 import yuri.vulkan.api;
 import yuri.vulkan.detail;
 import yuri.log;
@@ -18,20 +19,20 @@ using namespace skia;
  * 全局vulkan上下文
  */
 class VulkanContext final {
-  glfw::Application app;                   // glfw app
-  DebugUtilsMessengerEXT debug_messenger_; // debug_messenger
+  glfw::Application app{};                   // glfw app
+  DebugUtilsMessengerEXT debug_messenger_{}; // debug_messenger
 
 public:
-  Instance instance;                               // vulkan实例
-  PhysicalDevice physical_device;                  // 物理 gpu设备
-  Device logic_device;                             // 逻辑 gpu设备
-  Queue queue;                                     // gpu渲染队列
-  std::uint32_t queue_family_index = 0;            // 选择的index
-  CommandPool command_pool;                        // command pool
-  DispatchLoaderDynamic instance_dynamic_dispatch; // instance 动态加载器
-  gpu::VulkanBackendContext skia_vk_context;       // vk_context
-  sk_sp<GrDirectContext> skia_direct_context;      // GrDirectContext
-  gpu::MutableTextureState present_state;          // skia present state
+  Instance instance{};                               // vulkan实例
+  PhysicalDevice physical_device{};                  // 物理 gpu设备
+  Device logic_device{};                             // 逻辑 gpu设备
+  Queue queue{};                                     // gpu渲染队列
+  std::uint32_t queue_family_index = 0;              // 选择的index
+  CommandPool command_pool{};                        // command pool
+  DispatchLoaderDynamic instance_dynamic_dispatch{}; // instance 动态加载器
+  gpu::VulkanBackendContext skia_vk_context{};       // vk_context
+  sk_sp<GrDirectContext> skia_direct_context{};      // GrDirectContext
+  gpu::MutableTextureState present_state{};          // skia present state
 
   VulkanContext();
   ~VulkanContext();
