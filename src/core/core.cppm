@@ -5,7 +5,7 @@ export module yuri.core;
 
 export import :signal;
 export import :type_traits;
-
+export import :service_collection;
 export import :service_collection;
 export import yuri.core.profiling;
 export import yuri.core.utils;
