@@ -1,6 +1,6 @@
-export module vulkan.detail:swapchain_create_info;
+export module yuri.vulkan.detail:swapchain_create_info;
 
-import vulkan.api;
+import yuri.vulkan.api;
 import std;
 
 export namespace vk::detail {

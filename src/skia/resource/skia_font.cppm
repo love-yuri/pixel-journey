@@ -2,10 +2,10 @@
 // Created by love-yuri on 2026/1/12.
 //
 
-export module skia.resource:font;
+export module yuri.skia.resource:font;
 
-import yuri_log;
-import skia.api;
+import yuri.log;
+import yuri.skia.api;
 import std;
 
 using namespace skia;

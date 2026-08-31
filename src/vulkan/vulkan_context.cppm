@@ -1,14 +1,14 @@
 /**
  * vulkan上下文模块
  */
-export module vulkan.context;
+export module yuri.vulkan.context;
 
-import vulkan.api;
-import vulkan.detail;
-import yuri_log;
-import skia.api;
-import configuration;
-import glfw.api;
+import yuri.vulkan.api;
+import yuri.vulkan.detail;
+import yuri.log;
+import yuri.skia.api;
+import yuri.configuration;
+import yuri.glfw.api;
 import std;
 
 using namespace vk;

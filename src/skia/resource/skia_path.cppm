@@ -2,9 +2,9 @@
 // Created by love-yuri on 2026/4/27.
 //
 
-export module skia.resource:path;
+export module yuri.skia.resource:path;
 
-import skia.api;
+import yuri.skia.api;
 
 export namespace skia::path {
 

@@ -5,7 +5,7 @@
 /**
  * vulkan 配置
  */
-export module configuration:vulkan;
+export module yuri.configuration:vulkan;
 
 import std;
 

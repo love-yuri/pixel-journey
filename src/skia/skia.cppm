@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/1/12.
 //
 
-export module skia;
+export module yuri.skia;
 
-export import skia.resource;
-export import skia.api;
+export import yuri.skia.resource;
+export import yuri.skia.api;

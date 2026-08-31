@@ -2,13 +2,13 @@
 // Created by yuri on 2026/1/10.
 //
 
-export module vulkan.api:utils;
+export module yuri.vulkan.api:utils;
 
 import :core;
 import :config;
-import glfw.api;
-import yuri_log;
-import configuration;
+import yuri.glfw.api;
+import yuri.log;
+import yuri.configuration;
 import std;
 
 export namespace vk {

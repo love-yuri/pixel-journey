@@ -2,7 +2,7 @@
 // Created by yuri on 2026/1/10.
 //
 
-export module vulkan.api:config;
+export module yuri.vulkan.api:config;
 
 import :core;
 

@@ -2,14 +2,14 @@
 // Created by yuri on 2026/1/6.
 //
 
-export module glfw.context;
+export module yuri.glfw.context;
 
 import std;
-import vulkan;
-import configuration;
-import yuri_log;
-import glfw.api;
-import skia.api;
+import yuri.vulkan;
+import yuri.configuration;
+import yuri.log;
+import yuri.glfw.api;
+import yuri.skia.api;
 
 // 最大值
 constexpr auto uint_32_max = std::numeric_limits<std::uint32_t>::max();

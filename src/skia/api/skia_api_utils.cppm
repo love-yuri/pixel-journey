@@ -2,12 +2,12 @@
 // Created by yuri on 2026/1/12.
 //
 
-export module skia.api:utils;
+export module yuri.skia.api:utils;
 
 import :core;
-import vulkan.api;
-import glfw.api;
-import yuri_log;
+import yuri.vulkan.api;
+import yuri.glfw.api;
+import yuri.log;
 
 export namespace skia {
 

@@ -1,14 +1,14 @@
 // ReSharper disable CppTooWideScopeInitStatement
-export module glfw.window;
+export module yuri.glfw.window;
 
-import glfw.api;
-import glfw.context;
-import vulkan;
-import configuration;
-import core;
-import skia;
+import yuri.glfw.api;
+import yuri.glfw.context;
+import yuri.vulkan;
+import yuri.configuration;
+import yuri.core;
+import yuri.skia;
 import std;
-import ui;
+import yuri.ui;
 
 using namespace ui::widgets;
 

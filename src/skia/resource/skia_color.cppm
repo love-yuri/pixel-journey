@@ -2,14 +2,14 @@
 // Created by love-yuri on 2026/1/13.
 //
 
-export module skia.resource:color;
+export module yuri.skia.resource:color;
 
 #define SkColorGetA(color) (((color) >> 24) & 0xFF)
 #define SkColorGetR(color)      (((color) >> 16) & 0xFF)
 #define SkColorGetG(color)      (((color) >>  8) & 0xFF)
 #define SkColorGetB(color)      (((color) >>  0) & 0xFF)
 
-import skia.api;
+import yuri.skia.api;
 import std;
 
 /**

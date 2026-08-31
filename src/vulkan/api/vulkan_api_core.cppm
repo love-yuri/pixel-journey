@@ -1,7 +1,7 @@
 module;
 #define VULKAN_HPP_NO_EXCEPTIONS
 #include <vulkan/vulkan.hpp>
-export module vulkan.api:core;
+export module yuri.vulkan.api:core;
 
 import std;
 

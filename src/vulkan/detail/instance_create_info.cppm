@@ -1,9 +1,9 @@
-export module vulkan.detail:instance_create_info;
+export module yuri.vulkan.detail:instance_create_info;
 
-import configuration;
-import vulkan.api;
-import yuri_log;
-import glfw.api;
+import yuri.configuration;
+import yuri.vulkan.api;
+import yuri.log;
+import yuri.glfw.api;
 import std;
 
 export namespace vk::detail {

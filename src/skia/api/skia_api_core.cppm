@@ -45,7 +45,7 @@ module;
 #include <include/effects/SkImageFilters.h>
 #include <src/gpu/GpuTypesPriv.h>
 #include <src/gpu/vk/vulkanmemoryallocator/VulkanMemoryAllocatorPriv.h>
-export module skia.api:core;
+export module yuri.skia.api:core;
 
 import std;
 
