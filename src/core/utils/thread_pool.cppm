@@ -2,10 +2,10 @@
 // Created by love-yuri on 2026/4/28.
 //
 
-export module core.utils:thread_pool;
+export module yuri.core.utils:thread_pool;
 
 import std;
-import yuri_log;
+import yuri.log;
 
 class ThreadPool {
   std::atomic_bool stopped{ false };

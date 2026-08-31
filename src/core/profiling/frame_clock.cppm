@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/3/25.
 //
 
-export module core.profiling:frame_clock;
+export module yuri.core.profiling:frame_clock;
 
 import std;
 

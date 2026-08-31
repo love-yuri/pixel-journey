@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/3/30.
 //
 
-export module core.utils:uuid;
+export module yuri.core.utils:uuid;
 
 import std;
 

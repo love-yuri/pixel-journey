@@ -3,7 +3,7 @@
 //
 
 // utils/type_traits.cppm
-export module core:type_traits;
+export module yuri.core:type_traits;
 
 export namespace meta {
 

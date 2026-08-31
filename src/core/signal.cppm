@@ -2,10 +2,10 @@
 // Created by yuri on 2026/1/23.
 //
 
-export module core:signal;
+export module yuri.core:signal;
 
 import std;
-import yuri_log;
+import yuri.log;
 
 export template <typename>
 class function_ref;

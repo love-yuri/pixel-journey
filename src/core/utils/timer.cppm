@@ -2,11 +2,11 @@
 // Created by love-yuri on 2026/7/24.
 //
 
-export module core.utils:timer;
+export module yuri.core.utils:timer;
 
 import std;
 import :thread_pool;
-import yuri_log;
+import yuri.log;
 
 using namespace std::chrono;
 

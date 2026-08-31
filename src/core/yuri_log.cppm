@@ -9,7 +9,7 @@ module;
 #include <windows.h>
 #endif
 #include <ctime>
-export module yuri_log;
+export module yuri.log;
 
 import std;
 
