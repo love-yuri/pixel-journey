@@ -6,8 +6,8 @@
 
 ```c++
 import std;
-import vulkan;
-import glfw;
+import yuri.vulkan;
+import yuri.glfw;
 
 int main() {
   glfw::glfw_window gw = {200, 200, "yuri"};

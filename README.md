@@ -15,6 +15,22 @@
 | 构建系统 | CMake ≥ 4.0.0 + Ninja |
 | 编译器 | MSVC ≥ 19.38 / GCC ≥ 15.0 / Clang ≥ 19.0 |
 
+## 公共模块
+
+所有对外模块统一使用 `yuri.` 前缀；应用代码通常只需要导入聚合模块：
+
+```cpp
+import yuri.core;          // 核心设施、日志、工具与性能分析
+import yuri.configuration; // 通用与 Vulkan 配置
+import yuri.glfw;          // 窗口与 GLFW 集成
+import yuri.skia;          // Skia API 与资源
+import yuri.vulkan;        // Vulkan API、上下文与细节封装
+import yuri.ui;            // UI 聚合入口
+import yuri.log;           // 仅使用日志时的轻量入口
+```
+
+各目录下的 `yuri.*` 子模块和 `:partition` 仅用于库内部组织；应用应优先使用上述聚合模块。
+
 ## 项目结构
 
 ```

@@ -1,10 +1,10 @@
 import std;
-import vulkan;
-import glfw;
-import yuri_log;
-import skia;
-import ui;
-import core;
+import yuri.vulkan;
+import yuri.glfw;
+import yuri.log;
+import yuri.skia;
+import yuri.ui;
+import yuri.core;
 
 using namespace skia;
 using namespace ui::layout;
