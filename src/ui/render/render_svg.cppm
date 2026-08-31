@@ -4,12 +4,12 @@ module;
 #else
 #include <unistd.h>
 #endif
-export module ui.render:svg;
+export module yuri.ui.render:svg;
 
 import :base;
-import skia.resource;
-import skia.api;
-import yuri_log;
+import yuri.skia.resource;
+import yuri.skia.api;
+import yuri.log;
 import std;
 
 using namespace skia;

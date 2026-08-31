@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/1/15.
 //
 
-export module ui.layout:alignment;
+export module yuri.ui.layout:alignment;
 
 export namespace ui::layout {
 

@@ -2,10 +2,10 @@
 // Created by love-yuri on 2026/1/27.
 //
 
-export module ui.widgets:text;
+export module yuri.ui.widgets:text;
 
 import :base;
-import ui.render;
+import yuri.ui.render;
 
 using namespace ui::render;
 

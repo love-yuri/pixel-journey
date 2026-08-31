@@ -1,10 +1,10 @@
 //
 // Created by yuri on 2026/1/19.
 //
-export module ui.animation:core;
+export module yuri.ui.animation:core;
 
 import std;
-import core;
+import yuri.core;
 
 using namespace std::chrono;
 using namespace std::chrono_literals;

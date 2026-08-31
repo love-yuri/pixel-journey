@@ -2,12 +2,12 @@
 // Created by yuri on 2026/1/19.
 //
 
-export module ui.animation:linear_animation;
+export module yuri.ui.animation:linear_animation;
 
 import :core;
-import skia;
-import core;
-import ui.algorithm;
+import yuri.skia;
+import yuri.core;
+import yuri.ui.algorithm;
 import std;
 
 using namespace profiling;

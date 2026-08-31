@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/1/26.
 //
 
-export module ui.layout:vbox_layout;
+export module yuri.ui.layout:vbox_layout;
 
 import :base;
 import :size_constraints;

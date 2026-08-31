@@ -6,11 +6,11 @@ module;
 // ReSharper disable once CppUnusedIncludeDirective
 #include "include/private/SkFloatingPoint.h"
 #endif
-export module ui.render:base;
+export module yuri.ui.render:base;
 
-import skia.api;
-import skia.resource;
-import ui.layout;
+import yuri.skia.api;
+import yuri.skia.resource;
+import yuri.ui.layout;
 import std;
 
 using namespace skia;

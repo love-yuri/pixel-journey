@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/1/22.
 //
 
-export module ui.layout:insets;
+export module yuri.ui.layout:insets;
 
 export namespace ui::layout {
 

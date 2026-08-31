@@ -2,12 +2,12 @@
 // Created by love-yuri on 2026/4/2.
 //
 
-export module ui.animation:bezier_animation;
+export module yuri.ui.animation:bezier_animation;
 
 import :core;
-import skia;
-import core;
-import ui.algorithm;
+import yuri.skia;
+import yuri.core;
+import yuri.ui.algorithm;
 import std;
 
 using namespace profiling;

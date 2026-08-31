@@ -2,12 +2,12 @@
 // Created by yuri on 2026/4/29.
 //
 
-export module ui.widgets:scroll_area;
+export module yuri.ui.widgets:scroll_area;
 
 import :base;
-import core;
-import skia.api;
-import ui.animation;
+import yuri.core;
+import yuri.skia.api;
+import yuri.ui.animation;
 import std;
 
 using namespace skia;

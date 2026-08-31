@@ -3,16 +3,16 @@
 //
 module;
 
-export module ui.widgets:button;
+export module yuri.ui.widgets:button;
 
 import std;
-import ui.layout;
-import ui.render;
-import skia.resource;
+import yuri.ui.layout;
+import yuri.ui.render;
+import yuri.skia.resource;
 import :base;
 import :box;
-import core;
-import ui.animation;
+import yuri.core;
+import yuri.ui.animation;
 
 using namespace ui::render;
 using namespace ui::layout;

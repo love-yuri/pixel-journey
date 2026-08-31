@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/3/30.
 //
 
-export module ui.layout:hbox_layout;
+export module yuri.ui.layout:hbox_layout;
 
 import :base;
 import :size_constraints;

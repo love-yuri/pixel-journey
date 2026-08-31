@@ -2,13 +2,13 @@
 // Created by yuri on 2026/1/20.
 //
 
-export module ui.widgets:box;
+export module yuri.ui.widgets:box;
 
 import std;
-import ui.layout;
-import ui.render;
+import yuri.ui.layout;
+import yuri.ui.render;
 import :base;
-import ui.animation;
+import yuri.ui.animation;
 
 using namespace ui::render;
 using namespace ui::layout;

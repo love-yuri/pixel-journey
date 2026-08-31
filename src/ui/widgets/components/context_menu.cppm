@@ -2,13 +2,13 @@
 // Created by yuri on 2026/7/13.
 //
 
-export module ui.widgets:context_menu;
+export module yuri.ui.widgets:context_menu;
 
 import :base;
-import core;
-import skia;
-import ui.render;
-import ui.layout;
+import yuri.core;
+import yuri.skia;
+import yuri.ui.render;
+import yuri.ui.layout;
 import std;
 
 using namespace skia;

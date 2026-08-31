@@ -2,7 +2,7 @@
 // Created by yuri on 2026/1/27.
 //
 
-export module ui.layout:size_constraints;
+export module yuri.ui.layout:size_constraints;
 
 import std;
 

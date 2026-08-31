@@ -2,10 +2,10 @@
 // Created by yuri on 2026/1/29.
 //
 
-export module ui.widgets:window_base;
+export module yuri.ui.widgets:window_base;
 
-import glfw.api;
-import skia.api;
+import yuri.glfw.api;
+import yuri.skia.api;
 
 using namespace glfw;
 

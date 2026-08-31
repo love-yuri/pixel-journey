@@ -2,11 +2,11 @@
 // Created by love-yuri on 2026/1/14.
 //
 
-export module ui;
+export module yuri.ui;
 
-export import ui.render;
-export import ui.widgets;
-export import ui.layout;
-export import ui.animation;
-export import ui.algorithm;
-export import ui.runtime;
+export import yuri.ui.render;
+export import yuri.ui.widgets;
+export import yuri.ui.layout;
+export import yuri.ui.animation;
+export import yuri.ui.algorithm;
+export import yuri.ui.runtime;

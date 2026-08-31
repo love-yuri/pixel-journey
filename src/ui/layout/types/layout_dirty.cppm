@@ -2,7 +2,7 @@
 // Created by love-yuri on 2026/1/26.
 //
 
-export module ui.layout:layout_dirty;
+export module yuri.ui.layout:layout_dirty;
 
 import std;
 

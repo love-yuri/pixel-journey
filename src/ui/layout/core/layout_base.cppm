@@ -2,11 +2,11 @@
 // Created by love-yuri on 2026/1/26.
 //
 
-export module ui.layout:base;
+export module yuri.ui.layout:base;
 
 import std;
 import :layout_dirty;
-import skia.api;
+import yuri.skia.api;
 
 export namespace ui::layout {
 

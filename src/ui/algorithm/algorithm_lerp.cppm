@@ -2,9 +2,9 @@
 // Created by love-yuri on 2026/3/25.
 //
 
-export module ui.algorithm:lerp;
+export module yuri.ui.algorithm:lerp;
 
-import skia;
+import yuri.skia;
 
 using namespace skia;
 

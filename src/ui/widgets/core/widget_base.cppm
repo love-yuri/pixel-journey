@@ -2,13 +2,13 @@
 // Created by love-yuri on 2026/1/16.
 //
 
-export module ui.widgets:base;
+export module yuri.ui.widgets:base;
 
 import :window_base;
-import skia.api;
-import ui.layout;
-import ui.animation;
-import core;
+import yuri.skia.api;
+import yuri.ui.layout;
+import yuri.ui.animation;
+import yuri.core;
 import std;
 
 using namespace skia;

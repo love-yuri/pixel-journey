@@ -2,10 +2,10 @@
 // Created by Codex on 2026/8/24.
 //
 
-export module ui.runtime:dispatcher;
+export module yuri.ui.runtime:dispatcher;
 
 import std;
-import glfw.api;
+import yuri.glfw.api;
 
 /**
  * UI 线程任务队列。

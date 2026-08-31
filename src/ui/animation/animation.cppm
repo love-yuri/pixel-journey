@@ -2,7 +2,7 @@
 // Created by yuri on 2026/1/19.
 //
 
-export module ui.animation;
+export module yuri.ui.animation;
 
 export import :core;
 export import :linear_animation;

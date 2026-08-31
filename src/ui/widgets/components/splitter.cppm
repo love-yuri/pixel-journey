@@ -1,11 +1,11 @@
 //
 // Created by love-yuri on 2026/1/29.
 //
-export module ui.widgets:splitter;
+export module yuri.ui.widgets:splitter;
 
 import std;
-import skia;
-import ui.layout;
+import yuri.skia;
+import yuri.ui.layout;
 import :base;
 
 using namespace ui::layout;

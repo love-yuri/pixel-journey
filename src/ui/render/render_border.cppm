@@ -1,8 +1,8 @@
-export module ui.render:border;
+export module yuri.ui.render:border;
 
 import :base;
-import skia.resource;
-import yuri_log;
+import yuri.skia.resource;
+import yuri.log;
 import std;
 
 using namespace skia;
