@@ -59,8 +59,8 @@ enum class CursorType {
   VResize = GLFW_VRESIZE_CURSOR,
 
   // 对角线调整大小光标（部分系统支持）
-  ResizeNWSE = GLFW_RESIZE_NWSE_CURSOR,  // 西北-东南方向
-  ResizeNESW = GLFW_RESIZE_NESW_CURSOR,  // 东北-西南方向
+  ResizeNWSE = GLFW_RESIZE_NWSE_CURSOR, // 西北-东南方向
+  ResizeNESW = GLFW_RESIZE_NESW_CURSOR, // 东北-西南方向
 
   // 移动光标（四向箭头）
   Move = GLFW_RESIZE_ALL_CURSOR,
@@ -72,6 +72,12 @@ enum class CursorType {
 class Application final {
 public:
   explicit Application() {
+#ifdef GLFW_WAYLAND_LIBDECOR
+    // 禁用 Wayland 下基于 GTK 的 libdecor 装饰插件：它会把 GTK 拉进进程并在主线程里驱动 GTK
+    // 主循环，与应用内其它 GTK 使用者（如网页登录窗口的 WebKitGTK）冲突
+    glfwInitHint(GLFW_WAYLAND_LIBDECOR, GLFW_WAYLAND_DISABLE_LIBDECOR);
+#endif
+
     if (glfwInit() == GLFW_FALSE) {
       throw std::runtime_error("glfw: 初始化失败!");
     }
@@ -90,7 +96,7 @@ public:
  * @param window window指针
  * @param type 鼠标类型
  */
-void setStandardCursor(GLFWwindow* window, CursorType type) {
+void setStandardCursor(GLFWwindow *window, CursorType type) {
   const auto cursor = glfwCreateStandardCursor(static_cast<int>(type));
   glfwSetCursor(window, cursor);
 }
@@ -99,10 +105,10 @@ void setStandardCursor(GLFWwindow* window, CursorType type) {
  * 获取vulkan所需扩展
  * @return 扩展合集
  */
-std::vector<const char*> get_vk_extensions() {
+std::vector<const char *> get_vk_extensions() {
   uint32_t extCount = 0;
   const char **extensions = glfwGetRequiredInstanceExtensions(&extCount);
-  return std::vector<const char*> { extensions, extensions + extCount };
+  return std::vector<const char *>{ extensions, extensions + extCount };
 }
 
 /**
@@ -113,7 +119,7 @@ std::vector<const char*> get_vk_extensions() {
  * @param title 窗口标题
  * @return 窗口指针
  */
-GLFWwindow* create_window(const int width, const int height, const std::string& title) {
+GLFWwindow *create_window(const int width, const int height, const std::string &title) {
   return glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 }
 
@@ -121,7 +127,7 @@ GLFWwindow* create_window(const int width, const int height, const std::string& 
  * 销毁窗口指针
  * @param window 窗口指针
  */
-void destroy_window(GLFWwindow* window) {
+void destroy_window(GLFWwindow *window) {
   glfwDestroyWindow(window);
 }
 
@@ -129,13 +135,10 @@ void destroy_window(GLFWwindow* window) {
  * 获取窗口的帧buffer大小
  * @return <width, height>
  */
-std::tuple<std::uint32_t, std::uint32_t> get_buffer_size(GLFWwindow* window) {
+std::tuple<std::uint32_t, std::uint32_t> get_buffer_size(GLFWwindow *window) {
   int height, width;
   glfwGetFramebufferSize(window, &width, &height);
-  return {
-    static_cast<std::uint32_t>(width),
-    static_cast<std::uint32_t>(height)
-  };
+  return { static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height) };
 }
 
 /**
@@ -143,10 +146,10 @@ std::tuple<std::uint32_t, std::uint32_t> get_buffer_size(GLFWwindow* window) {
  * @return <width, height>
  */
 std::tuple<int, int> getPrimaryMonitorSize() {
-  GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
-  const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
+  GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
 
   return { mode->width, mode->height };
 }
 
-}
+} // namespace glfw
