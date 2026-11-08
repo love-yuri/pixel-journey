@@ -24,8 +24,8 @@ sk_sp<SkFontMgr> defaultFontMgr = SkFontMgr_New_FontConfig(nullptr, SkFontScanne
 constexpr auto default_font_path = R"(C:\Users\love-yuri\AppData\Local\Microsoft\Windows\Fonts\MapleMono-NF-CN-Medium.ttf)";
 constexpr auto bold_font_path = R"(C:\Users\love-yuri\AppData\Local\Microsoft\Windows\Fonts\MapleMono-NF-CN-SemiBold.ttf)";
 #else
-constexpr auto default_font_path = "/usr/share/fonts/maple/MapleMono-NF-CN-Medium.ttf";
-constexpr auto bold_font_path = "/usr/share/fonts/maple/MapleMono-NF-CN-SemiBold.ttf";
+constexpr auto default_font_path = "/usr/share/fonts/maple/MapleMonoNL-NF-CN-Medium.ttf";
+constexpr auto bold_font_path = "/usr/share/fonts/maple/MapleMonoNL-NF-CN-SemiBold.ttf";
 #endif
 
 /**
