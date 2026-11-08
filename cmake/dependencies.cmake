@@ -38,6 +38,8 @@ elseif(UNIX)
     set_target_properties(skia PROPERTIES
         IMPORTED_LOCATION             "${SKIA_OUT}/libskia.a"      # Linux 静态库
         INTERFACE_INCLUDE_DIRECTORIES "${SKIA_ROOT}"               # 头文件路径
+        # PartitionAlloc 静态库相互依赖，使用链接组解析循环引用。
+        INTERFACE_LINK_LIBRARIES "$<LINK_GROUP:RESCAN,${SKIA_OUT}/libraw_ptr.a,${SKIA_OUT}/liballocator_core.a,${SKIA_OUT}/liballocator_base.a>"
     )
     # svg所需依赖
     list(APPEND THIRD_PARTY_LIBS
