@@ -45,11 +45,13 @@ public:
   // 设置左侧面板最小宽度
   void setMinLeftWidth(const float w) {
     min_left_width = w;
+    split_pos = std::max(split_pos, w);
   }
 
   // 设置左侧面板最大宽度
   void setMaxLeftWidth(const float w) {
     max_left_width = w;
+    split_pos = std::min(split_pos, w);
   }
 
   // split的位置
