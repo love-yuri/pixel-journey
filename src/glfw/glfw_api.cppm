@@ -108,6 +108,12 @@ void setStandardCursor(GLFWwindow *window, CursorType type) {
 std::vector<const char *> get_vk_extensions() {
   uint32_t extCount = 0;
   const char **extensions = glfwGetRequiredInstanceExtensions(&extCount);
+  if (extensions == nullptr || extCount == 0) {
+    const char *description = nullptr;
+    glfwGetError(&description);
+    throw std::runtime_error(std::format("GLFW 无法获取 Vulkan 窗口扩展: {}",
+                                        description ? description : "当前环境不支持 Vulkan 窗口表面，请检查 Vulkan 驱动"));
+  }
   return std::vector<const char *>{ extensions, extensions + extCount };
 }
 
