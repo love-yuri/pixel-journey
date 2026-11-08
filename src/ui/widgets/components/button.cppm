@@ -73,7 +73,6 @@ protected:
     is_dragging = false;
     clicked.emit();
   }
-
 };
 
 Button::Button(const std::string_view text, Widget *parent) : Box(parent) {
