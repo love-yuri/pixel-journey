@@ -120,11 +120,15 @@ mkdir build && cd build
 cmake .. -G Ninja
 cmake --build .
 
-# 运行测试
-ctest
+# 运行控件示例
+./test/demo
 ```
 
 > **Windows**: 使用 Clang 构建需链接 libc++，使用 MSVC 可直接在 VS 开发者终端中构建。
+
+## 控件示例
+
+[分栏示例](docs/demo.md) 展示左右分栏布局，左侧包含“首页”按钮，右侧预留内容区域。入口为 `test/demo.cpp`，构建目标为 `demo`。
 
 ## 项目特性
 

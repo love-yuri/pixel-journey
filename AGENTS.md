@@ -72,7 +72,7 @@ configuration (is_debug_mode, vulkan constants)
 
 ### Test / Example Apps
 
-- `test/vulkan_hello.cpp` — Minimal Vulkan random-color demo, built as CTest
+- `test/demo.cpp` — Minimal split-pane UI demo, built as `demo` (not registered as CTest)
 
 ### Project Roles
 
