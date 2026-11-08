@@ -17,11 +17,12 @@ export namespace glfw {
 class Window : public Widget, public WindowBase {
 
 protected:
-  std::string title_{};          // 窗口标题
-  GLFWwindow *window_ = nullptr; // 窗口指针
-  WindowContext context_;        // context
-  float cursor_x = 0.0f;         // 鼠标位置—x
-  float cursor_y = 0.0f;         // 鼠标位置-y
+  std::string title_{};                                      // 窗口标题
+  GLFWwindow *window_ = nullptr;                             // 窗口指针
+  WindowContext context_;                                    // context
+  float cursor_x = 0.0f;                                     // 鼠标位置—x
+  float cursor_y = 0.0f;                                     // 鼠标位置-y
+  skia::SkColor background_color = skia::skia_colors::white; // 背景色
 
 public:
   Window(int width, int height, std::string_view title = "yuri");
@@ -222,6 +223,9 @@ void Window::run() {
 
     // 更新布局
     updateLayout();
+
+    // 清空背景
+    frame->sk_surface->getCanvas()->clear(background_color);
 
     // 渲染
     render(frame->sk_surface->getCanvas());
