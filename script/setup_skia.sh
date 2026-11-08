@@ -5,7 +5,9 @@ set -euo pipefail
 # Skia 安装 & 构建脚本
 # ====================================
 
-SKIA_ROOT="${SKIA_ROOT:-$HOME/github/skia}"
+# 在切换工作目录前解析脚本位置，避免相对调用路径失效。
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+export SKIA_ROOT="$(realpath -m -- "${SKIA_ROOT:-$HOME/github/skia}")"
 SKIA_REPO="https://skia.googlesource.com/skia.git"
 OUT_DIR="$SKIA_ROOT/out/Shared"
 
@@ -31,7 +33,6 @@ python3 tools/git-sync-deps
 # ====================================
 # 3. 调用 Python 构建脚本
 # ====================================
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "==> 开始构建 Skia..."
 
 python3 "$SCRIPT_DIR/build.py"

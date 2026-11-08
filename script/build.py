@@ -4,7 +4,9 @@ import subprocess
 # -----------------------------
 # 配置 Skia 根目录
 # -----------------------------
-SKIA_ROOT = r"D:\skia" if os.name == "nt" else "/home/yuri/github/skia"
+SKIA_ROOT = os.path.abspath(os.path.expanduser(os.environ.get(
+    "SKIA_ROOT", r"D:\skia" if os.name == "nt" else "~/github/skia"
+)))
 OUT_DIR = os.path.join(SKIA_ROOT, "out", "Shared")
 
 # GN 可执行文件
@@ -54,11 +56,15 @@ else:
 # -----------------------------
 # 调用 GN 生成 Ninja 构建文件
 # -----------------------------
-subprocess.check_call([GN_EXE, "gen", OUT_DIR, "--args=" + " ".join(args)], shell=False)
+subprocess.check_call(
+    [GN_EXE, "gen", OUT_DIR, "--args=" + " ".join(args)],
+    cwd=SKIA_ROOT,
+    shell=False,
+)
 
 # -----------------------------
 # 调用 Ninja 编译
 # -----------------------------
-subprocess.check_call([NINJA_EXE, "-C", OUT_DIR], shell=False)
+subprocess.check_call([NINJA_EXE, "-C", OUT_DIR], cwd=SKIA_ROOT, shell=False)
 
 print("Skia 编译完成！输出目录:", OUT_DIR)
