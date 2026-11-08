@@ -348,7 +348,7 @@ public:
    * 设置布局
    */
   template <typename LayoutType>
-  requires std::derived_from<LayoutType, LayoutType>
+  requires std::derived_from<LayoutType, Layout<Widget>>
   void setLayout();
 
   /**
@@ -621,7 +621,7 @@ void Widget::setPadding(const Insets &insets) noexcept {
 }
 
 template <typename LayoutType>
-requires std::derived_from<LayoutType, LayoutType>
+requires std::derived_from<LayoutType, Layout<Widget>>
 void Widget::setLayout() {
   layout_ = std::make_unique<LayoutType>(this);
   has_layout = true;
