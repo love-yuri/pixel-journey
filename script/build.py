@@ -5,7 +5,7 @@ import subprocess
 # 配置 Skia 根目录
 # -----------------------------
 SKIA_ROOT = os.path.abspath(os.path.expanduser(os.environ.get(
-    "SKIA_ROOT", r"D:\skia" if os.name == "nt" else "~/github/skia"
+    "SKIA_ROOT", "C:/skia" if os.name == "nt" else "~/github/skia"
 )))
 OUT_DIR = os.path.join(SKIA_ROOT, "out", "Shared")
 
@@ -27,13 +27,11 @@ args = [
     "skia_use_gl=false",       # 不使用opengl
     "skia_enable_svg=true",    # 使用SVG
     # "skia_enable_tools=true",  # 启用 tools"
-    r'cc="clang"',             # 使用clang
-    r'cxx="clang++"',          # 使用clang++
 ]
 
 # 后端选择
 if os.name == "nt":
-    # Windows 特定
+    # Windows 使用 Skia 自动检测的 MSVC，不指定 Clang 路径或编译器。
     args += [
         "skia_pdf_subset_harfbuzz=true",
         # 使用 skia 自带库
@@ -44,11 +42,12 @@ if os.name == "nt":
         "skia_use_system_libpng=false",
         "skia_use_system_libwebp=false",
         "skia_use_system_zlib=false",
-        r'clang_win="D:/LLVM"',
     ]
 else:
     # Linux 特定
     args += [
+        r'cc="clang"',           # 使用clang
+        r'cxx="clang++"',        # 使用clang++
         "skia_use_fontconfig=true",
         "skia_use_freetype=true",  # 使用ttf
     ]

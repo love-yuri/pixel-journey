@@ -13,7 +13,7 @@ message(STATUS "GLFW version: ${glfw3_VERSION}")
 # skia
 # ----------------------------------------------------------------------------
 if(WIN32)
-    set(SKIA_ROOT "D:/skia")
+    set(SKIA_ROOT "C:/skia")
     set(SKIA_OUT "${SKIA_ROOT}/out/Shared")
     add_library(skia STATIC IMPORTED)
     set_target_properties(skia PROPERTIES
@@ -26,9 +26,6 @@ if(WIN32)
         ${SKIA_OUT}/skshaper.lib
         ${SKIA_OUT}/skunicode_icu.lib
         ${SKIA_OUT}/skunicode_core.lib
-        ${SKIA_OUT}/allocator_base.lib
-        ${SKIA_OUT}/allocator_core.lib
-        ${SKIA_OUT}/raw_ptr.lib
         winmm.lib
     )
 elseif(UNIX)

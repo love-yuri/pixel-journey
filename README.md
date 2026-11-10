@@ -112,8 +112,8 @@ UI 框架采用分层设计，从底向上依次为：
 git clone https://github.com/love-yuri/pixel-journey.git
 cd pixel-journey
 
-# 编译 Skia (首次需要)
-python script/build.py
+# 下载并编译 Skia (首次需要，Windows / Linux)
+python script/setup_skia.py
 
 # 构建项目
 mkdir build && cd build
@@ -125,6 +125,9 @@ cmake --build .
 ```
 
 > **Windows**: 使用 Clang 构建需链接 libc++，使用 MSVC 可直接在 VS 开发者终端中构建。
+
+Skia 默认下载到 Windows 的 `C:/skia` 或 Linux 的 `~/github/skia`；可通过 `SKIA_ROOT`
+环境变量覆盖脚本使用的路径。已有源码时可直接运行 `python script/build.py` 重新编译。
 
 ## 控件示例
 

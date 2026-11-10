@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Build Skia (first time only)
-python script/build.py
+python script/setup_skia.py
 
 # Configure and build
 mkdir -p build && cd build
@@ -21,7 +21,7 @@ ctest
 - C++23 with modules, compiler: MSVC >= 19.38 / GCC >= 15.0 / Clang >= 19.0
 - Windows: uses vcpkg (`E:/love-yuri/github/vcpkg` or `$VCPKG_ROOT`), static CRT
 - Linux: forces clang++, links additional system libs (fontconfig, freetype, icu, harfbuzz, etc.)
-- Skia is a prebuilt static lib from hardcoded paths (`D:/skia` on Windows, `/home/yuri/github/skia` on Linux)
+- Skia is a prebuilt static lib from hardcoded paths (`C:/skia` on Windows, `/home/yuri/github/skia` on Linux)
 
 ## Architecture
 
