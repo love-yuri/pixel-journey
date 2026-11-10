@@ -1,7 +1,6 @@
 //
 // Created by love-yuri on 2026/1/16.
 //
-
 export module yuri.ui.widgets:base;
 
 import :window_base;
@@ -28,7 +27,7 @@ class Widget {
 
 protected:
   Widget *parent_ = nullptr;                         // 父控件
-  std::vector<Widget *> children_{};                 // 子控件列表
+  std::vector<Widget *> children_;                   // 子控件列表
   LayoutDirty layout_dirty{};                        // 脏布局类型
   std::unique_ptr<Layout<Widget>> layout_ = nullptr; // 布局
 
@@ -37,7 +36,7 @@ protected:
   float y_ = 0.f;                   // 控件y 坐标
   float width_ = 0.f;               // 控件宽度
   float height_ = 0.f;              // 控件高度
-  Insets padding_{};                // 内边距
+  Insets padding_;                  // 内边距
   SizeConstraints size_constraints; // 布局约束信息
 
   /**
@@ -491,7 +490,7 @@ void Widget::render(SkCanvas *canvas) {
 
   // 变换后绘制children
   canvas->translate(padding_.left, padding_.top);
-  for (const auto child : children_) {
+  for (auto *const child : children_) {
     if (child->visible_) {
       child->render(canvas);
     }
@@ -532,13 +531,13 @@ void Widget::layoutChildren() {
   }
 
   // 更新子控件布局
-  for (const auto child : this->children_) {
+  for (auto *const child : this->children_) {
     child->updateLayout();
   }
 }
 
 Widget::~Widget() {
-  for (const auto child : children_) {
+  for (auto *const child : children_) {
     // 本控件析构不需要再次处理自身
     child->parent_ = nullptr;
     delete child;
@@ -569,9 +568,9 @@ WindowBase *Widget::window() {
   if (window_) {
     return window_;
   }
-  auto parent = parent_;
+  auto *parent = parent_;
   while (parent) {
-    if (const auto w = dynamic_cast<WindowBase *>(parent)) {
+    if (auto *const w = dynamic_cast<WindowBase *>(parent)) {
       return window_ = w;
     }
     parent = parent->parent_;
@@ -703,11 +702,11 @@ void Widget::MouseMove(const float x, const float y) {
   const auto child_x = x - padding_.left;
   const auto child_y = y - padding_.top;
 
-  for (const auto child : std::views::reverse(children_)) {
+  for (auto *const child : std::views::reverse(children_)) {
     if (!child->visible_) continue;
     if (child->contains(child_x, child_y) || child->is_dragging) {
       // 鼠标在此子控件内，清除其他兄弟的悬浮状态
-      for (const auto sibling : children_) {
+      for (auto *const sibling : children_) {
         if (sibling != child && sibling->visible_ && sibling->hovered_) {
           sibling->clearHoverState();
         }
@@ -718,7 +717,7 @@ void Widget::MouseMove(const float x, const float y) {
   }
 
   // 鼠标不在任何子控件内，清除所有子控件的悬浮状态
-  for (const auto child : children_) {
+  for (auto *const child : children_) {
     if (child->visible_ && child->hovered_) {
       child->clearHoverState();
     }
@@ -730,7 +729,7 @@ void Widget::MouseLeftPressed(const float x, const float y) {
   const auto child_x = x - padding_.left;
   const auto child_y = y - padding_.top;
 
-  for (const auto child : std::views::reverse(children_)) {
+  for (auto *const child : std::views::reverse(children_)) {
     if (child->visible_ && (child->contains(child_x, child_y) || child->is_dragging)) {
       child->MouseLeftPressed(child_x - child->x_, child_y - child->y_);
       mouse_capture = child;
@@ -761,7 +760,7 @@ void Widget::MouseRightPressed(const float x, const float y) {
   const auto child_y = y - padding_.top;
 
   for (std::size_t index = children_.size(); index > 0; --index) {
-    const auto child = children_[index - 1];
+    auto *const child = children_[index - 1];
     if (child->visible_ && child->contains(child_x, child_y)) {
       child->MouseRightPressed(child_x - child->x_, child_y - child->y_);
       right_mouse_capture = child;
@@ -797,7 +796,7 @@ void Widget::MouseWheel(const float x, const float y, const float delta_x, const
   const auto child_x = x - padding_.left;
   const auto child_y = y - padding_.top;
 
-  for (const auto child : children_) {
+  for (auto *const child : children_) {
     if (child->visible_ && child->contains(child_x, child_y)) {
       child->MouseWheel(child_x - child->x_, child_y - child->y_, delta_x, delta_y);
       return;
@@ -810,7 +809,8 @@ void Widget::clearHoverState() {
     hovered_ = false;
     onMouseLeave(0, 0);
   }
-  for (const auto child : children_) {
+
+  for (auto *const child : children_) {
     if (child->visible_) {
       child->clearHoverState();
     }

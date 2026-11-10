@@ -82,12 +82,12 @@ export namespace ui::render {
 
 /** 将 SVG 光栅化为图片缓存，并在指定区域内按原始尺寸对齐绘制的节点。 */
 class RenderSvg final : public RenderNode {
-  std::string file_path{};                  // SVG 资源路径
-  sk_sp<SkSVGDOM> svg_dom = nullptr;        // 光栅化前使用的 SVG 文档
-  sk_sp<SkImage> cache_ = nullptr;          // CPU 光栅化生成的图片缓存
-  SkSize size_ = SkSize::MakeEmpty();       // SVG 原始尺寸
-  SkPoint offset_ = {0.f, 0.f};             // 图片绘制原点
-  Alignment alignment_{};                   // 内容对齐方式
+  std::string file_path;                      // SVG 资源路径
+  sk_sp<SkSVGDOM> svg_dom = nullptr;          // 光栅化前使用的 SVG 文档
+  sk_sp<SkImage> cache_ = nullptr;            // CPU 光栅化生成的图片缓存
+  SkSize size_ = SkSize::MakeEmpty();         // SVG 原始尺寸
+  SkPoint offset_ = { .fX = 0.f, .fY = 0.f }; // 图片绘制原点
+  Alignment alignment_{};                     // 内容对齐方式
 
   /** 按 SVG 原始尺寸生成 CPU 图片缓存。 */
   void rasterize();
