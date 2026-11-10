@@ -10,7 +10,7 @@ export module yuri.ui.render:base;
 
 import yuri.skia.api;
 import yuri.skia.resource;
-import yuri.ui.layout;
+import yuri.ui.layout.core;
 import std;
 
 using namespace skia;

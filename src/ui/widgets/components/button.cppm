@@ -6,7 +6,7 @@ module;
 export module yuri.ui.widgets:button;
 
 import std;
-import yuri.ui.layout;
+import yuri.ui.layout.core;
 import yuri.ui.render;
 import yuri.skia.resource;
 import :base;

@@ -5,7 +5,7 @@
 export module yuri.ui.widgets:box;
 
 import std;
-import yuri.ui.layout;
+import yuri.ui.layout.core;
 import yuri.ui.render;
 import :base;
 import yuri.ui.animation;

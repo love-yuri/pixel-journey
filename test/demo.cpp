@@ -10,19 +10,19 @@ using namespace ui::layout;
 
 static void create_left_widget(Splitter* splitter) {
   const auto widget = new Widget(splitter);
-  widget->setLayout<VBoxLayout<Widget>>();
+  widget->setLayout<VBoxLayout>();
   const auto button = new Button("首页", widget);
   button->setMaxHeight(40);
 }
 
 static void create_right_widget(Splitter* splitter) {
   const auto widget = new Widget(splitter);
-  widget->setLayout<VBoxLayout<Widget>>();
+  widget->setLayout<VBoxLayout>();
 }
 
 int main() {
   Window window(1080, 720, "yuri");
-  window.setLayout<HBoxLayout<Widget>>();
+  window.setLayout<HBoxLayout>();
 
   const auto splitter = new Splitter(&window);
   splitter->setMinLeftWidth(300);

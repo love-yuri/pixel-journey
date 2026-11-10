@@ -5,7 +5,7 @@
 module;
 // MSVC 模块中使用 SkRect 的中心计算时，需要此静态内联函数定义。
 #include "include/private/SkFloatingPoint.h"
-export module yuri.ui.layout:alignment;
+export module yuri.ui.layout.core:alignment;
 
 import yuri.skia.api;
 

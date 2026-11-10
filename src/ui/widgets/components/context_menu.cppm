@@ -8,7 +8,7 @@ import :base;
 import yuri.core;
 import yuri.skia;
 import yuri.ui.render;
-import yuri.ui.layout;
+import yuri.ui.layout.core;
 import std;
 
 using namespace skia;

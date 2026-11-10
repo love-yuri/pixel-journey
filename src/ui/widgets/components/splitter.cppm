@@ -5,7 +5,7 @@ export module yuri.ui.widgets:splitter;
 
 import std;
 import yuri.skia;
-import yuri.ui.layout;
+import yuri.ui.layout.core;
 import :base;
 
 using namespace ui::layout;
@@ -22,14 +22,14 @@ class Splitter;
 
 class SplitterLayout : public Layout<Widget> {
 public:
-  explicit SplitterLayout(Widget *widget) : Layout(widget) {
-  }
-  void apply() const override;
+  /**
+   * 根据分割位置排列面板。
+   * @param parent 拥有当前布局的分割控件
+   */
+  void apply(Widget &parent) const override;
 };
 
 class Splitter : public Widget {
-  friend class SplitterLayout;
-
 public:
   explicit Splitter(Widget *parent) :
     Widget(parent), paint_(SkPaintBuilder().setColor(skia_colors::gray).build()) {
@@ -77,7 +77,7 @@ public:
 
   void layoutChildren() override {
     if (layout_) {
-      layout_->apply();
+      layout_->apply(*this);
     }
     for (const auto child : children_) {
       child->updateLayout();
@@ -149,21 +149,21 @@ private:
   SkPaint paint_;
 };
 
-void SplitterLayout::apply() const {
-  const auto &children = widget_->children();
+void SplitterLayout::apply(Widget &parent) const {
+  const auto &children = parent.children();
   const auto n = children.size();
   if (n == 0) return;
 
-  const auto w = widget_->contentWidth();
-  const auto h = widget_->contentHeight();
-  const auto *splitter = static_cast<const Splitter *>(widget_);
-  const auto split = splitter->splitPosition();
+  const auto w = parent.contentWidth();
+  const auto h = parent.contentHeight();
+  const auto &splitter = static_cast<const Splitter &>(parent);
+  const auto split = splitter.splitPosition();
 
   if (n == 1) {
-    setGeometry(children[0], 0, 0, w, h);
+    arrange(*children[0], SkRect::MakeXYWH(0.f, 0.f, w, h));
   } else {
-    setGeometry(children[0], 0, 0, split, h);
-    setGeometry(children[1], split, 0, w - split, h);
+    arrange(*children[0], SkRect::MakeXYWH(0.f, 0.f, split, h));
+    arrange(*children[1], SkRect::MakeXYWH(split, 0.f, w - split, h));
   }
 }
 

@@ -5,7 +5,7 @@ export module yuri.ui.widgets:base;
 
 import :window_base;
 import yuri.skia.api;
-import yuri.ui.layout;
+import yuri.ui.layout.core;
 import yuri.ui.animation;
 import yuri.core;
 import std;
@@ -23,7 +23,13 @@ class Widget {
   WindowBase *window_ = nullptr;         // 窗口指针
   Widget *mouse_capture = nullptr;       // 正在被点击的控件
   Widget *right_mouse_capture = nullptr; // 正在被右键点击的控件
-  friend Layout<Widget>;                 // 友元layout组件
+  friend class Layout<Widget>;           // 仅布局基类可提交布局结果
+
+  /**
+   * 应用布局结果，绕过手动几何修改限制，并在几何变化时标记布局失效。
+   * @param rect 相对于父控件内容区域的几何信息
+   */
+  void apply_layout_geometry(const SkRect &rect) noexcept;
 
 protected:
   Widget *parent_ = nullptr;                         // 父控件
@@ -527,7 +533,7 @@ void Widget::updateLayout() {
 void Widget::layoutChildren() {
   // 重新布局
   if (layout_) {
-    layout_->apply();
+    layout_->apply(*this);
   }
 
   // 更新子控件布局
@@ -588,26 +594,26 @@ void Widget::setGeometry(const SkRect &rect) noexcept {
     return;
   }
 
+  apply_layout_geometry(rect);
+}
+
+// clang-format off
+void Widget::setGeometry(const float x, const float y, const float width, const float height) noexcept {
+  setGeometry(SkRect::MakeXYWH(x, y, width, height));
+}
+// clang-format on
+
+void Widget::apply_layout_geometry(const SkRect &rect) noexcept {
+  if (x_ == rect.x() && y_ == rect.y() && width_ == rect.width() && height_ == rect.height()) {
+    return;
+  }
+
   x_ = rect.x();
   y_ = rect.y();
   width_ = rect.width();
   height_ = rect.height();
   markLayoutDirty(LayoutDirty::Self);
 }
-
-// clang-format off
-void Widget::setGeometry(const float x, const float y, const float width, const float height) noexcept {
-  if (parent_ && parent_->has_layout) {
-    return;
-  }
-
-  x_ = x;
-  y_ = y;
-  width_ = width;
-  height_ = height;
-  markLayoutDirty(LayoutDirty::Self);
-}
-// clang-format on
 
 void Widget::setPadding(const float padding) noexcept {
   padding_.setAll(padding);
@@ -622,54 +628,55 @@ void Widget::setPadding(const Insets &insets) noexcept {
 template <typename LayoutType>
 requires std::derived_from<LayoutType, Layout<Widget>>
 void Widget::setLayout() {
-  layout_ = std::make_unique<LayoutType>(this);
+  layout_ = std::make_unique<LayoutType>();
   has_layout = true;
+  markLayoutDirty();
 }
 
 void Widget::removeLayout() {
   layout_ = nullptr;
   has_layout = false;
+  markLayoutDirty();
 }
 
 void Widget::setMaxSize(const float w, const float h) noexcept {
   size_constraints.max_w = std::max(w, size_constraints.min_w);
   size_constraints.max_h = std::max(h, size_constraints.min_h);
+  markLayoutDirty();
 }
 
 void Widget::setMinSize(const float w, const float h) noexcept {
   size_constraints.min_w = std::min(w, size_constraints.max_w);
   size_constraints.min_h = std::min(h, size_constraints.max_h);
+  markLayoutDirty();
 }
 
 void Widget::setMaxWidth(const float w) noexcept {
   size_constraints.max_w = std::max(w, size_constraints.min_w);
+  markLayoutDirty();
 }
 
 void Widget::setMinWidth(const float w) noexcept {
   size_constraints.min_w = std::min(w, size_constraints.max_w);
+  markLayoutDirty();
 }
 
 void Widget::setMaxHeight(const float h) noexcept {
   size_constraints.max_h = std::max(h, size_constraints.min_h);
+  markLayoutDirty();
 }
 
 void Widget::setMinHeight(const float h) noexcept {
   size_constraints.min_h = std::min(h, size_constraints.max_h);
+  markLayoutDirty();
 }
 
 void Widget::resize(const float width, const float height) noexcept {
-  if (parent_ && parent_->has_layout) {
-    return;
-  }
-
-  width_ = width;
-  height_ = height;
-
-  markLayoutDirty(LayoutDirty::Self);
+  setGeometry(x_, y_, width, height);
 }
 
 void Widget::move(const float x, const float y) noexcept {
-  if (parent_ && parent_->has_layout) {
+  if (parent_ && parent_->has_layout || x == x_ && y == y_) {
     return;
   }
 
@@ -682,10 +689,18 @@ void Widget::move(const SkPoint &point) noexcept {
 }
 
 void Widget::setX(const float x) noexcept {
+  if (parent_ && parent_->has_layout || x == x_) {
+    return;
+  }
+
   x_ = x;
 }
 
 void Widget::setY(const float y) noexcept {
+  if (parent_ && parent_->has_layout || y == y_) {
+    return;
+  }
+
   y_ = y;
 }
 
