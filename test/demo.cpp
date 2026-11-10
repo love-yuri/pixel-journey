@@ -24,7 +24,7 @@ int main() {
   Window window(1080, 720, "yuri");
   window.setLayout<HBoxLayout<Widget>>();
 
-  auto splitter = new Splitter(&window);
+  const auto splitter = new Splitter(&window);
   splitter->setMinLeftWidth(300);
 
   // 创建左侧界面

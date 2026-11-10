@@ -12,7 +12,9 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 
 ### 命名规范
 
-1. **函数**: 小驼峰 (`addTask`, `getPlayerBar`)
+1. **函数**: 统一使用小写下划线命名（`snake_case`），如 `set_font`、`add_task`、`get_player_bar`
+   - 成员函数、全局函数、辅助函数均遵循此规则
+   - 构造函数、析构函数和运算符遵循 C++ 语法；第三方接口调用与重写保留其要求的名称
 2. **类型**: 大驼峰 (`ThreadPool`, `PlayerBar`, `SongInfo`)
 3. **变量**: 下划线命名 (`player_bar`, `cover_image`)
    - 类私有变量且仅有一个单词时添加 `_` 后缀 (`name_`, `bg_`, `alpha_`)
@@ -42,7 +44,7 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 2. **代码尽量一行写完**，不要出现以下情况：
    ```cpp
    // BAD - 参数拆行但不够美观
-   void PlayerBar::drawVolumeBar(SkCanvas *canvas, const float x, const float cy,
+   void PlayerBar::draw_volume_bar(SkCanvas *canvas, const float x, const float cy,
      const float w) const {
    ```
    除非多行参数排列非常整齐好看（如多个长参数对齐排列）
