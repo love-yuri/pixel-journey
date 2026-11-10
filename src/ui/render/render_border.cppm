@@ -13,7 +13,7 @@ class RenderBorder : public RenderNode {
   using RenderNode::RenderNode;
   SkPaint paint = PaintDesc {
     .color = skia_colors::gray,
-    .style = SkPaint::kStroke_Style
+    .style = SkPaint::kStroke_Style,
   };
 
 public:
@@ -22,41 +22,47 @@ public:
   /**
    * render
    */
-  void render(SkCanvas* canvas) override;
+  void draw(SkCanvas* canvas) override;
+
+  /**
+   * 更新border边界
+   */
+  void update(SkRect rect) override;
 
   /**
    * 设置border宽度
    * @param width 宽度
    */
-  inline void setWidth(const float width) noexcept {
+  void setWidth(const float width) noexcept {
     paint.setStrokeWidth(width);
   }
 
   /**
    * 设置边框颜色
    */
-  inline void setColor(const SkColor c) noexcept {
+  void setColor(const SkColor c) noexcept {
     paint.setColor(c);
   }
 };
 
-void RenderBorder::render(SkCanvas *canvas) {
+void RenderBorder::draw(SkCanvas *canvas) {
   if (!visible) {
     return;
   }
 
-  const auto insert = paint.getStrokeWidth() / 2;
-  const SkRect rect = {
-    self_box.fLeft + insert,
-    self_box.fTop + insert,
-    self_box.fRight - insert,
-    self_box.fBottom - insert,
-  };
   if (radius == nullptr || *radius <= 0) {
-    canvas->drawRect(rect, paint);
+    canvas->drawRect(self_box, paint);
   } else {
-    canvas->drawRoundRect(rect, *radius, *radius, paint);
+    canvas->drawRoundRect(self_box, *radius, *radius, paint);
   }
+}
+
+void RenderBorder::update(const SkRect rect) {
+  const auto insert = paint.getStrokeWidth() / 2;
+  self_box.fLeft = rect.fLeft + insert;
+  self_box.fTop = rect.fTop + insert;
+  self_box.fRight = rect.fRight - insert;
+  self_box.fBottom = rect.fBottom - insert;
 }
 
 } // namespace ui::render

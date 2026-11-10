@@ -20,8 +20,8 @@ export namespace ui::widgets {
 class Box : public Widget {
 
 protected:
-  RenderBorder render_border; // border节点
-  RenderBackground render_bg; // background节点
+  RenderBorder render_border{}; // border节点
+  RenderBackground render_bg{}; // background节点
 
 public:
   float radius = 0; // 圆角
@@ -51,8 +51,8 @@ public:
 };
 
 void Box::paint(SkCanvas *canvas) {
-  render_bg.render(canvas);
-  render_border.render(canvas);
+  render_bg.draw(canvas);
+  render_border.draw(canvas);
 }
 
 Box::Box(Widget *parent): Widget(parent) {

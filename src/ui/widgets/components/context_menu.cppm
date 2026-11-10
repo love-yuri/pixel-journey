@@ -125,9 +125,9 @@ void ContextMenu::setItems(std::vector<ContextMenuItem> items) {
 
   for (std::size_t index = 0; index < items_.size(); ++index) {
     auto &text = item_texts.emplace_back(items_[index].name());
-    text.setFontSize(13.5f);
-    text.setColor(kMenuTextColor);
-    text.setAlignment(Alignment::CenterLeft);
+    text.set_font_size(13.5f);
+    text.set_color(kMenuTextColor);
+    text.set_alignment(Alignment::CenterLeft);
     text.update(
       SkRect::MakeXYWH(
         padding_.left + 18.0f,
@@ -237,7 +237,7 @@ void ContextMenu::paint(SkCanvas *canvas) {
   canvas->drawRoundRect(menu_rect.makeInset(0.5f, 0.5f), kMenuRadius, kMenuRadius, border);
 
   for (auto &text : item_texts) {
-    text.render(canvas);
+    text.draw(canvas);
   }
 }
 

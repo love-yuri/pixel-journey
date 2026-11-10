@@ -41,7 +41,7 @@ public:
   /**
    * 返回字体节点
    */
-  inline RenderText& text() noexcept {
+  RenderText& text() noexcept {
     return render_text;
   }
 
@@ -76,20 +76,20 @@ protected:
 };
 
 Button::Button(const std::string_view text, Widget *parent) : Box(parent) {
-  render_text.setTextAndAlignment(text, Alignment::Center);
-  render_bg.setColor(ColorFromARGB(0xff, 145, 209, 123));
+  render_text.set_text_and_alignment(text, Alignment::Center);
+  render_bg.set_color(ColorFromARGB(0xff, 145, 209, 123));
 
   radius = 4;
 
   // 默认大小要能够显示字体
-  const auto &textBound = render_text.textBound();
+  const auto &textBound = render_text.text_bound();
   resize(textBound.width() + 32, textBound.height() + 18);
 }
 
 void Button::paint(SkCanvas *canvas) {
-  render_bg.render(canvas);
-  render_border.render(canvas);
-  render_text.render(canvas);
+  render_bg.draw(canvas);
+  render_border.draw(canvas);
+  render_text.draw(canvas);
 }
 
 void Button::layoutChildren() {

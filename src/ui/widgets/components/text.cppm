@@ -19,7 +19,7 @@ public:
   }
 
   void paint(SkCanvas *canvas) override {
-    renderText.render(canvas);
+    renderText.draw(canvas);
   }
 
   void layoutChildren() override {
@@ -30,7 +30,7 @@ public:
    * 设置对齐方式
    */
   inline void setAlignment(const Alignment alignment) {
-    renderText.setAlignment(alignment);
+    renderText.set_alignment(alignment);
   }
 
   /**
@@ -38,28 +38,28 @@ public:
    * @param size 字体大小
    */
   inline void setFontSize(const float size) {
-    renderText.setFontSize(size);
+    renderText.set_font_size(size);
   }
 
   /**
    * 设置字体颜色
    */
   inline void setColor(const SkColor color) {
-    renderText.setColor(color);
+    renderText.set_color(color);
   }
 
   /**
    * 设置文本
    */
   inline void setText(const std::string_view text) {
-    renderText.setText(text);
+    renderText.set_text(text);
   }
 
   /**
    * 设置文本和对齐方式
    */
   inline void setTextAndAlignment(const std::string_view text, const Alignment alignment) {
-    renderText.setTextAndAlignment(text, alignment);
+    renderText.set_text_and_alignment(text, alignment);
   }
 
 };
