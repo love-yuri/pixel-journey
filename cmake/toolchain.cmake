@@ -1,15 +1,25 @@
 if (WIN32)
-  # 工具链配置
-  find_program(_VCPKG_EXECUTABLE vcpkg)
-  if (_VCPKG_EXECUTABLE)
-    get_filename_component(VCPKG_ROOT "${_VCPKG_EXECUTABLE}" DIRECTORY)
-    message(STATUS "找到 VCPKG_ROOT: ${VCPKG_ROOT}")
-  else ()
-    message(FATAL_ERROR "找不到 vcpkg，请设置环境变量 VCPKG_ROOT 或确保 vcpkg 在 PATH 中")
+  find_program(_VCPKG_EXECUTABLE vcpkg REQUIRED)
+  set(_VCPKG_EXECUTABLE_PATH "${_VCPKG_EXECUTABLE}")
+  get_filename_component(_VCPKG_DIRECTORY "${_VCPKG_EXECUTABLE}" DIRECTORY)
+
+  # Scoop 的 exe 是启动代理，真实程序路径保存在同名 .shim 文件中。
+  if (EXISTS "${_VCPKG_DIRECTORY}/vcpkg.shim")
+    file(STRINGS "${_VCPKG_DIRECTORY}/vcpkg.shim" _VCPKG_SHIM_PATH
+        REGEX "^path = \"[^\"]+\"")
+    if (_VCPKG_SHIM_PATH MATCHES "^path = \"([^\"]+)\"")
+      file(TO_CMAKE_PATH "${CMAKE_MATCH_1}" _VCPKG_EXECUTABLE_PATH)
+    else ()
+      message(FATAL_ERROR "无法解析 ${_VCPKG_DIRECTORY}/vcpkg.shim")
+    endif ()
   endif ()
 
-  # 设置 vcpkg 工具链文件
-  set(CMAKE_TOOLCHAIN_FILE "C:/Users/love-yuri/scoop/apps/vcpkg/2026.10.16/scripts/buildsystems/vcpkg.cmake" CACHE STRING "VCPKG 工具链文件路径")
+  get_filename_component(_VCPKG_DIRECTORY "${_VCPKG_EXECUTABLE_PATH}" DIRECTORY)
+  if (NOT EXISTS "${_VCPKG_DIRECTORY}/scripts/buildsystems/vcpkg.cmake")
+    message(FATAL_ERROR "找不到 ${_VCPKG_DIRECTORY}/scripts/buildsystems/vcpkg.cmake")
+  endif ()
+  set(CMAKE_TOOLCHAIN_FILE "${_VCPKG_DIRECTORY}/scripts/buildsystems/vcpkg.cmake"
+      CACHE FILEPATH "VCPKG 工具链文件路径")
 
   # windows默认静态链接
   set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
