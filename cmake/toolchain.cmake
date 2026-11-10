@@ -9,7 +9,7 @@ if (WIN32)
   endif ()
 
   # 设置 vcpkg 工具链文件
-  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "VCPKG 工具链文件路径")
+  set(CMAKE_TOOLCHAIN_FILE "C:/Users/love-yuri/scoop/apps/vcpkg/2026.10.16/scripts/buildsystems/vcpkg.cmake" CACHE STRING "VCPKG 工具链文件路径")
 
   # windows默认静态链接
   set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
