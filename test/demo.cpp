@@ -12,6 +12,8 @@ static void create_left_widget(Splitter* splitter) {
   const auto widget = new Widget(splitter);
   widget->setLayout<VBoxLayout>();
   const auto button = new Button("首页", widget);
+  button->setMaxWidth(200);
+  button->set_horizontal_alignment(HorizontalAlignment::Center);
   button->setMaxHeight(40);
 }
 

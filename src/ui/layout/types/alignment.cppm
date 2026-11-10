@@ -32,6 +32,28 @@ enum class VerticalAlignment : unsigned char {
 };
 
 /**
+ * 计算内容在可用宽度内的水平偏移，不缩放或裁剪内容。
+ * @param alignment 水平对齐方式
+ * @param available_width 已扣除内边距的可用宽度
+ * @param content_width 内容宽度
+ * @return 相对于可用区域左侧的偏移，内容超出区域时可为负值
+ */
+[[nodiscard]] float calc_aligned_offset(HorizontalAlignment alignment,
+                                       float available_width,
+                                       float content_width) noexcept;
+
+/**
+ * 计算内容在可用高度内的垂直偏移，不缩放或裁剪内容。
+ * @param alignment 垂直对齐方式
+ * @param available_height 已扣除内边距的可用高度
+ * @param content_height 内容高度
+ * @return 相对于可用区域顶部的偏移，内容超出区域时可为负值
+ */
+[[nodiscard]] float calc_aligned_offset(VerticalAlignment alignment,
+                                       float available_height,
+                                       float content_height) noexcept;
+
+/**
  * 水平与垂直对齐方式的组合，默认左上对齐。
  */
 struct Alignment {
@@ -111,7 +133,38 @@ constexpr Alignment Alignment::BottomRight = { // 右下对齐
   .vertical = VerticalAlignment::Bottom,
 };
 
-SkPoint Alignment::calc_aligned_position(const SkRect area, const SkRect content) const noexcept {
+} // namespace ui::layout
+
+float ui::layout::calc_aligned_offset(const HorizontalAlignment alignment,
+                                    const float available_width,
+                                    const float content_width) noexcept {
+  switch (alignment) {
+    case HorizontalAlignment::Left:
+      return 0.f;
+    case HorizontalAlignment::Center:
+      return (available_width - content_width) * 0.5f;
+    case HorizontalAlignment::Right:
+      return available_width - content_width;
+  }
+  return 0.f;
+}
+
+float ui::layout::calc_aligned_offset(const VerticalAlignment alignment,
+                                    const float available_height,
+                                    const float content_height) noexcept {
+  switch (alignment) {
+    case VerticalAlignment::Top:
+      return 0.f;
+    case VerticalAlignment::Center:
+      return (available_height - content_height) * 0.5f;
+    case VerticalAlignment::Bottom:
+      return available_height - content_height;
+  }
+  return 0.f;
+}
+
+SkPoint ui::layout::Alignment::calc_aligned_position(const SkRect area,
+                                                   const SkRect content) const noexcept {
   float x = 0.f, y = 0.f;
 
   // 对齐对应边缘或中心，同时抵消内容边界自身的坐标偏移。
@@ -141,5 +194,3 @@ SkPoint Alignment::calc_aligned_position(const SkRect area, const SkRect content
 
   return {.fX = x, .fY = y};
 }
-
-} // namespace ui::layout

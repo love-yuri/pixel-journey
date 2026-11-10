@@ -17,7 +17,7 @@ export namespace ui::layout {
 class VBoxLayout : public Layout<Widget> {
 public:
   /**
-   * 根据可用高度和尺寸约束垂直排列子控件。
+   * 根据可用高度和尺寸约束垂直排列子控件，并应用各子控件的水平对齐方式。
    * @param parent 需要排列子控件的父控件
    */
   void apply(Widget &parent) const override;
@@ -38,7 +38,9 @@ void VBoxLayout::apply(Widget &parent) const {
     const auto &constraints = child->sizeConstraints();
     const auto child_width = constraints.clampW(width);
     const auto height = constraints.clampH(available / remaining);
-    arrange(*child, skia::SkRect::MakeXYWH(0.f, y, child_width, height));
+    // 以扣除内边距后的内容区域计算交叉轴偏移，不影响主轴分配。
+    const auto x = calc_aligned_offset(child->horizontal_alignment(), width, child_width); // 水平偏移
+    arrange(*child, skia::SkRect::MakeXYWH(x, y, child_width, height));
     y += height + (i < children.size() - 1 ? spacing_ : 0.f);
     available -= height;
     remaining -= 1.f;

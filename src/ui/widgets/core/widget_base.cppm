@@ -38,12 +38,14 @@ protected:
   std::unique_ptr<Layout<Widget>> layout_ = nullptr; // 布局
 
   /* 控件几何信息 */
-  float x_ = 0.f;                   // 控件x 坐标
-  float y_ = 0.f;                   // 控件y 坐标
-  float width_ = 0.f;               // 控件宽度
-  float height_ = 0.f;              // 控件高度
-  Insets padding_;                  // 内边距
-  SizeConstraints size_constraints; // 布局约束信息
+  float x_ = 0.f;                                             // 控件x 坐标
+  float y_ = 0.f;                                             // 控件y 坐标
+  float width_ = 0.f;                                         // 控件宽度
+  float height_ = 0.f;                                        // 控件高度
+  Insets padding_;                                            // 内边距
+  SizeConstraints size_constraints;                           // 布局约束信息
+  HorizontalAlignment horizontal = HorizontalAlignment::Left; // 水平对齐
+  VerticalAlignment vertical = VerticalAlignment::Top;        // 垂直对齐
 
   /**
    * 是否展示 - 手动修改
@@ -285,6 +287,28 @@ public:
   [[nodiscard]] const SizeConstraints &sizeConstraints() const noexcept {
     return size_constraints;
   }
+
+  /** 获取控件在 VBox 布局中的水平对齐方式。 */
+  [[nodiscard]] HorizontalAlignment horizontal_alignment() const noexcept {
+    return horizontal;
+  }
+
+  /** 获取控件在 HBox 布局中的垂直对齐方式。 */
+  [[nodiscard]] VerticalAlignment vertical_alignment() const noexcept {
+    return vertical;
+  }
+
+  /**
+   * 设置控件在 VBox 布局中的水平对齐方式，并触发重新布局。
+   * @param alignment 水平对齐方式
+   */
+  void set_horizontal_alignment(HorizontalAlignment alignment) noexcept;
+
+  /**
+   * 设置控件在 HBox 布局中的垂直对齐方式，并触发重新布局。
+   * @param alignment 垂直对齐方式
+   */
+  void set_vertical_alignment(VerticalAlignment alignment) noexcept;
 
   /**
    * 是否显示控件
@@ -623,6 +647,20 @@ void Widget::setPadding(const float padding) noexcept {
 void Widget::setPadding(const Insets &insets) noexcept {
   padding_ = insets;
   markLayoutDirty(LayoutDirty::Self);
+}
+
+void Widget::set_horizontal_alignment(const HorizontalAlignment alignment) noexcept {
+  if (horizontal == alignment) return;
+
+  horizontal = alignment;
+  markLayoutDirty();
+}
+
+void Widget::set_vertical_alignment(const VerticalAlignment alignment) noexcept {
+  if (vertical == alignment) return;
+
+  vertical = alignment;
+  markLayoutDirty();
 }
 
 template <typename LayoutType>
