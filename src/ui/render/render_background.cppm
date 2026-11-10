@@ -27,7 +27,7 @@ public:
    * 绘制背景，使用所属控件提供的本地坐标。
    * @param canvas 目标画布
    */
-  void draw(SkCanvas *canvas) const override;
+  void draw(SkCanvas *canvas) override;
 
   /**
    * 更新背景的绘制区域。
@@ -48,7 +48,7 @@ public:
   void set_opacity(float opacity) noexcept;
 };
 
-void RenderBackground::draw(SkCanvas *canvas) const {
+void RenderBackground::draw(SkCanvas *canvas) {
   if (!visible) {
     return;
   }
