@@ -21,8 +21,7 @@ export namespace ui::animation {
 
 /**
  * 动画管理
- * 使用方法: 1: animation_manager->start(0.f, 30.f, 100, this, &memberThunk<Box, float,
- * &Box::setPadding>);
+ * 使用方法：animation_manager->start(0.f, 30.f, 100.f, &value);
  */
 class AnimationManager {
 public:
@@ -144,5 +143,5 @@ bool AnimationManager::update() {
 
 } // namespace ui::animation
 
-auto animation_manager_ = std::make_shared<AnimationManager>();
-export AnimationManager *animation_manager = animation_manager_.get();
+auto animation_manager_instance = std::make_shared<AnimationManager>(); // 动画管理器实例
+export AnimationManager *animation_manager = animation_manager_instance.get(); // 全局动画管理器

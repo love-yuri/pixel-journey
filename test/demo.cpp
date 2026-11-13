@@ -10,24 +10,25 @@ using namespace ui::layout;
 
 static void create_left_widget(Splitter* splitter) {
   const auto widget = new Widget(splitter);
-  widget->setLayout<VBoxLayout>();
+  widget->set_layout<VBoxLayout>();
   const auto button = new Button("首页", widget);
-  button->setMaxWidth(200);
+  button->set_max_width(200);
   button->set_horizontal_alignment(HorizontalAlignment::Center);
-  button->setMaxHeight(40);
+  button->set_max_height(40);
+  button->set_margin(10);
 }
 
 static void create_right_widget(Splitter* splitter) {
   const auto widget = new Widget(splitter);
-  widget->setLayout<VBoxLayout>();
+  widget->set_layout<VBoxLayout>();
 }
 
 int main() {
   Window window(1080, 720, "yuri");
-  window.setLayout<HBoxLayout>();
+  window.set_layout<HBoxLayout>();
 
   const auto splitter = new Splitter(&window);
-  splitter->setMinLeftWidth(300);
+  splitter->set_min_left_width(300);
 
   // 创建左侧界面
   create_left_widget(splitter);

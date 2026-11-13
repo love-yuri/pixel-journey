@@ -5,6 +5,7 @@
 export module yuri.ui.layout.core:base;
 
 import yuri.skia.api;
+import std;
 
 export namespace ui::layout {
 
@@ -18,9 +19,9 @@ protected:
   float spacing_ = 0.f; // 子控件间距
 
   /**
-   * 提交布局结果，由控件更新几何信息和脏标记。
+   * 从布局槽中扣除子控件外边距，再提交控件几何信息和脏标记。
    * @param child 接收布局结果的子控件
-   * @param rect 相对于父控件内容区域的几何信息
+   * @param rect 相对于父控件内容区域的布局槽，包含子控件外边距
    */
   static void arrange(T &child, const skia::SkRect &rect) noexcept;
 
@@ -48,7 +49,14 @@ public:
 
 template <typename T>
 void Layout<T>::arrange(T &child, const skia::SkRect &rect) noexcept {
-  child.apply_layout_geometry(rect);
+  const auto margin = child.margin();
+  // 外边距只影响布局槽，绘制和事件始终使用扣除外边距后的控件边界。
+  child.apply_layout_geometry(skia::SkRect::MakeXYWH(
+    rect.x() + margin.left,
+    rect.y() + margin.top,
+    std::max(0.f, rect.width() - margin.left - margin.right),
+    std::max(0.f, rect.height() - margin.top - margin.bottom)
+  ));
 }
 
 template <typename T>

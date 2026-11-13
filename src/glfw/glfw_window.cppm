@@ -103,7 +103,7 @@ void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
   self->cursor_x = static_cast<float>(x);
   self->cursor_y = static_cast<float>(y);
   if (self->visible_) {
-    self->MouseMove(self->cursor_x, self->cursor_y);
+    self->mouse_move(self->cursor_x, self->cursor_y);
   }
 }
 
@@ -113,7 +113,7 @@ void onMouseMoveStatic(GLFWwindow *window, const double x, const double y) {
 void onMouseEnterStatic(GLFWwindow *window, const int is_entered) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
   if (self->visible_ && !is_entered) {
-    self->onMouseLeave(self->cursor_x, self->cursor_y);
+    self->on_mouse_leave(self->cursor_x, self->cursor_y);
   }
 }
 
@@ -128,15 +128,15 @@ void onMouseButtonStatic(GLFWwindow *window, const int button, const int action,
 
   if (button == left_mouse_button) {
     if (action == button_pressed) {
-      self->MouseLeftPressed(self->cursor_x, self->cursor_y);
+      self->mouse_left_pressed(self->cursor_x, self->cursor_y);
     } else if (action == button_released) {
-      self->MouseLeftReleased(self->cursor_x, self->cursor_y);
+      self->mouse_left_released(self->cursor_x, self->cursor_y);
     }
   } else if (button == right_mouse_button) {
     if (action == button_pressed) {
-      self->MouseRightPressed(self->cursor_x, self->cursor_y);
+      self->mouse_right_pressed(self->cursor_x, self->cursor_y);
     } else if (action == button_released) {
-      self->MouseRightReleased(self->cursor_x, self->cursor_y);
+      self->mouse_right_released(self->cursor_x, self->cursor_y);
     }
   }
 }
@@ -147,7 +147,7 @@ void onMouseButtonStatic(GLFWwindow *window, const int button, const int action,
 void onScrollStatic(GLFWwindow *window, const double xoffset, const double yoffset) {
   const auto self = static_cast<Window *>(glfwGetWindowUserPointer(window));
   if (self->visible_) {
-    self->MouseWheel(self->cursor_x, self->cursor_y, static_cast<float>(xoffset), static_cast<float>(yoffset));
+    self->mouse_wheel(self->cursor_x, self->cursor_y, static_cast<float>(xoffset), static_cast<float>(yoffset));
   }
 }
 
@@ -163,7 +163,7 @@ Window::Window(const int width, const int height, const std::string_view title) 
   context_(window_) {
 
   // 更新几何信息
-  setGeometry(0, 0, width, height); // NOLINT(*-narrowing-conversions)
+  set_geometry(0, 0, width, height); // NOLINT(*-narrowing-conversions)
 
   // 窗口居中
   auto [w, h] = getPrimaryMonitorSize();
@@ -222,7 +222,7 @@ void Window::run() {
     const bool update_animation_success = animation_manager->update();
 
     // 更新布局
-    updateLayout();
+    update_layout();
 
     // 清空背景
     frame->sk_surface->getCanvas()->clear(background_color);

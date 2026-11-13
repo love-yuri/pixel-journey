@@ -39,7 +39,7 @@ struct Insets {
   /**
    * 设置所有值
    */
-  void setAll(const float all) noexcept {
+  void set_all(const float all) noexcept {
     left = all;
     right = all;
     top = all;
@@ -47,30 +47,30 @@ struct Insets {
   }
 
   /**
-   * 仅padding left
+   * 仅设置左侧边距
    */
-  constexpr static Insets fromLeft(const float l) noexcept {
+  constexpr static Insets from_left(const float l) noexcept {
     return {l, 0, 0, 0};
   }
 
   /**
-   * 仅 padding top
+   * 仅设置顶部边距
    */
-  constexpr static Insets fromTop(const float t) noexcept {
+  constexpr static Insets from_top(const float t) noexcept {
     return {0, t, 0, 0};
   }
 
   /**
-   * 仅 padding right
+   * 仅设置右侧边距
    */
-  constexpr static Insets fromRight(const float r) noexcept {
+  constexpr static Insets from_right(const float r) noexcept {
     return {0, 0, r, 0};
   }
 
   /**
-   * 仅 padding bottom
+   * 仅设置底部边距
    */
-  constexpr static Insets fromBottom(const float b) noexcept {
+  constexpr static Insets from_bottom(const float b) noexcept {
     return {0, 0, 0, b};
   }
 };

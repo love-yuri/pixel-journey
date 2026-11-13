@@ -41,7 +41,7 @@ public:
   [[nodiscard]] const std::string &name() const noexcept;
 
 private:
-  std::string name_{}; // 菜单项名称
+  std::string name_; // 菜单项名称
 };
 
 /** 通用弹出式上下文菜单 */
@@ -54,10 +54,10 @@ public:
   ~ContextMenu() override;
 
   /** 更新菜单项 */
-  void setItems(std::vector<ContextMenuItem> items);
+  void set_items(std::vector<ContextMenuItem> items);
 
   /** 在鼠标当前位置弹出菜单 */
-  void popupAtCursor();
+  void popup_at_cursor();
 
   /** 在窗口指定位置弹出菜单 */
   void popup(float x, float y);
@@ -66,36 +66,36 @@ public:
   void hide();
 
   /** 隐藏当前处于活动状态的上下文菜单 */
-  static void hideActive();
+  static void hide_active();
 
   /** 绘制上下文菜单 */
   void paint(SkCanvas *canvas) override;
 
   /** 菜单项点击事件 */
-  Signal<std::size_t> itemClicked{};
+  Signal<std::size_t> item_clicked{};
 
 protected:
   /** 更新菜单项悬浮状态 */
-  void onMouseMove(float x, float y) override;
+  void on_mouse_move(float x, float y) override;
 
   /** 清除菜单项悬浮状态 */
-  void onMouseLeave(float x, float y) override;
+  void on_mouse_leave(float x, float y) override;
 
   /** 处理菜单项点击 */
-  void onMouseLeftReleased(float x, float y) override;
+  void on_mouse_left_released(float x, float y) override;
 
 private:
   /** 根据坐标获取菜单项索引 */
-  [[nodiscard]] int itemIndexAt(float x, float y) const noexcept;
+  [[nodiscard]] int item_index_at(float x, float y) const noexcept;
 
   /** 获取菜单当前高度 */
-  [[nodiscard]] float menuHeight() const noexcept;
+  [[nodiscard]] float menu_height() const noexcept;
 
-  inline static ContextMenu *active_menu = nullptr; // 当前活动菜单
-  std::vector<ContextMenuItem> items_{};            // 菜单项
-  std::vector<RenderText> item_texts{};             // 菜单项渲染节点
-  float menu_width = kDefaultMenuWidth;             // 菜单宽度
-  int hovered_item = -1;                            // 当前悬浮菜单项
+  inline static ContextMenu *active_menu_ = nullptr; // 当前活动菜单
+  std::vector<ContextMenuItem> items_;               // 菜单项
+  std::vector<RenderText> item_texts_{};             // 菜单项渲染节点
+  float menu_width_ = kDefaultMenuWidth;             // 菜单宽度
+  int hovered_item_ = -1;                            // 当前悬浮菜单项
 };
 
 ContextMenuItem::ContextMenuItem(std::string name) : name_(std::move(name)) {
@@ -106,50 +106,49 @@ const std::string &ContextMenuItem::name() const noexcept {
 }
 
 ContextMenu::ContextMenu(std::vector<ContextMenuItem> items, Widget *anchor) :
-  Widget(anchor == nullptr ? nullptr : anchor->rootWidget()) {
-  setPadding(kOuterPadding);
-  setItems(std::move(items));
-  setVisible(false);
+  Widget(anchor == nullptr ? nullptr : anchor->root_widget()) {
+  set_items(std::move(items));
+  set_visible(false);
 }
 
 ContextMenu::~ContextMenu() {
-  if (active_menu == this) {
-    active_menu = nullptr;
+  if (active_menu_ == this) {
+    active_menu_ = nullptr;
   }
 }
 
-void ContextMenu::setItems(std::vector<ContextMenuItem> items) {
+void ContextMenu::set_items(std::vector<ContextMenuItem> items) {
   items_ = std::move(items);
-  item_texts.clear();
-  item_texts.reserve(items_.size());
+  item_texts_.clear();
+  item_texts_.reserve(items_.size());
 
   for (std::size_t index = 0; index < items_.size(); ++index) {
-    auto &text = item_texts.emplace_back(items_[index].name());
+    auto &text = item_texts_.emplace_back(items_[index].name());
     text.set_font_size(13.5f);
     text.set_color(kMenuTextColor);
     text.set_alignment(Alignment::CenterLeft);
     text.update(
       SkRect::MakeXYWH(
-        padding_.left + 18.0f,
-        padding_.top + kMenuPadding + static_cast<float>(index) * kMenuItemHeight,
-        menu_width - 36.0f,
+        kOuterPadding + 18.0f,
+        kOuterPadding + kMenuPadding + static_cast<float>(index) * kMenuItemHeight,
+        menu_width_ - 36.0f,
         kMenuItemHeight
       )
     );
   }
 
-  setGeometry(
+  set_geometry(
     x(),
     y(),
-    menu_width + padding_.left + padding_.right,
-    menuHeight() + padding_.top + padding_.bottom
+    menu_width_ + kOuterPadding * 2.0f,
+    menu_height() + kOuterPadding * 2.0f
   );
   if (items_.empty()) {
     hide();
   }
 }
 
-void ContextMenu::popupAtCursor() {
+void ContextMenu::popup_at_cursor() {
   const auto cursor_position = window()->cursorPosition();
   popup(cursor_position.x(), cursor_position.y());
 }
@@ -159,41 +158,41 @@ void ContextMenu::popup(const float x, const float y) {
     return;
   }
 
-  if (active_menu != nullptr && active_menu != this) {
-    active_menu->hide();
+  if (active_menu_ != nullptr && active_menu_ != this) {
+    active_menu_->hide();
   }
 
-  const float menu_x = std::clamp(x, 0.0f, std::max(0.0f, parent_->width() - menu_width));
+  const float menu_x = std::clamp(x, 0.0f, std::max(0.0f, parent_->width() - menu_width_));
   float menu_y = y;
-  if (menu_y + menuHeight() > parent_->height()) {
-    menu_y = y - menuHeight() + 1.0f;
+  if (menu_y + menu_height() > parent_->height()) {
+    menu_y = y - menu_height() + 1.0f;
   }
-  menu_y = std::clamp(menu_y, 0.0f, std::max(0.0f, parent_->height() - menuHeight()));
+  menu_y = std::clamp(menu_y, 0.0f, std::max(0.0f, parent_->height() - menu_height()));
 
-  move(menu_x - padding_.left, menu_y - padding_.top);
-  setVisible(true);
+  move(menu_x - kOuterPadding, menu_y - kOuterPadding);
+  set_visible(true);
   hovered_ = true;
-  active_menu = this;
+  active_menu_ = this;
 }
 
 void ContextMenu::hide() {
-  setVisible(false);
+  set_visible(false);
   hovered_ = false;
-  hovered_item = -1;
+  hovered_item_ = -1;
   window()->setCursor(CursorType::Arrow);
-  if (active_menu == this) {
-    active_menu = nullptr;
+  if (active_menu_ == this) {
+    active_menu_ = nullptr;
   }
 }
 
-void ContextMenu::hideActive() {
-  if (active_menu != nullptr) {
-    active_menu->hide();
+void ContextMenu::hide_active() {
+  if (active_menu_ != nullptr) {
+    active_menu_->hide();
   }
 }
 
 void ContextMenu::paint(SkCanvas *canvas) {
-  const auto menu_rect = SkRect::MakeXYWH(padding_.left, padding_.top, menu_width, menuHeight());
+  const auto menu_rect = SkRect::MakeXYWH(kOuterPadding, kOuterPadding, menu_width_, menu_height());
 
   // 柔和阴影用于将菜单从下层内容中分离
   SkPaint shadow_layer;
@@ -212,16 +211,16 @@ void ContextMenu::paint(SkCanvas *canvas) {
   canvas->drawRoundRect(menu_rect, kMenuRadius, kMenuRadius, background);
 
   // ReSharper disable once CppDFAConstantConditions
-  if (hovered_item >= 0) {
+  if (hovered_item_ >= 0) {
     // ReSharper disable once CppDFAUnreachableCode
     SkPaint hover;
     hover.setAntiAlias(true);
     hover.setColor(kMenuHoverColor);
     const float hover_y =
-      padding_.top + kMenuPadding + static_cast<float>(hovered_item) * kMenuItemHeight;
+      kOuterPadding + kMenuPadding + static_cast<float>(hovered_item_) * kMenuItemHeight;
     canvas->drawRoundRect(
       SkRect::MakeXYWH(
-        padding_.left + kMenuPadding, hover_y, menu_width - kMenuPadding * 2.0f, kMenuItemHeight
+        kOuterPadding + kMenuPadding, hover_y, menu_width_ - kMenuPadding * 2.0f, kMenuItemHeight
       ),
       8.0f,
       8.0f,
@@ -236,34 +235,34 @@ void ContextMenu::paint(SkCanvas *canvas) {
   border.setColor(kMenuBorderColor);
   canvas->drawRoundRect(menu_rect.makeInset(0.5f, 0.5f), kMenuRadius, kMenuRadius, border);
 
-  for (auto &text : item_texts) {
+  for (auto &text : item_texts_) {
     text.draw(canvas);
   }
 }
 
-void ContextMenu::onMouseMove(const float x, const float y) {
-  hovered_item = itemIndexAt(x, y);
-  window()->setCursor(hovered_item >= 0 ? CursorType::Hand : CursorType::Arrow);
+void ContextMenu::on_mouse_move(const float x, const float y) {
+  hovered_item_ = item_index_at(x, y);
+  window()->setCursor(hovered_item_ >= 0 ? CursorType::Hand : CursorType::Arrow);
 }
 
-void ContextMenu::onMouseLeave(float, float) {
+void ContextMenu::on_mouse_leave(float x, float y) {
   hide();
 }
 
-void ContextMenu::onMouseLeftReleased(const float x, const float y) {
-  const int clicked_item = itemIndexAt(x, y);
+void ContextMenu::on_mouse_left_released(const float x, const float y) {
+  const int clicked_item = item_index_at(x, y);
   hide();
   if (clicked_item >= 0) {
-    itemClicked.emit(static_cast<std::size_t>(clicked_item));
+    item_clicked.emit(static_cast<std::size_t>(clicked_item));
   }
 }
 
-int ContextMenu::itemIndexAt(const float x, const float y) const noexcept {
-  const float content_x = x - padding_.left;
-  const float content_y = y - padding_.top;
+int ContextMenu::item_index_at(const float x, const float y) const noexcept {
+  const float content_x = x - kOuterPadding;
+  const float content_y = y - kOuterPadding;
   if (
-    content_x < kMenuPadding || content_x >= menu_width - kMenuPadding || content_y < kMenuPadding
-    || content_y >= menuHeight() - kMenuPadding
+    content_x < kMenuPadding || content_x >= menu_width_ - kMenuPadding || content_y < kMenuPadding
+    || content_y >= menu_height() - kMenuPadding
   ) {
     return -1;
   }
@@ -272,7 +271,7 @@ int ContextMenu::itemIndexAt(const float x, const float y) const noexcept {
   return index < items_.size() ? static_cast<int>(index) : -1;
 }
 
-float ContextMenu::menuHeight() const noexcept {
+float ContextMenu::menu_height() const noexcept {
   return kMenuPadding * 2.0f + static_cast<float>(items_.size()) * kMenuItemHeight;
 }
 

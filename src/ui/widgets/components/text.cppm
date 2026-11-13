@@ -12,54 +12,54 @@ using namespace ui::render;
 export namespace ui::widgets {
 
 class Text: public Widget {
-  RenderText renderText; // 字体节点
+  RenderText render_text_; // 字体节点
 public:
-  explicit Text(const std::string_view text, Widget* parent): Widget(parent), renderText(text) {
+  explicit Text(const std::string_view text, Widget* parent): Widget(parent), render_text_(text) {
 
   }
 
   void paint(SkCanvas *canvas) override {
-    renderText.draw(canvas);
+    render_text_.draw(canvas);
   }
 
-  void layoutChildren() override {
-    renderText.update(contentRect());
+  void layout_children() override {
+    render_text_.update(local_bounds());
   }
 
   /**
    * 设置对齐方式
    */
-  inline void setAlignment(const Alignment alignment) {
-    renderText.set_alignment(alignment);
+  inline void set_alignment(const Alignment alignment) {
+    render_text_.set_alignment(alignment);
   }
 
   /**
    * 设置字体大小
    * @param size 字体大小
    */
-  inline void setFontSize(const float size) {
-    renderText.set_font_size(size);
+  inline void set_font_size(const float size) {
+    render_text_.set_font_size(size);
   }
 
   /**
    * 设置字体颜色
    */
-  inline void setColor(const SkColor color) {
-    renderText.set_color(color);
+  inline void set_color(const SkColor color) {
+    render_text_.set_color(color);
   }
 
   /**
    * 设置文本
    */
-  inline void setText(const std::string_view text) {
-    renderText.set_text(text);
+  inline void set_text(const std::string_view text) {
+    render_text_.set_text(text);
   }
 
   /**
    * 设置文本和对齐方式
    */
-  inline void setTextAndAlignment(const std::string_view text, const Alignment alignment) {
-    renderText.set_text_and_alignment(text, alignment);
+  inline void set_text_and_alignment(const std::string_view text, const Alignment alignment) {
+    render_text_.set_text_and_alignment(text, alignment);
   }
 
 };
