@@ -13,11 +13,15 @@ static void create_left_widget(Splitter* splitter) {
   const auto layout = new VBoxLayout();
 
   widget->set_layout(layout);
-  const auto button = new Button("首页", widget);
-  button->set_max_width(200);
+  layout->set_spacing(10);
+
+  auto button = new Button("首页", widget);
+  button->set_max_size(200, 40);
   button->set_horizontal_alignment(HorizontalAlignment::Center);
-  button->set_max_height(40);
-  button->set_margin(10);
+
+  button = new Button("首页", widget);
+  button->set_max_size(200, 40);
+  button->set_horizontal_alignment(HorizontalAlignment::Center);
 }
 
 static void create_right_widget(Splitter* splitter) {
