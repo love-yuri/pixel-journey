@@ -1,6 +1,7 @@
 Checks:
   - '-*'                                     # 先禁用所有检查作为基线
   - 'readability-*'                          # 启用所有 readability 类检查
+  - '-readability-make-member-function-const' # 禁用：不提示将成员函数改为 const
   - '-readability-non-const-parameter'       # 禁用：误报，Skia 接口 const 修饰不完善
   - '-readability-uppercase-literal-suffix'  # 禁用：不强制浮点字面量后缀大写 F
   - '-readability-identifier-length'         # 禁用：不检查变量名长度（如 x、y）

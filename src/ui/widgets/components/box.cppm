@@ -37,7 +37,7 @@ public:
    * 获取box的背景节点
    * @return 背景节点
    */
-  inline RenderBackground& background() {
+  RenderBackground& background() {
     return render_bg;
   }
 
@@ -45,7 +45,7 @@ public:
    * 返回border对象
    * @return border
    */
-  inline RenderBorder& border() noexcept {
+  RenderBorder& border() noexcept {
     return render_border;
   }
 };
