@@ -36,6 +36,13 @@ public:
   void update(SkRect rect) override;
 
   /**
+   * 获取背景色
+   */
+  [[nodiscard]] SkColor color() const noexcept {
+    return paint_.getColor();
+  }
+
+  /**
    * 设置背景颜色。
    * @param color 背景颜色
    */

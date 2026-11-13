@@ -8,6 +8,7 @@ export import :button;
 export import :base;
 export import :window_base;
 export import :box;
+export import :border;
 export import :text;
 export import :splitter;
 export import :scroll_area;

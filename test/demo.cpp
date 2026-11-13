@@ -9,9 +9,11 @@ using namespace glfw;
 using namespace ui::layout;
 
 static void create_left_widget(Splitter* splitter) {
-  const auto widget = new Widget(splitter);
+  const auto border = new Border(splitter);
+  const auto widget = new Widget(border);
   const auto layout = new VBoxLayout();
 
+  border->set_padding(10);
   widget->set_layout(layout);
   layout->set_spacing(10);
 
