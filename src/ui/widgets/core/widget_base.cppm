@@ -35,7 +35,7 @@ protected:
   Widget *parent_ = nullptr;                         // 父控件
   std::vector<Widget *> children_;                   // 子控件列表
   LayoutDirty layout_dirty_{};                       // 脏布局类型
-  std::unique_ptr<Layout<Widget>> layout_ = nullptr; // 布局
+  Layout<Widget>* layout_ = nullptr;                 // 布局
 
   /* 控件几何信息 */
   float x_ = 0.f;                                              // 控件x 坐标
@@ -63,11 +63,6 @@ protected:
    * 开启后move事件将不再检查是否在控件内
    */
   std::uint8_t is_dragging_ : 1 = 0;
-
-  /**
-   * 判断控件是否存在layout - 手动修改
-   */
-  std::uint8_t has_layout_ : 1 = 0;
 
   /**
    * 鼠标移动事件分发
@@ -307,8 +302,13 @@ public:
    * 获取布局指针-不拥有所有权
    * @return 布局指针
    */
-  [[nodiscard]] Layout<Widget> *layout() const {
-    return layout_.get();
+  template <typename LayoutType>
+  requires std::derived_from<LayoutType, Layout<Widget>>
+  [[nodiscard]] LayoutType *layout() const {
+    if (layout_ == nullptr) {
+      return nullptr;
+    }
+    return static_cast<LayoutType*>(layout_);
   }
 
   /**
@@ -359,7 +359,7 @@ public:
    */
   template <typename LayoutType>
   requires std::derived_from<LayoutType, Layout<Widget>>
-  void set_layout();
+  void set_layout(LayoutType* layout) noexcept;
 
   /**
    * 设置最大尺寸
@@ -558,6 +558,10 @@ Widget::~Widget() {
       v.erase(it);
     }
   }
+  if (layout_) {
+    delete layout_;
+    layout_ = nullptr;
+  }
 }
 
 Widget::Widget(Widget *parent) : parent_(parent) {
@@ -594,7 +598,7 @@ bool Widget::contains(const float x, const float y) const {
 }
 
 void Widget::set_geometry(const SkRect &rect) noexcept {
-  if (parent_ && parent_->has_layout_) {
+  if (parent_ && parent_->layout_ != nullptr) {
     return;
   }
 
@@ -649,15 +653,17 @@ void Widget::set_vertical_alignment(const VerticalAlignment alignment) noexcept 
 
 template <typename LayoutType>
 requires std::derived_from<LayoutType, Layout<Widget>>
-void Widget::set_layout() {
-  layout_ = std::make_unique<LayoutType>();
-  has_layout_ = true;
+void Widget::set_layout(LayoutType* layout) noexcept {
+  if (layout == nullptr) {
+    return;
+  }
+
+  layout_ = layout;
   mark_layout_dirty();
 }
 
 void Widget::remove_layout() {
   layout_ = nullptr;
-  has_layout_ = false;
   mark_layout_dirty();
 }
 
@@ -698,7 +704,7 @@ void Widget::resize(const float width, const float height) noexcept {
 }
 
 void Widget::move(const float x, const float y) noexcept {
-  if (parent_ && parent_->has_layout_ || x == x_ && y == y_) {
+  if (parent_ && parent_->layout_ || x == x_ && y == y_) {
     return;
   }
 
@@ -711,7 +717,7 @@ void Widget::move(const SkPoint &point) noexcept {
 }
 
 void Widget::set_x(const float x) noexcept {
-  if (parent_ && parent_->has_layout_ || x == x_) {
+  if (parent_ && parent_->layout_ || x == x_) {
     return;
   }
 
@@ -719,7 +725,7 @@ void Widget::set_x(const float x) noexcept {
 }
 
 void Widget::set_y(const float y) noexcept {
-  if (parent_ && parent_->has_layout_ || y == y_) {
+  if (parent_ && parent_->layout_ || y == y_) {
     return;
   }
 

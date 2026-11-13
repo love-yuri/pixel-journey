@@ -33,7 +33,7 @@ class Splitter : public Widget {
 public:
   explicit Splitter(Widget *parent) :
     Widget(parent), paint_(SkPaintBuilder().setColor(skia_colors::gray).build()) {
-    set_layout<SplitterLayout>();
+    set_layout(new SplitterLayout());
   }
 
   // 设置分割位置
