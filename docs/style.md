@@ -12,14 +12,21 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 
 ### 命名规范
 
-1. **函数**: 统一使用小写下划线命名（`snake_case`），如 `set_font`、`add_task`、`get_player_bar`
+1. **函数**: 统一使用小写下划线命名（`snake_case`），如 `set_font`、`add_task`、`size_constraints`
    - 成员函数、全局函数、辅助函数均遵循此规则
+   - 简单属性读取直接使用属性名，不加 `get_` 前缀，如 `height()`、`size_constraints()`；对应 setter 使用 `set_` 前缀
    - 构造函数、析构函数和运算符遵循 C++ 语法；第三方接口调用与重写保留其要求的名称
 2. **类型**: 大驼峰 (`ThreadPool`, `PlayerBar`, `SongInfo`)
 3. **变量**: 下划线命名 (`player_bar`, `cover_image`)
-   - 类私有变量且仅有一个单词时添加 `_` 后缀 (`name_`, `bg_`, `alpha_`)
-   - 两个及以上单词不加后缀 (`player_bar`, `cover_bg`, `text_alpha`)
+   - 类的 private 和 protected 成员变量统一添加 `_` 后缀，不区分单词数量，如 `name_`、`size_constraints_`、`render_text_`；静态成员变量同样遵循此规则
+   - public 数据成员、参数、局部变量和普通全局变量不加 `_` 后缀，如 `item_clicked`、`player_bar`、`cover_image`
+   - 常量按下面的常量规则命名，不因访问权限添加 `_` 后缀
 4. **常量**: `constexpr` 优先于 `const`，命名用 `k` 前缀大驼峰 (`kBarHeight`, `kCoverSize`)
+
+### 渐进统一命名
+
+- 在功能开发或修复时，顺带统一本次已经修改文件的命名，并同步必要的调用处与重写声明。
+- 不为统一命名批量修改无关文件；命名调整随对应功能一起提交，避免全仓库重命名。
 
 ### 注释规范
 
